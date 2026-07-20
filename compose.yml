@@ -1,0 +1,23 @@
+name: buildlog
+
+services:
+  postgres:
+    image: postgres:17.5
+    container_name: buildlog-postgres
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-UTC}
+      POSTGRES_DB: ${POSTGRES_DB:-buildlog}
+      POSTGRES_USER: ${POSTGRES_USER:-buildlog}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "${POSTGRES_PORT:-11162}:5432"
+    volumes:
+      - ./.local/postgres17:/var/lib/postgresql/data
+    command: ["postgres", "-c", "timezone=${TZ:-UTC}", "-c", "client_encoding=UTF8"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-buildlog} -d ${POSTGRES_DB:-buildlog}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
