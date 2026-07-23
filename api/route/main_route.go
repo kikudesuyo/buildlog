@@ -17,8 +17,30 @@ func NewRouter(db *gorm.DB) http.Handler {
 	r.Use(corsMiddleware)
 
 	r.Route("/api/v1", func(r chi.Router) {
-		r.Get("/posts", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetPostList(db))
+		r.Get("/diaries", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetDiaryList(db))
+		})
+		r.Post("/diaries", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleCreateDiary(db))
+		})
+		r.Put("/diaries/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateDiary(db))
+		})
+		r.Delete("/diaries/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteDiary(db))
+		})
+
+		r.Get("/techs", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetTechList(db))
+		})
+		r.Post("/techs", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleCreateTech(db))
+		})
+		r.Put("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateTech(db))
+		})
+		r.Delete("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteTech(db))
 		})
 	})
 
@@ -28,7 +50,7 @@ func NewRouter(db *gorm.DB) http.Handler {
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)

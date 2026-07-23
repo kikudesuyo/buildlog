@@ -3,7 +3,6 @@ import type { LoadEvent } from '@sveltejs/kit';
 import type {
 	DiaryEntry,
 	FeaturedTechArticle,
-	ProfileData,
 	TechArticle
 } from '$lib/api/types';
 
@@ -17,30 +16,8 @@ type ApiObjectResponse<T> = {
 	data: T;
 };
 
-type ApiDiaryEntry = Omit<DiaryEntry, 'imageAlt' | 'categoryColorClass'> & {
-	image_alt?: string;
-	category_color_class?: string;
-};
 
-type ApiTechFeed = {
-	featured_article: ApiFeaturedTechArticle;
-	articles: ApiTechArticle[];
-};
 
-type ApiTechArticle = Omit<TechArticle, 'readTime' | 'isNewsletter'> & {
-	read_time: string;
-	is_newsletter?: boolean;
-};
-
-type ApiFeaturedTechArticle = Omit<FeaturedTechArticle, 'readTime'> & {
-	read_time: string;
-};
-
-type ApiProfileData = Omit<ProfileData, 'avatarUrl' | 'contactEmail' | 'finalQuote'> & {
-	avatar_url: string;
-	contact_email: string;
-	final_quote: string;
-};
 
 const apiBaseUrl = env.PUBLIC_API_BASE_URL || 'http://localhost:8081/api/v1';
 
@@ -52,12 +29,28 @@ async function get<T>(fetchFn: ApiFetch, path: string): Promise<T> {
 	return response.json() as Promise<T>;
 }
 
+export type ApiPost = {
+	id: number;
+	type: string;
+	title: string;
+	content: string;
+	excerpt: string;
+	category: string;
+	read_time: string;
+	views: string;
+	is_newsletter: boolean;
+	created_at: string;
+	updated_at: string;
+};
+
 export async function fetchDiaryEntries(fetchFn: ApiFetch): Promise<DiaryEntry[]> {
-	const response = await get<ApiListResponse<ApiDiaryEntry>>(fetchFn, '/diary');
-	return response.data_list.map(({ image_alt, category_color_class, ...entry }) => ({
-		...entry,
-		imageAlt: image_alt,
-		categoryColorClass: category_color_class
+	const response = await get<ApiListResponse<ApiPost>>(fetchFn, '/diaries');
+	return response.data_list.map((post) => ({
+		id: post.id,
+		title: post.title,
+		content: post.content,
+		createdAt: post.created_at,
+		updatedAt: post.updated_at
 	}));
 }
 
@@ -65,39 +58,158 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 	featuredArticle: FeaturedTechArticle;
 	techArticles: TechArticle[];
 }> {
-	const response = await get<ApiObjectResponse<ApiTechFeed>>(fetchFn, '/tech');
+	const response = await get<ApiListResponse<ApiPost>>(fetchFn, '/techs');
+	
+	const allArticles: TechArticle[] = response.data_list.map((post) => ({
+		id: post.id,
+		title: post.title,
+		excerpt: post.excerpt,
+		category: post.category,
+		readTime: post.read_time,
+		views: post.views,
+		isNewsletter: post.is_newsletter,
+		createdAt: post.created_at,
+		updatedAt: post.updated_at
+	}));
+
+	const featured = allArticles.length > 0 ? allArticles[0] : {
+		title: '',
+		excerpt: '',
+		category: '',
+		readTime: '',
+		createdAt: '',
+		updatedAt: ''
+	};
+	const remaining = allArticles.length > 1 ? allArticles.slice(1) : [];
+
 	return {
-		featuredArticle: toFeaturedTechArticle(response.data.featured_article),
-		techArticles: response.data.articles.map(toTechArticle)
+		featuredArticle: featured,
+		techArticles: remaining
 	};
 }
 
-export async function fetchProfileData(fetchFn: ApiFetch): Promise<ProfileData> {
-	const response = await get<ApiObjectResponse<ApiProfileData>>(fetchFn, '/profile');
-	const { avatar_url, contact_email, final_quote, ...profile } = response.data;
+async function sendRequest<T>(method: string, path: string, body?: any): Promise<T> {
+	const response = await fetch(`${apiBaseUrl}${path}`, {
+		method,
+		headers: body ? { 'Content-Type': 'application/json' } : undefined,
+		body: body ? JSON.stringify(body) : undefined
+	});
+	if (!response.ok) {
+		throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+	}
+	return response.json() as Promise<T>;
+}
+
+export async function createDiary(title: string, content: string): Promise<DiaryEntry> {
+	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/diaries', { title, content });
 	return {
-		...profile,
-		avatarUrl: avatar_url,
-		contactEmail: contact_email,
-		finalQuote: final_quote
+		id: response.data.id,
+		title: response.data.title,
+		content: response.data.content,
+		createdAt: response.data.created_at,
+		updatedAt: response.data.updated_at
 	};
 }
 
-function toTechArticle({
-	read_time,
-	is_newsletter,
-	...article
-}: ApiTechArticle): TechArticle {
+export async function updateDiary(id: number, title: string, content: string): Promise<DiaryEntry> {
+	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/diaries/${id}`, { title, content });
 	return {
-		...article,
-		readTime: read_time,
-		isNewsletter: is_newsletter
+		id: response.data.id,
+		title: response.data.title,
+		content: response.data.content,
+		createdAt: response.data.created_at,
+		updatedAt: response.data.updated_at
 	};
 }
 
-function toFeaturedTechArticle({ read_time, ...article }: ApiFeaturedTechArticle): FeaturedTechArticle {
+export async function deleteDiary(id: number): Promise<void> {
+	await sendRequest<void>('DELETE', `/diaries/${id}`);
+}
+
+export async function createTech(req: {
+	title: string;
+	excerpt: string;
+	category: string;
+	readTime: string;
+	views?: string;
+	isNewsletter?: boolean;
+}): Promise<TechArticle> {
+	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/techs', {
+		title: req.title,
+		excerpt: req.excerpt,
+		category: req.category,
+		read_time: req.readTime,
+		views: req.views || '',
+		is_newsletter: req.isNewsletter || false
+	});
 	return {
-		...article,
-		readTime: read_time
+		id: response.data.id,
+		title: response.data.title,
+		excerpt: response.data.excerpt,
+		category: response.data.category,
+		readTime: response.data.read_time,
+		views: response.data.views,
+		isNewsletter: response.data.is_newsletter,
+		createdAt: response.data.created_at,
+		updatedAt: response.data.updated_at
+	};
+}
+
+export async function updateTech(id: number, req: {
+	title: string;
+	excerpt: string;
+	category: string;
+	readTime: string;
+	views?: string;
+	isNewsletter?: boolean;
+}): Promise<TechArticle> {
+	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/techs/${id}`, {
+		title: req.title,
+		excerpt: req.excerpt,
+		category: req.category,
+		read_time: req.readTime,
+		views: req.views || '',
+		is_newsletter: req.isNewsletter || false
+	});
+	return {
+		id: response.data.id,
+		title: response.data.title,
+		excerpt: response.data.excerpt,
+		category: response.data.category,
+		readTime: response.data.read_time,
+		views: response.data.views,
+		isNewsletter: response.data.is_newsletter,
+		createdAt: response.data.created_at,
+		updatedAt: response.data.updated_at
+	};
+}
+
+export async function deleteTech(id: number): Promise<void> {
+	await sendRequest<void>('DELETE', `/techs/${id}`);
+}
+
+export async function fetchDiary(fetchFn: ApiFetch, id: number): Promise<DiaryEntry> {
+	const response = await get<ApiObjectResponse<ApiPost>>(fetchFn, `/diaries/${id}`);
+	return {
+		id: response.data.id,
+		title: response.data.title,
+		content: response.data.content,
+		createdAt: response.data.created_at,
+		updatedAt: response.data.updated_at
+	};
+}
+
+export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArticle> {
+	const response = await get<ApiObjectResponse<ApiPost>>(fetchFn, `/techs/${id}`);
+	return {
+		id: response.data.id,
+		title: response.data.title,
+		excerpt: response.data.excerpt,
+		category: response.data.category,
+		readTime: response.data.read_time,
+		views: response.data.views,
+		isNewsletter: response.data.is_newsletter,
+		createdAt: response.data.created_at,
+		updatedAt: response.data.updated_at
 	};
 }

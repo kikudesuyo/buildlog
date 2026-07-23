@@ -1,7 +1,13 @@
 CREATE TABLE posts (
     id BIGSERIAL PRIMARY KEY,
+    type TEXT NOT NULL,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
+    excerpt TEXT DEFAULT '',
+    category TEXT DEFAULT '',
+    read_time TEXT DEFAULT '',
+    views TEXT DEFAULT '',
+    is_newsletter BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

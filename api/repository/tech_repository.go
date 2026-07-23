@@ -1,14 +1,38 @@
 package repository
 
-import "github.com/kikudesuyo/buildlog/api/entity"
+import (
+	"context"
 
-func GetTechFeed() entity.TechFeed {
-	return entity.TechFeed{
-		FeaturedArticle: entity.FeaturedTechArticle{Title: "静かなるシステムの構築：Rustによるメモリ安全性の再考", Excerpt: "現代のソフトウェア開発において、安全性はもはやオプションではありません。所有権モデルがもたらす新しい秩序と、開発者の認知負荷を軽減するための抽象化について考察します。", Category: "Architecture", ReadTime: "12分で読める", Date: "2024.11.10"},
-		Articles: []entity.TechArticle{
-			{ID: "tech-1", Title: "インタフェースの沈黙：ミニマリズムUIの実装戦略", Excerpt: "情報を削ぎ落とすことで、ユーザーの集中力を最大化する。CSS Container Queriesを活用した、文脈に応じた適応型レイアウトの設計。", Category: "Development", ReadTime: "8 min read", Date: "2024.11.02", Views: "856 views"},
-			{ID: "tech-2", Title: "生成AI時代のプロダクト倫理：透明性の設計", Excerpt: "LLMをプロダクトに組み込む際、どのようにして人間中心の設計を維持するか。データセットの偏りとアルゴリズムの透明性に関する実務的アプローチ。", Category: "Data Science", ReadTime: "15 min read", Date: "2024.10.28", Views: "2,105 views"},
-			{ID: "tech-3", Title: "今週のライブラリ選定：Headless UIとアクセシビリティの追求", Excerpt: "スタイリングを強制しないコンポーネントが、いかにして長期的なメンテナンス性を向上させるか。Radix UIとTailwindの組み合わせ事例を詳解。", Category: "Newsletter", ReadTime: "5 min read", Date: "2024.10.20", Views: "542 views", IsNewsletter: true},
-		},
-	}
+	"github.com/kikudesuyo/buildlog/api/entity"
+	"gorm.io/gorm"
+)
+
+func ListTechs(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
+	techs := make([]entity.DBTablePost, 0)
+	err := db.WithContext(ctx).
+		Where("type = ?", "tech").
+		Order("created_at DESC").
+		Order("id DESC").
+		Find(&techs).Error
+	return techs, err
+}
+
+func GetTechByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePost, error) {
+	var tech entity.DBTablePost
+	err := db.WithContext(ctx).Where("type = ?", "tech").First(&tech, id).Error
+	return &tech, err
+}
+
+func CreateTech(ctx context.Context, db *gorm.DB, tech *entity.DBTablePost) error {
+	tech.Type = "tech"
+	return db.WithContext(ctx).Create(tech).Error
+}
+
+func UpdateTech(ctx context.Context, db *gorm.DB, tech *entity.DBTablePost) error {
+	tech.Type = "tech"
+	return db.WithContext(ctx).Save(tech).Error
+}
+
+func DeleteTech(ctx context.Context, db *gorm.DB, id int64) error {
+	return db.WithContext(ctx).Where("type = ?", "tech").Delete(&entity.DBTablePost{}, id).Error
 }
