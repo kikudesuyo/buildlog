@@ -2,7 +2,7 @@ name: buildlog
 
 services:
   postgres:
-    image: postgres:17.5
+    image: postgres:18.4
     container_name: buildlog-postgres
     restart: unless-stopped
     environment:
@@ -14,7 +14,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-11162}:5432"
     volumes:
-      - ./.local/postgres17:/var/lib/postgresql/data
+      - ./.local/postgres18:/var/lib/postgresql
     command: ["postgres", "-c", "timezone=${TZ:-UTC}", "-c", "client_encoding=UTF8"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-buildlog} -d ${POSTGRES_DB:-buildlog}"]

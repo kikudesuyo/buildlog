@@ -7,9 +7,10 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	v1 "github.com/kikudesuyo/buildlog/api/handler/v1"
+	"gorm.io/gorm"
 )
 
-func NewRouter() http.Handler {
+func NewRouter(db *gorm.DB) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -17,16 +18,7 @@ func NewRouter() http.Handler {
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/posts", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetPostList)
-		})
-		r.Get("/diary", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleListDiaryEntries)
-		})
-		r.Get("/tech", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetTechFeed)
-		})
-		r.Get("/profile", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetProfileData)
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetPostList(db))
 		})
 	})
 

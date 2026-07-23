@@ -5,7 +5,7 @@ variable "database_url" {
 
 env "local" {
   url = var.database_url
-  dev = "docker://postgres/17/dev?search_path=public"
+  dev = "docker://postgres/18/dev?search_path=public"
 
   schema {
     src = "file://sql/schema.sql"

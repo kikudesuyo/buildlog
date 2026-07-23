@@ -5,8 +5,9 @@ import (
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/repository"
+	"gorm.io/gorm"
 )
 
-func GetPostList(ctx context.Context) []entity.DBTablePost {
-	return repository.GetPostList()
+func GetPostList(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
+	return repository.GetPostList(ctx, db)
 }
