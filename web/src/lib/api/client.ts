@@ -1,7 +1,6 @@
 import { env } from '$env/dynamic/public';
 import type { LoadEvent } from '@sveltejs/kit';
 import type {
-	AppProject,
 	DiaryEntry,
 	FeaturedTechArticle,
 	ProfileData,
@@ -35,11 +34,6 @@ type ApiTechArticle = Omit<TechArticle, 'readTime' | 'isNewsletter'> & {
 
 type ApiFeaturedTechArticle = Omit<FeaturedTechArticle, 'readTime'> & {
 	read_time: string;
-};
-
-type ApiAppProject = Omit<AppProject, 'demoUrl' | 'codeUrl'> & {
-	demo_url?: string;
-	code_url?: string;
 };
 
 type ApiProfileData = Omit<ProfileData, 'avatarUrl' | 'contactEmail' | 'finalQuote'> & {
@@ -76,15 +70,6 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 		featuredArticle: toFeaturedTechArticle(response.data.featured_article),
 		techArticles: response.data.articles.map(toTechArticle)
 	};
-}
-
-export async function fetchAppProjects(fetchFn: ApiFetch): Promise<AppProject[]> {
-	const response = await get<ApiListResponse<ApiAppProject>>(fetchFn, '/apps');
-	return response.data_list.map(({ demo_url, code_url, ...project }) => ({
-		...project,
-		demoUrl: demo_url,
-		codeUrl: code_url
-	}));
 }
 
 export async function fetchProfileData(fetchFn: ApiFetch): Promise<ProfileData> {

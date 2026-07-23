@@ -35,17 +35,6 @@ type TechFeed struct {
 	Articles        []TechArticle       `json:"articles"`
 }
 
-type AppProject struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Category    string   `json:"category"`
-	Tags        []string `json:"tags"`
-	Description string   `json:"description"`
-	Icon        string   `json:"icon"`
-	DemoURL     string   `json:"demo_url,omitempty"`
-	CodeURL     string   `json:"code_url,omitempty"`
-}
-
 type ProfileHighlight struct {
 	Title       string `json:"title"`
 	Period      string `json:"period"`
