@@ -30,9 +30,11 @@ docker-build-prod:
 _docker-build:
 	gcloud builds submit --default-buckets-behavior="regional-user-owned-bucket" --region=asia-northeast1 --config=_cloudbuild.all.yaml --project ${project} .
 
+ALLOWED_ORIGINS ?=
+
 # 本番環境 Cloud Runへデプロイ
 deploy-prod:
-	make __deploy project=${GCP_PROJECT_PROD} bucketprefix=prod resourceprefix=prod apidomain=${API_DOMAIN_PROD} is_production=true
+	make __deploy project=${GCP_PROJECT_PROD} bucketprefix=prod resourceprefix=prod apidomain=${API_DOMAIN_PROD} is_production=true allowed_origins="${ALLOWED_ORIGINS}"
 
 __deploy:
 	gcloud builds submit \
@@ -40,7 +42,7 @@ __deploy:
 	  --region=asia-northeast1 \
 	  --config=_cloudbuild.all.yaml \
 	  --project ${project} \
-	  --substitutions=_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production}
+	  --substitutions=_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production},_ALLOWED_ORIGINS="${allowed_origins}"
 
 # チェックサム作成
 migrate_hash:
