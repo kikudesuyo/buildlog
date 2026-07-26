@@ -3,7 +3,8 @@ import type { LoadEvent } from '@sveltejs/kit';
 import type {
 	DiaryEntry,
 	FeaturedTechArticle,
-	TechArticle
+	TechArticle,
+	TrashEntry
 } from '$lib/api/types';
 
 type ApiFetch = LoadEvent['fetch'];
@@ -198,4 +199,31 @@ export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArti
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};
+}
+
+export type ApiTrashPost = {
+	id: number;
+	type: string;
+	title: string;
+	content: string;
+	category: string;
+	created_at: string;
+	deleted_at: string;
+};
+
+export async function fetchTrashEntries(fetchFn: ApiFetch): Promise<TrashEntry[]> {
+	const response = await get<ApiListResponse<ApiTrashPost>>(fetchFn, '/trash');
+	return response.data_list.map((post) => ({
+		id: post.id,
+		type: post.type,
+		title: post.title,
+		content: post.content,
+		category: post.category,
+		createdAt: post.created_at,
+		deletedAt: post.deleted_at
+	}));
+}
+
+export async function restoreEntry(id: number): Promise<void> {
+	await sendRequest<void>('PUT', `/trash/${id}/restore`);
 }
