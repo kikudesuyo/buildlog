@@ -48,6 +48,16 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Delete("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteTech(db))
 		})
+
+		r.Post("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandlePostLike(db))
+		})
+		r.Delete("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteLike(db))
+		})
+		r.Get("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetLikeStatus(db))
+		})
 	})
 
 	return r

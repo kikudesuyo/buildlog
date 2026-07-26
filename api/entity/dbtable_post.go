@@ -11,6 +11,8 @@ type DBTablePost struct {
 	Views     string    `gorm:"column:views" json:"views"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
+	LikesCount int64     `gorm:"-" json:"likes_count"`
+	HasLiked   bool      `gorm:"-" json:"has_liked"`
 }
 
 func (DBTablePost) TableName() string {

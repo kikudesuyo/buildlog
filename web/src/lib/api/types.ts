@@ -4,6 +4,8 @@ export interface DiaryEntry {
 	content: string;
 	createdAt: string;
 	updatedAt: string;
+	likesCount: number;
+	hasLiked?: boolean;
 }
 
 export interface TechArticle {
@@ -14,6 +16,8 @@ export interface TechArticle {
 	views?: string;
 	createdAt: string;
 	updatedAt: string;
+	likesCount: number;
+	hasLiked?: boolean;
 }
 
 export type FeaturedTechArticle = TechArticle;
