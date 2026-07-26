@@ -1,0 +1,42 @@
+steps:
+  # 1. Dockerイメージのビルド
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:latest'
+      - '-t'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$COMMIT_SHA'
+      - '.'
+
+  # 2. Artifact Registryへのイメージプッシュ
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX'
+
+  # 3. Cloud Runへのデプロイ
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'buildlog-api-$_RESOURCE_PREFIX'
+      - '--image'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$COMMIT_SHA'
+      - '--region'
+      - 'asia-northeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8081'
+      # Cloud SQLの接続インスタンス
+      - '--add-cloudsql-instances'
+      - '$PROJECT_ID:asia-northeast1:buildlog-postgres-$_RESOURCE_PREFIX'
+      # 環境変数の設定
+      - '--update-env-vars'
+      - 'IS_PRODUCTION=$_IS_PRODUCTION,API_DOMAIN=$_API_DOMAIN'
+
+images:
+  - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$COMMIT_SHA'
