@@ -6,7 +6,7 @@ steps:
       - '-t'
       - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:latest'
       - '-t'
-      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$COMMIT_SHA'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$_COMMIT_SHA'
       - '.'
 
   # 2. Artifact Registryへのイメージプッシュ
@@ -23,7 +23,7 @@ steps:
       - 'deploy'
       - 'buildlog-api-$_RESOURCE_PREFIX'
       - '--image'
-      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$COMMIT_SHA'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$_COMMIT_SHA'
       - '--region'
       - 'asia-northeast1'
       - '--platform'
@@ -31,12 +31,24 @@ steps:
       - '--allow-unauthenticated'
       - '--port'
       - '8081'
-      # Cloud SQLの接続インスタンス
+      # コスト最小化スペック
+      - '--cpu'
+      - '1'
+      - '--memory'
+      - '256Mi'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '1'
+      # Cloud SQLの接続インスタンス (コスト最適化のため単一インスタンスに接続)
       - '--add-cloudsql-instances'
-      - '$PROJECT_ID:asia-northeast1:buildlog-postgres-$_RESOURCE_PREFIX'
+      - '$PROJECT_ID:asia-northeast1:buildlog-postgres'
       # 環境変数の設定
       - '--update-env-vars'
-      - 'IS_PRODUCTION=$_IS_PRODUCTION,API_DOMAIN=$_API_DOMAIN'
+      - 'IS_PRODUCTION=$_IS_PRODUCTION,API_DOMAIN=$_API_DOMAIN,DATABASE_URL=$_DATABASE_URL'
 
 images:
-  - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$COMMIT_SHA'
+  - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$_COMMIT_SHA'
+
+substitutions:
+  _COMMIT_SHA: 'latest'

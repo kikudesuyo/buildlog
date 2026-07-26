@@ -1,11 +1,9 @@
-.PHONY: build dev dev-auth lint lint-fix docker-build-stage docker-build-prod _docker-build deploy-stage deploy-prod __deploy
+.PHONY: build dev dev-auth lint lint-fix docker-build-prod _docker-build deploy-prod __deploy
 
 GO111MODULE=on
 LOAD_ENV=. ./default_env.sh
 APP_BINARY ?= app
-GCP_PROJECT_DEV ?=
-GCP_PROJECT_PROD ?=
-API_DOMAIN_STAGE ?=
+GCP_PROJECT_PROD ?= buildlog-503612
 API_DOMAIN_PROD ?=
 
 build:
@@ -26,9 +24,6 @@ lint:
 lint-fix:
 	golangci-lint run ./... --fix
 
-docker-build-stage:
-	make _docker-build project=${GCP_PROJECT_DEV}
-
 docker-build-prod:
 	make _docker-build project=${GCP_PROJECT_PROD}
 
@@ -39,17 +34,13 @@ _docker-build:
 deploy-prod:
 	make __deploy project=${GCP_PROJECT_PROD} bucketprefix=prod resourceprefix=prod apidomain=${API_DOMAIN_PROD} is_production=true
 
-# ステージング環境 Cloud Runへデプロイ
-deploy-stage:
-	make __deploy project=${GCP_PROJECT_DEV} bucketprefix=dev resourceprefix=dev apidomain=${API_DOMAIN_STAGE} is_production=false
-
 __deploy:
 	gcloud builds submit \
 	  --default-buckets-behavior="regional-user-owned-bucket" \
 	  --region=asia-northeast1 \
 	  --config=_cloudbuild.all.yaml \
 	  --project ${project} \
-	  --substitutions=_BUCKET_PREFIX=${bucketprefix},_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production}
+	  --substitutions=_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production},_DATABASE_URL="${DATABASE_URL}"
 
 # チェックサム作成
 migrate_hash:
