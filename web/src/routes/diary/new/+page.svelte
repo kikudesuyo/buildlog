@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { createDiary } from '$lib/api/client';
+	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
 	let title = $state('');
 	let content = $state('');
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
+	let isDirty = $derived(title.trim().length > 0 || content.trim().length > 0);
 
 	// ダミーのUIステート (image.pngの再現用)
 	let tags = $state(['エッセイ', '創作']);
@@ -37,8 +40,8 @@
 		errorMessage = '';
 		try {
 			await createDiary(title, content);
-			goto('/admin');
-		} catch (err) {
+			goto(resolve('/admin'));
+		} catch {
 			errorMessage = 'つぶやきの保存に失敗しました。';
 			isSubmitting = false;
 		}
@@ -56,6 +59,8 @@
 	}
 </script>
 
+<UnsavedChangesGuard {isDirty} {isSubmitting} />
+
 <svelte:head>
 	<title>新しい下書き — Essence</title>
 </svelte:head>
@@ -63,7 +68,7 @@
 <!-- ヘッダー（全幅） -->
 <header class="fixed top-0 left-0 w-full h-16 bg-white border-b border-outline-variant/20 px-gutter flex items-center justify-between z-50">
 	<div class="flex items-center gap-3">
-		<a href="/admin" class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
+		<a href={resolve('/admin')} class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
 			Essence
 		</a>
 		<span class="h-4 w-px bg-outline-variant/30"></span>

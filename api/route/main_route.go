@@ -20,6 +20,9 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Get("/diaries", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleGetDiaryList(db))
 		})
+		r.Get("/diaries/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetDiary(db))
+		})
 		r.Post("/diaries", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleCreateDiary(db))
 		})
@@ -32,6 +35,9 @@ func NewRouter(db *gorm.DB) http.Handler {
 
 		r.Get("/techs", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleGetTechList(db))
+		})
+		r.Get("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetTech(db))
 		})
 		r.Post("/techs", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleCreateTech(db))

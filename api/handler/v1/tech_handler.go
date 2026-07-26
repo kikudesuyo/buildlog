@@ -22,6 +22,21 @@ func HandleGetTechList(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
+func HandleGetTech(db *gorm.DB) handler.ProcessFunc {
+	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
+		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+		if err != nil {
+			return nil, err
+		}
+
+		tech, err := service.GetTechByID(r.Context(), db, id)
+		if err != nil {
+			return nil, err
+		}
+		return entity.NewObjectResponse(tech), nil
+	}
+}
+
 func HandleCreateTech(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		var req entity.CreateTechRequest

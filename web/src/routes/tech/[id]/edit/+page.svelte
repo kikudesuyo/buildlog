@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { updateTech } from '$lib/api/client';
+	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
 	let { data } = $props();
 
@@ -13,10 +15,17 @@
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
+	let isDirty = $derived(
+		title !== data.tech.title ||
+		excerpt !== data.tech.excerpt ||
+		category !== data.tech.category ||
+		readTime !== data.tech.readTime ||
+		views !== (data.tech.views || '') ||
+		isNewsletter !== (data.tech.isNewsletter || false)
+	);
 
 	// ダミーのUIステート (image.pngの再現用)
 	let tags = $state(['技術', 'プログラミング']);
-	let isPublicLimited = $state(false);
 	let isCommentsAllowed = $state(true);
 
 	// オートリサイズ用のアクション
@@ -51,8 +60,8 @@
 				views,
 				isNewsletter
 			});
-			goto('/admin/tech');
-		} catch (err) {
+			goto(resolve('/admin/tech'));
+		} catch {
 			errorMessage = '技術記事の更新に失敗しました。';
 			isSubmitting = false;
 		}
@@ -70,6 +79,8 @@
 	}
 </script>
 
+<UnsavedChangesGuard {isDirty} {isSubmitting} />
+
 <svelte:head>
 	<title>技術記事を編集 — Essence</title>
 </svelte:head>
@@ -77,7 +88,7 @@
 <!-- ヘッダー（全幅） -->
 <header class="fixed top-0 left-0 w-full h-16 bg-white border-b border-outline-variant/20 px-gutter flex items-center justify-between z-50">
 	<div class="flex items-center gap-3">
-		<a href="/admin/tech" class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
+		<a href={resolve('/admin/tech')} class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
 			Essence
 		</a>
 		<span class="h-4 w-px bg-outline-variant/30"></span>

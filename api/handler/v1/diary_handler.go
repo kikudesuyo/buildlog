@@ -22,6 +22,21 @@ func HandleGetDiaryList(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
+func HandleGetDiary(db *gorm.DB) handler.ProcessFunc {
+	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
+		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+		if err != nil {
+			return nil, err
+		}
+
+		diary, err := service.GetDiaryByID(r.Context(), db, id)
+		if err != nil {
+			return nil, err
+		}
+		return entity.NewObjectResponse(diary), nil
+	}
+}
+
 func HandleCreateDiary(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		var req entity.CreateDiaryRequest

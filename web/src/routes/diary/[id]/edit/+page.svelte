@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { updateDiary } from '$lib/api/client';
+	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
 	let { data } = $props();
 
@@ -8,6 +10,7 @@
 	let content = $state(data.diary.content);
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
+	let isDirty = $derived(title !== data.diary.title || content !== data.diary.content);
 
 	// ダミーのUIステート (image.pngの再現用)
 	let tags = $state(['エッセイ', '創作']);
@@ -39,8 +42,8 @@
 		errorMessage = '';
 		try {
 			await updateDiary(data.diary.id, title, content);
-			goto('/admin');
-		} catch (err) {
+			goto(resolve('/admin'));
+		} catch {
 			errorMessage = 'つぶやきの更新に失敗しました。';
 			isSubmitting = false;
 		}
@@ -58,6 +61,8 @@
 	}
 </script>
 
+<UnsavedChangesGuard {isDirty} {isSubmitting} />
+
 <svelte:head>
 	<title>つぶやきを編集 — Essence</title>
 </svelte:head>
@@ -65,7 +70,7 @@
 <!-- ヘッダー（全幅） -->
 <header class="fixed top-0 left-0 w-full h-16 bg-white border-b border-outline-variant/20 px-gutter flex items-center justify-between z-50">
 	<div class="flex items-center gap-3">
-		<a href="/admin" class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
+		<a href={resolve('/admin')} class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
 			Essence
 		</a>
 		<span class="h-4 w-px bg-outline-variant/30"></span>
