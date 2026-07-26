@@ -27,7 +27,12 @@
 
 <div class="editorial-container mx-auto px-gutter relative flex flex-col gap-8">
 	<header class="flex items-center justify-between">
-		<h1 class="font-display-lg text-display-lg text-primary">日々のつぶやき</h1>
+		<div>
+			{#if isAdmin}
+				<p class="font-label-sm text-label-sm mb-stack-sm tracking-[0.2em] text-outline uppercase">Content Manager / Diary</p>
+			{/if}
+			<h1 class="font-display-lg text-display-lg text-primary">{isAdmin ? 'つぶやき管理' : '日々のつぶやき'}</h1>
+		</div>
 		{#if isAdmin}
 			<a
 				href={resolve(isAdmin ? '/admin/diary/new' : '/diary/new')}
