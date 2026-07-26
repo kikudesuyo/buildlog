@@ -1,4 +1,4 @@
-import { env } from '$env/static/public';
+import * as env from '$env/static/public';
 import type { LoadEvent } from '@sveltejs/kit';
 import type {
 	DiaryEntry,
