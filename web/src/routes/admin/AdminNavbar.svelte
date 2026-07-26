@@ -4,7 +4,8 @@
 
 	const navItems = [
 		{ href: '/admin', label: 'Diary', description: 'つぶやきを管理', icon: 'edit_note' },
-		{ href: '/admin/tech', label: 'Tech', description: '技術記事を管理', icon: 'article' }
+		{ href: '/admin/tech', label: 'Tech', description: '技術記事を管理', icon: 'article' },
+		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' }
 	] as const;
 
 	let isOpen = $state(false);

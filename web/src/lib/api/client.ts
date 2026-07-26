@@ -199,3 +199,129 @@ export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArti
 		updatedAt: response.data.updated_at
 	};
 }
+
+export type ApiApp = {
+	id: number;
+	slug: string;
+	name: string;
+	category: string;
+	tags: string[];
+	description: string;
+	icon: string;
+	icon_url: string;
+	demo_url: string;
+	code_url: string;
+	created_at: string;
+	updated_at: string;
+};
+
+export async function fetchAppProjects(fetchFn: ApiFetch): Promise<AppProject[]> {
+	const response = await get<ApiListResponse<ApiApp>>(fetchFn, '/apps');
+	return response.data_list.map((app) => ({
+		id: app.id.toString(),
+		slug: app.slug,
+		name: app.name,
+		category: app.category,
+		tags: app.tags,
+		description: app.description,
+		icon: app.icon,
+		iconUrl: app.icon_url,
+		demoUrl: app.demo_url,
+		codeUrl: app.code_url
+	}));
+}
+
+export async function fetchApp(fetchFn: ApiFetch, id: number): Promise<AppProject> {
+	const response = await get<ApiObjectResponse<ApiApp>>(fetchFn, `/apps/${id}`);
+	return {
+		id: response.data.id.toString(),
+		slug: response.data.slug,
+		name: response.data.name,
+		category: response.data.category,
+		tags: response.data.tags,
+		description: response.data.description,
+		icon: response.data.icon,
+		iconUrl: response.data.icon_url,
+		demoUrl: response.data.demo_url,
+		codeUrl: response.data.code_url
+	};
+}
+
+export async function createApp(req: {
+	slug: string;
+	name: string;
+	category: string;
+	tags: string[];
+	description: string;
+	icon: string;
+	iconUrl?: string;
+	demoUrl?: string;
+	codeUrl?: string;
+}): Promise<AppProject> {
+	const response = await sendRequest<ApiObjectResponse<ApiApp>>('POST', '/apps', {
+		slug: req.slug,
+		name: req.name,
+		category: req.category,
+		tags: req.tags,
+		description: req.description,
+		icon: req.icon,
+		icon_url: req.iconUrl || '',
+		demo_url: req.demoUrl || '',
+		code_url: req.codeUrl || ''
+	});
+
+	return {
+		id: response.data.id.toString(),
+		slug: response.data.slug,
+		name: response.data.name,
+		category: response.data.category,
+		tags: response.data.tags,
+		description: response.data.description,
+		icon: response.data.icon,
+		iconUrl: response.data.icon_url,
+		demoUrl: response.data.demo_url,
+		codeUrl: response.data.code_url
+	};
+}
+
+export async function updateApp(id: number, req: {
+	slug: string;
+	name: string;
+	category: string;
+	tags: string[];
+	description: string;
+	icon: string;
+	iconUrl?: string;
+	demoUrl?: string;
+	codeUrl?: string;
+}): Promise<AppProject> {
+	const response = await sendRequest<ApiObjectResponse<ApiApp>>('PUT', `/apps/${id}`, {
+		slug: req.slug,
+		name: req.name,
+		category: req.category,
+		tags: req.tags,
+		description: req.description,
+		icon: req.icon,
+		icon_url: req.iconUrl || '',
+		demo_url: req.demoUrl || '',
+		code_url: req.codeUrl || ''
+	});
+
+	return {
+		id: response.data.id.toString(),
+		slug: response.data.slug,
+		name: response.data.name,
+		category: response.data.category,
+		tags: response.data.tags,
+		description: response.data.description,
+		icon: response.data.icon,
+		iconUrl: response.data.icon_url,
+		demoUrl: response.data.demo_url,
+		codeUrl: response.data.code_url
+	};
+}
+
+export async function deleteApp(id: number): Promise<void> {
+	await sendRequest<void>('DELETE', `/apps/${id}`);
+}
+
