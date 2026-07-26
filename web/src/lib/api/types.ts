@@ -18,7 +18,7 @@ export interface TechArticle {
 	updatedAt: string;
 }
 
-export type FeaturedTechArticle = Omit<TechArticle, 'id' | 'views' | 'isNewsletter'>;
+export type FeaturedTechArticle = TechArticle;
 
 export interface AppProject {
 	id: string;

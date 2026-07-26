@@ -73,10 +73,13 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 	}));
 
 	const featured = allArticles.length > 0 ? allArticles[0] : {
+		id: 0,
 		title: '',
 		excerpt: '',
 		category: '',
 		readTime: '',
+		views: '',
+		isNewsletter: false,
 		createdAt: '',
 		updatedAt: ''
 	};
