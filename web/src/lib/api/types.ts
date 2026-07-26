@@ -1,26 +1,22 @@
 export interface DiaryEntry {
-	id: string;
+	id: number;
 	title: string;
-	excerpt: string;
-	category: string;
-	date: string;
-	image?: string;
-	imageAlt?: string;
-	categoryColorClass?: string;
+	content: string;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface TechArticle {
-	id: string;
+	id: number;
 	title: string;
-	excerpt: string;
+	content: string;
 	category: string;
-	readTime: string;
-	date: string;
 	views?: string;
-	isNewsletter?: boolean;
+	createdAt: string;
+	updatedAt: string;
 }
 
-export type FeaturedTechArticle = Omit<TechArticle, 'id' | 'views' | 'isNewsletter'>;
+export type FeaturedTechArticle = TechArticle;
 
 export interface AppProject {
 	id: string;

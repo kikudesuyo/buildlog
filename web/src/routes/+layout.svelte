@@ -2,9 +2,18 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import Navbar from '$lib/components/Navbar.svelte';
+	import AdminNavbar from '$lib/components/AdminNavbar.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import { page } from '$app/stores';
 
 	let { children } = $props();
+
+	// エディタ系のルートかどうかを判定
+	let isEditor = $derived(
+		$page.url.pathname.includes('/new') ||
+		$page.url.pathname.includes('/edit')
+	);
+	let isAdmin = $derived($page.url.pathname.startsWith('/admin'));
 </script>
 
 <svelte:head>
@@ -13,9 +22,17 @@
 </svelte:head>
 
 <div class="min-h-screen flex flex-col justify-between bg-surface text-on-surface">
-	<Navbar />
-	<main class="flex-grow pt-28 pb-section-gap">
+	{#if !isEditor}
+		{#if isAdmin}
+			<AdminNavbar />
+		{:else}
+			<Navbar />
+		{/if}
+	{/if}
+	<main class="flex-grow {isEditor ? 'pt-0 pb-0' : isAdmin ? 'pt-24 pb-section-gap md:pl-64 md:pt-12' : 'pt-28 pb-section-gap'}">
 		{@render children()}
 	</main>
-	<Footer />
+	{#if !isEditor}
+		<Footer />
+	{/if}
 </div>

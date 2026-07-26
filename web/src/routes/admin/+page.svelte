@@ -1,0 +1,21 @@
+<script lang="ts">
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { deleteDiary } from '$lib/api/client';
+	import DiaryFeed from '$lib/components/DiaryFeed.svelte';
+	let { data } = $props();
+
+	async function handleDelete(id: number) {
+		if (!confirm('この記事を削除してもよろしいですか？')) return;
+		try {
+			await deleteDiary(id);
+		} catch {
+			alert('削除に失敗しました。');
+			return false;
+		}
+		return true;
+	}
+</script>
+
+<svelte:head><title>Essence — Admin Diary</title></svelte:head>
+<DiaryFeed entries={data.diaryEntries} isAdmin onEdit={(id) => goto(resolve(`/admin/diary/${id}/edit`))} onDelete={handleDelete} />
