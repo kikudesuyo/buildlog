@@ -47,7 +47,7 @@ import { resolve } from '$app/paths';
 		<div class="flex items-center gap-stack-lg">
 			{#each computedNavItems as item (item.href)}
 				<a
-					href={resolve(item.href)}
+					href={resolve(item.href as any)}
 					class="font-label-md text-label-md transition-colors duration-200 pb-0.5 {isActive(item.href)
 						? 'text-primary font-bold border-b-2 border-primary'
 						: 'text-on-surface-variant hover:text-primary'}"
