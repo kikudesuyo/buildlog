@@ -40,12 +40,12 @@ steps:
       - '0'
       - '--max-instances'
       - '1'
-      # Cloud SQLの接続インスタンス (コスト最適化のため単一インスタンスに接続)
-      - '--add-cloudsql-instances'
-      - '$PROJECT_ID:asia-northeast1:buildlog-postgres'
-      # 環境変数の設定
+      # 環境変数の設定 (DATABASE_URLを除外)
       - '--update-env-vars'
-      - 'IS_PRODUCTION=$_IS_PRODUCTION,API_DOMAIN=$_API_DOMAIN,DATABASE_URL=$_DATABASE_URL'
+      - 'IS_PRODUCTION=$_IS_PRODUCTION,API_DOMAIN=$_API_DOMAIN'
+      # Secret Managerから環境変数へマウント
+      - '--set-secrets'
+      - 'DATABASE_URL=DATABASE_URL:latest'
 
 images:
   - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$_COMMIT_SHA'

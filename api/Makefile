@@ -40,7 +40,7 @@ __deploy:
 	  --region=asia-northeast1 \
 	  --config=_cloudbuild.all.yaml \
 	  --project ${project} \
-	  --substitutions=_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production},_DATABASE_URL="${DATABASE_URL}"
+	  --substitutions=_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production}
 
 # チェックサム作成
 migrate_hash:

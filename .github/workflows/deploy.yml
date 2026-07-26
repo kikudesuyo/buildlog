@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+# OIDC認証のためにIDトークンの発行権限を追加
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   deploy-api:
     name: Deploy Go API to Cloud Run
@@ -13,10 +18,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
+      - name: Authenticate to Google Cloud (WIF)
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: 'projects/328735755994/locations/global/workloadIdentityPools/buildlog-pool/providers/github-provider'
+          service_account: 'github-actions-deployer@buildlog-503612.iam.gserviceaccount.com'
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -24,43 +30,4 @@ jobs:
       - name: Deploy to Cloud Run (via Cloud Build)
         run: |
           cd api
-          make deploy-prod project=buildlog-503612
-
-  deploy-web:
-    name: Deploy SvelteKit to Cloudflare Pages
-    runs-on: ubuntu-latest
-    needs: deploy-api
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: 'web/pnpm-lock.yaml'
-
-      - name: Install dependencies
-        run: |
-          cd web
-          pnpm install --frozen-lockfile
-
-      - name: Build Web App
-        run: |
-          cd web
-          pnpm run build
-        env:
-          PUBLIC_API_BASE_URL: ${{ secrets.PUBLIC_API_BASE_URL }}
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy web/.svelte-kit/cloudflare --project-name=buildlog
+          make deploy-prod
