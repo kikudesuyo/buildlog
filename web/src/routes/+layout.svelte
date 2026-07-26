@@ -2,7 +2,7 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import Navbar from '$lib/components/Navbar.svelte';
-	import AdminNavbar from '$lib/components/AdminNavbar.svelte';
+	import AdminNavbar from './admin/AdminNavbar.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { page } from '$app/stores';
 

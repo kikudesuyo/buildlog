@@ -5,9 +5,6 @@ import { resolve } from '$app/paths';
 	let isSearchOpen = $state(false);
 	let searchQuery = $state('');
 
-	// 現在のパスが管理者画面（/admin で始まる）かどうかを判定
-	let isAdmin = $derived(page.url.pathname.startsWith('/admin'));
-
 	const navItems = [
 		{ href: '/', label: 'Diary' },
 		{ href: '/tech', label: 'Tech' },
@@ -15,24 +12,10 @@ import { resolve } from '$app/paths';
 		{ href: '/apps', label: 'Apps' }
 	] as const;
 
-	// 管理画面にいるときはリンク先を /admin 等に差し替える
-	let computedNavItems = $derived(
-		navItems.map(item => {
-			if (isAdmin) {
-				if (item.href === '/') return { ...item, href: '/admin' };
-				if (item.href === '/tech') return { ...item, href: '/admin/tech' };
-			}
-			return item;
-		})
-	);
-
 	function isActive(path: string): boolean {
 		const current = page.url.pathname;
-		if (path === '/' || path === '/admin') {
-			return current === '/' || current === '/admin';
-		}
-		if (path === '/tech' || path === '/admin/tech') {
-			return current.startsWith('/tech') || current.startsWith('/admin/tech');
+		if (path === '/') {
+			return current === '/';
 		}
 		return current.startsWith(path);
 	}
@@ -41,13 +24,13 @@ import { resolve } from '$app/paths';
 <!-- TopNavBar -->
 <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 transition-all duration-300">
 	<div class="flex justify-between items-center max-w-container-max mx-auto h-16 px-gutter">
-		<a href={resolve(isAdmin ? '/admin' : '/')} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
+		<a href={resolve('/')} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
 			Essence
 		</a>
 		<div class="flex items-center gap-stack-lg">
-			{#each computedNavItems as item (item.href)}
+			{#each navItems as item (item.href)}
 				<a
-					href={resolve(item.href as any)}
+					href={resolve(item.href)}
 					class="font-label-md text-label-md transition-colors duration-200 pb-0.5 {isActive(item.href)
 						? 'text-primary font-bold border-b-2 border-primary'
 						: 'text-on-surface-variant hover:text-primary'}"
@@ -58,11 +41,11 @@ import { resolve } from '$app/paths';
 		</div>
 		<div class="flex items-center gap-stack-md">
 			<a
-				href={resolve(isAdmin ? '/' : '/admin')}
+				href={resolve('/admin')}
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300 flex items-center justify-center"
-				title={isAdmin ? "一般表示に切り替え" : "管理画面に切り替え"}
+				title="管理画面に切り替え"
 			>
-				{isAdmin ? 'visibility' : 'admin_panel_settings'}
+				admin_panel_settings
 			</a>
 			<button
 				type="button"
