@@ -41,13 +41,13 @@ import { resolve } from '$app/paths';
 <!-- TopNavBar -->
 <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 transition-all duration-300">
 	<div class="flex justify-between items-center max-w-container-max mx-auto h-16 px-gutter">
-		<a href={isAdmin ? '/admin' : '/'} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
+		<a href={resolve(isAdmin ? '/admin' : '/')} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
 			Essence
 		</a>
 		<div class="flex items-center gap-stack-lg">
 			{#each computedNavItems as item (item.href)}
 				<a
-					href={item.href}
+					href={resolve(item.href)}
 					class="font-label-md text-label-md transition-colors duration-200 pb-0.5 {isActive(item.href)
 						? 'text-primary font-bold border-b-2 border-primary'
 						: 'text-on-surface-variant hover:text-primary'}"
@@ -58,7 +58,7 @@ import { resolve } from '$app/paths';
 		</div>
 		<div class="flex items-center gap-stack-md">
 			<a
-				href={isAdmin ? '/' : '/admin'}
+				href={resolve(isAdmin ? '/' : '/admin')}
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300 flex items-center justify-center"
 				title={isAdmin ? "一般表示に切り替え" : "管理画面に切り替え"}
 			>

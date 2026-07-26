@@ -63,7 +63,7 @@
 				<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>
 				{#if isAdmin}<div class="ml-auto flex gap-2"><button type="button" onclick={() => onEdit?.(featured.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(featured.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}
 			</div>
-			<h2 class="font-display-lg mb-stack-md text-[32px] leading-tight text-primary transition-colors group-hover:text-primary/80">
+			<h2 class="font-display-lg mb-stack-md text-[28px] leading-tight text-primary transition-colors group-hover:text-primary/80">
 				<a href={resolve(`/tech/${featured.id}`)} class="hover:underline">{featured.title}</a>
 			</h2>
 			<p class="font-body-md text-body-md mb-6 text-on-surface-variant line-clamp-3">{featured.content}</p>

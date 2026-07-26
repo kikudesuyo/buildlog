@@ -51,9 +51,26 @@ __deploy:
 	  --project ${project} \
 	  --substitutions=_BUCKET_PREFIX=${bucketprefix},_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production}
 
+# チェックサム作成
 migrate_hash:
 	cd ../sql && atlas migrate hash
 
+# マイグレーション実行
 migrate_apply:
 	$(LOAD_ENV) ; \
 	cd ../sql && atlas migrate apply --env local
+
+# テストデータ注入
+db_seed:
+	$(LOAD_ENV) ; \
+	cat ../sql/seeds/seed_posts.sql | docker compose -f ../compose.yml exec -T postgres psql -U $${POSTGRES_USER} -d $${POSTGRES_DB}
+
+# マイグレーション適用とテストデータ注入を実行
+db_setup: migrate_apply db_seed
+
+# ローカル環境のDBをクリーンアップして再マイグレーション（空のDBを作成）
+migrate_fresh:
+	$(LOAD_ENV) ; \
+	cd ../sql && atlas schema clean --env local --auto-approve ; \
+	docker compose -f ../compose.yml exec -T postgres psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c "CREATE SCHEMA IF NOT EXISTS public;" ; \
+	migrate_apply
