@@ -4,7 +4,7 @@
 
 <!-- Footer -->
 <footer class="bg-surface w-full py-section-gap border-t border-outline-variant/20">
-	<div class="max-w-[720px] mx-auto flex flex-col md:flex-row justify-between items-center gap-stack-md px-gutter">
+	<div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-stack-md px-gutter">
 		<div class="font-label-md text-label-md text-primary font-semibold">
 			Essence
 		</div>

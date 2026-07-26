@@ -5,6 +5,9 @@ import { resolve } from '$app/paths';
 	let isSearchOpen = $state(false);
 	let searchQuery = $state('');
 
+	// 現在のパスが管理者画面（/admin で始まる）かどうかを判定
+	let isAdmin = $derived(page.url.pathname.startsWith('/admin'));
+
 	const navItems = [
 		{ href: '/', label: 'Diary' },
 		{ href: '/tech', label: 'Tech' },
@@ -12,24 +15,39 @@ import { resolve } from '$app/paths';
 		{ href: '/apps', label: 'Apps' }
 	] as const;
 
+	// 管理画面にいるときはリンク先を /admin 等に差し替える
+	let computedNavItems = $derived(
+		navItems.map(item => {
+			if (isAdmin) {
+				if (item.href === '/') return { ...item, href: '/admin' };
+				if (item.href === '/tech') return { ...item, href: '/admin/tech' };
+			}
+			return item;
+		})
+	);
+
 	function isActive(path: string): boolean {
-		if (path === '/') {
-			return page.url.pathname === '/';
+		const current = page.url.pathname;
+		if (path === '/' || path === '/admin') {
+			return current === '/' || current === '/admin';
 		}
-		return page.url.pathname.startsWith(path);
+		if (path === '/tech' || path === '/admin/tech') {
+			return current.startsWith('/tech') || current.startsWith('/admin/tech');
+		}
+		return current.startsWith(path);
 	}
 </script>
 
 <!-- TopNavBar -->
 <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 transition-all duration-300">
-	<div class="flex justify-between items-center max-w-[720px] mx-auto h-16 px-gutter">
-		<a href={resolve('/')} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
+	<div class="flex justify-between items-center max-w-container-max mx-auto h-16 px-gutter">
+		<a href={isAdmin ? '/admin' : '/'} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
 			Essence
 		</a>
 		<div class="flex items-center gap-stack-lg">
-			{#each navItems as item (item.href)}
+			{#each computedNavItems as item (item.href)}
 				<a
-					href={resolve(item.href)}
+					href={item.href}
 					class="font-label-md text-label-md transition-colors duration-200 pb-0.5 {isActive(item.href)
 						? 'text-primary font-bold border-b-2 border-primary'
 						: 'text-on-surface-variant hover:text-primary'}"
@@ -39,6 +57,13 @@ import { resolve } from '$app/paths';
 			{/each}
 		</div>
 		<div class="flex items-center gap-stack-md">
+			<a
+				href={isAdmin ? '/' : '/admin'}
+				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300 flex items-center justify-center"
+				title={isAdmin ? "一般表示に切り替え" : "管理画面に切り替え"}
+			>
+				{isAdmin ? 'visibility' : 'admin_panel_settings'}
+			</a>
 			<button
 				type="button"
 				aria-label="Search"

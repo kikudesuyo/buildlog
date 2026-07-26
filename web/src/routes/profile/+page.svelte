@@ -6,7 +6,7 @@
 	<title>Essence — Profile</title>
 </svelte:head>
 
-<div class="mx-auto max-w-[720px] px-gutter">
+<div class="mx-auto max-w-container-max px-gutter">
 	<!-- Hero Section -->
 	<section class="mb-section-gap flex flex-col gap-stack-lg">
 		<div class="flex items-center gap-stack-md">

@@ -2,8 +2,12 @@
 	import { goto } from '$app/navigation';
 	import { deleteDiary } from '$lib/api/client';
 	import type { DiaryEntry } from '$lib/api/types';
+	import { page } from '$app/stores';
 
 	let { data } = $props();
+
+	// 管理者かどうか判定
+	let isAdmin = $derived($page.url.pathname.startsWith('/admin'));
 
 	let diariesList = $state<DiaryEntry[]>([]);
 
@@ -44,42 +48,46 @@
 	<!-- Intro / Header -->
 	<header class="flex items-center justify-between">
 		<h1 class="font-display-lg text-display-lg text-primary">日々のつぶやき</h1>
-		<button
-			type="button"
-			onclick={() => goto('/diary/new')}
-			class="font-label-md text-label-md cursor-pointer rounded-lg bg-primary px-6 py-2.5 text-on-primary transition-all hover:bg-primary/95 active:scale-95 flex items-center gap-1.5"
-		>
-			<span class="material-symbols-outlined text-[18px]">add</span>
-			つぶやく
-		</button>
+		{#if isAdmin}
+			<button
+				type="button"
+				onclick={() => goto('/diary/new')}
+				class="font-label-md text-label-md cursor-pointer rounded-lg bg-primary px-6 py-2.5 text-on-primary transition-all hover:bg-primary/95 active:scale-95 flex items-center gap-1.5"
+			>
+				<span class="material-symbols-outlined text-[18px]">add</span>
+				つぶやく
+			</button>
+		{/if}
 	</header>
 
 	<!-- つぶやき一覧 -->
 	<div class="flex flex-col gap-6">
 		{#each displayEntries as entry (entry.id)}
-			<article class="group relative rounded-xl border border-transparent p-4 -mx-4 transition-all duration-300 hover:bg-surface-container-low hover:border-outline-variant/10">
+			<article class="group relative rounded-xl border border-transparent p-4 -mx-4">
 				<div class="mb-stack-sm flex items-center justify-between">
 					<span class="font-label-sm text-label-sm text-outline">{formatDate(entry.createdAt)}</span>
 					
-					<!-- アクションボタン（ホバー時に表示） -->
-					<div class="flex gap-2 opacity-55 group-hover:opacity-100 transition-opacity">
-						<button
-							type="button"
-							onclick={() => goto(`/diary/${entry.id}/edit`)}
-							class="p-1 hover:text-primary transition-colors cursor-pointer text-outline hover:opacity-100"
-							title="編集"
-						>
-							<span class="material-symbols-outlined text-[18px]">edit</span>
-						</button>
-						<button
-							type="button"
-							onclick={() => handleDelete(entry.id)}
-							class="p-1 hover:text-error transition-colors cursor-pointer text-outline hover:opacity-100"
-							title="削除"
-						>
-							<span class="material-symbols-outlined text-[18px]">delete</span>
-						</button>
-					</div>
+					<!-- アクションボタン -->
+					{#if isAdmin}
+						<div class="flex gap-2">
+							<button
+								type="button"
+								onclick={() => goto(`/diary/${entry.id}/edit`)}
+								class="p-1 cursor-pointer text-outline opacity-60 hover:opacity-100 hover:text-primary transition-all duration-200"
+								title="編集"
+							>
+								<span class="material-symbols-outlined text-[18px]">edit</span>
+							</button>
+							<button
+								type="button"
+								onclick={() => handleDelete(entry.id)}
+								class="p-1 cursor-pointer text-outline opacity-60 hover:opacity-100 hover:text-error transition-all duration-200"
+								title="削除"
+							>
+								<span class="material-symbols-outlined text-[18px]">delete</span>
+							</button>
+						</div>
+					{/if}
 				</div>
 
 				<h2

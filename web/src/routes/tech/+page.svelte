@@ -45,6 +45,8 @@
 			alert('削除に失敗しました。');
 		}
 	}
+	import { page } from '$app/stores';
+	let isAdmin = $derived($page.url.pathname.startsWith('/admin'));
 </script>
 
 <svelte:head>
@@ -60,14 +62,16 @@
 				思考の断片を、構造化された知性へ。最新のテクノロジーと設計思想を綴る技術録。
 			</p>
 		</div>
-		<button
-			type="button"
-			onclick={() => goto('/tech/new')}
-			class="font-label-md text-label-md cursor-pointer rounded-lg bg-primary px-6 py-2.5 text-on-primary transition-all hover:bg-primary/95 active:scale-95 flex items-center gap-1.5 shrink-0"
-		>
-			<span class="material-symbols-outlined text-[18px]">add</span>
-			記事を書く
-		</button>
+		{#if isAdmin}
+			<button
+				type="button"
+				onclick={() => goto('/tech/new')}
+				class="font-label-md text-label-md cursor-pointer rounded-lg bg-primary px-6 py-2.5 text-on-primary transition-all hover:bg-primary/95 active:scale-95 flex items-center gap-1.5 shrink-0"
+			>
+				<span class="material-symbols-outlined text-[18px]">add</span>
+				記事を書く
+			</button>
+		{/if}
 	</section>
 
 	<!-- Filter Chips -->
@@ -89,7 +93,7 @@
 
 	<!-- Featured Article -->
 	{#if (!selectedCategory || selectedCategory === 'Architecture') && featuredArticle}
-		<article class="group relative rounded-xl border border-transparent p-4 -mx-4 transition-all duration-300 hover:bg-surface-container-low hover:border-outline-variant/10">
+		<article class="group relative rounded-xl border border-transparent p-4 -mx-4">
 			<div class="mb-stack-sm flex flex-wrap items-center gap-stack-sm">
 				<span
 					class="font-label-sm text-label-sm rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container"
@@ -103,24 +107,26 @@
 				<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>
 
 				<!-- アクションボタン -->
-				<div class="flex gap-2 ml-auto opacity-55 group-hover:opacity-100 transition-opacity">
-					<button
-						type="button"
-						onclick={() => goto(`/tech/${featuredArticle.id}/edit`)}
-						class="p-1 hover:text-primary transition-colors cursor-pointer text-outline hover:opacity-100"
-						title="編集"
-					>
-						<span class="material-symbols-outlined text-[18px]">edit</span>
-					</button>
-					<button
-						type="button"
-						onclick={() => handleDelete(featuredArticle.id)}
-						class="p-1 hover:text-error transition-colors cursor-pointer text-outline hover:opacity-100"
-						title="削除"
-					>
-						<span class="material-symbols-outlined text-[18px]">delete</span>
-					</button>
-				</div>
+				{#if isAdmin}
+					<div class="flex gap-2 ml-auto">
+						<button
+							type="button"
+							onclick={() => goto(`/tech/${featuredArticle.id}/edit`)}
+							class="p-1 cursor-pointer text-outline opacity-60 hover:opacity-100 hover:text-primary transition-all duration-200"
+							title="編集"
+						>
+							<span class="material-symbols-outlined text-[18px]">edit</span>
+						</button>
+						<button
+							type="button"
+							onclick={() => handleDelete(featuredArticle.id)}
+							class="p-1 cursor-pointer text-outline opacity-60 hover:opacity-100 hover:text-error transition-all duration-200"
+							title="削除"
+						>
+							<span class="material-symbols-outlined text-[18px]">delete</span>
+						</button>
+					</div>
+				{/if}
 			</div>
 			<h2
 				class="font-display-lg mb-stack-md text-[40px] leading-tight text-primary transition-colors group-hover:text-primary/80"
@@ -142,7 +148,7 @@
 			{#if article.isNewsletter}
 				<!-- Newsletter / Card Variant -->
 				<article
-					class="group relative rounded-xl border border-outline-variant/30 bg-white/40 p-8 backdrop-blur-sm transition-all duration-500 hover:border-primary/20 md:p-10"
+					class="group relative rounded-xl border border-outline-variant/30 bg-white/40 p-8 backdrop-blur-sm md:p-10"
 				>
 					<div class="mb-6 flex items-center justify-between">
 						<div class="flex gap-3">
@@ -159,24 +165,26 @@
 							<span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>
 							
 							<!-- アクションボタン -->
-							<div class="flex gap-2 opacity-55 group-hover:opacity-100 transition-opacity">
-								<button
-									type="button"
-									onclick={() => goto(`/tech/${article.id}/edit`)}
-									class="p-1 hover:text-primary transition-colors cursor-pointer text-outline hover:opacity-100"
-									title="編集"
-								>
-									<span class="material-symbols-outlined text-[18px]">edit</span>
-								</button>
-								<button
-									type="button"
-									onclick={() => handleDelete(article.id)}
-									class="p-1 hover:text-error transition-colors cursor-pointer text-outline hover:opacity-100"
-									title="削除"
-								>
-									<span class="material-symbols-outlined text-[18px]">delete</span>
-								</button>
-							</div>
+							{#if isAdmin}
+								<div class="flex gap-2">
+									<button
+										type="button"
+										onclick={() => goto(`/tech/${article.id}/edit`)}
+										class="p-1 cursor-pointer text-outline opacity-60 hover:opacity-100 hover:text-primary transition-all duration-200"
+										title="編集"
+									>
+										<span class="material-symbols-outlined text-[18px]">edit</span>
+									</button>
+									<button
+										type="button"
+										onclick={() => handleDelete(article.id)}
+										class="p-1 cursor-pointer text-outline opacity-60 hover:opacity-100 hover:text-error transition-all duration-200"
+										title="削除"
+									>
+										<span class="material-symbols-outlined text-[18px]">delete</span>
+									</button>
+								</div>
+							{/if}
 						</div>
 					</div>
 					<h3 class="font-headline-lg text-headline-lg mb-4 text-primary">
@@ -206,7 +214,7 @@
 				</article>
 			{:else}
 				<!-- Standard Tech Article Item -->
-				<article class="group relative flex flex-col gap-3 rounded-xl border border-transparent p-4 -mx-4 transition-all duration-300 hover:bg-surface-container-low hover:border-outline-variant/10">
+				<article class="group relative flex flex-col gap-3 rounded-xl border border-transparent p-4 -mx-4">
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-stack-sm">
 							<span
@@ -225,24 +233,26 @@
 							<span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>
 							
 							<!-- アクションボタン -->
-							<div class="flex gap-2 opacity-55 group-hover:opacity-100 transition-opacity">
-								<button
-									type="button"
-									onclick={() => goto(`/tech/${article.id}/edit`)}
-									class="p-1 hover:text-primary transition-colors cursor-pointer text-outline hover:opacity-100"
-									title="編集"
-								>
-									<span class="material-symbols-outlined text-[18px]">edit</span>
-								</button>
-								<button
-									type="button"
-									onclick={() => handleDelete(article.id)}
-									class="p-1 hover:text-error transition-colors cursor-pointer text-outline hover:opacity-100"
-									title="削除"
-								>
-									<span class="material-symbols-outlined text-[18px]">delete</span>
-								</button>
-							</div>
+							{#if isAdmin}
+								<div class="flex gap-2">
+									<button
+										type="button"
+										onclick={() => goto(`/tech/${article.id}/edit`)}
+										class="p-1 cursor-pointer text-outline opacity-60 hover:opacity-100 hover:text-primary transition-all duration-200"
+										title="編集"
+									>
+										<span class="material-symbols-outlined text-[18px]">edit</span>
+									</button>
+									<button
+										type="button"
+										onclick={() => handleDelete(article.id)}
+										class="p-1 cursor-pointer text-outline opacity-60 hover:opacity-100 hover:text-error transition-all duration-200"
+										title="削除"
+									>
+										<span class="material-symbols-outlined text-[18px]">delete</span>
+									</button>
+								</div>
+							{/if}
 						</div>
 					</div>
 					<h3
