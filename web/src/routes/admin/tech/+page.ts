@@ -1,6 +1,4 @@
 import type { PageLoad } from './$types';
-import { load as parentLoad } from '../tech/+page';
+import { fetchTechFeed } from '$lib/api/client';
 
-export const load: PageLoad = async (event) => {
-	return parentLoad(event as any);
-};
+export const load: PageLoad = async ({ fetch }) => fetchTechFeed(fetch);

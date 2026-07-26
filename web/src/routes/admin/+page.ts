@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types';
-import { load as parentLoad } from '../+page';
+import { fetchDiaryEntries } from '$lib/api/client';
 
-export const load: PageLoad = async (event) => {
-	return parentLoad(event as any);
-};
+export const load: PageLoad = async ({ fetch }) => ({
+	diaryEntries: await fetchDiaryEntries(fetch)
+});
