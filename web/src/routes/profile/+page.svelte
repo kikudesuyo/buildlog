@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Essence — Profile</title>
+	<title>Buildlog — Profile</title>
 </svelte:head>
 
 <div class="mx-auto max-w-container-max px-gutter">

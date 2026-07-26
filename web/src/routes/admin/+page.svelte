@@ -17,5 +17,5 @@
 	}
 </script>
 
-<svelte:head><title>Essence — Admin Diary</title></svelte:head>
+<svelte:head><title>Buildlog — Admin Diary</title></svelte:head>
 <DiaryFeed entries={data.diaryEntries} isAdmin onEdit={(id) => goto(resolve(`/admin/diary/${id}/edit`))} onDelete={handleDelete} />

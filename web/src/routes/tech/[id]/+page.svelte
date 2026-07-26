@@ -10,7 +10,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.tech.title} — Essence</title>
+	<title>{data.tech.title} — Buildlog</title>
 </svelte:head>
 
 <div class="editorial-container mx-auto px-gutter pt-24 pb-20 max-w-[800px]">

@@ -75,14 +75,14 @@
 <UnsavedChangesGuard {isDirty} {isSubmitting} />
 
 <svelte:head>
-	<title>新規技術記事作成 — Essence</title>
+	<title>新規技術記事作成 — Buildlog</title>
 </svelte:head>
 
 <!-- ヘッダー（全幅） -->
 <header class="fixed top-0 left-0 w-full h-16 bg-white border-b border-outline-variant/20 px-gutter flex items-center justify-between z-50">
 	<div class="flex items-center gap-3">
 		<a href={resolve('/admin/tech')} class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
-			Essence
+			Buildlog
 		</a>
 		<span class="h-4 w-px bg-outline-variant/30"></span>
 		<span class="text-outline font-label-md text-label-md">Drafts</span>

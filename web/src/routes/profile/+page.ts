@@ -9,11 +9,11 @@ const profileData: ProfileData = {
 	quote: '「余白とは、単なる空白ではなく、思考が呼吸するための空間である。」',
 	bio: [
 		'15年間にわたり、デザインとテクノロジーの交差点で「静寂」を追求してきました。情報の過剰な現代において、真に価値のある体験とは、引き算によってのみ生まれると信じています。',
-		'現在は Essence Editorial のリードデザイナーとして、執筆者と読者が深く繋がれるデジタル空間の構築に注力しています。物理的なノートのような手触り感と、デジタルの効率性を融合させた、新しい編集体験を提案しています。'
+		'現在は Buildlog のリードデザイナーとして、執筆者と読者が深く繋がれるデジタル空間の構築に注力しています。物理的なノートのような手触り感と、デジタルの効率性を融合させた、新しい編集体験を提案しています。'
 	],
 	highlights: [
 		{
-			title: 'Essence Platform',
+			title: 'Buildlog Platform',
 			period: '2021 — Present',
 			description: '次世代の執筆環境をデザイン。月間100万人のアクティブユーザーを持つプラットフォームへと成長。'
 		},
@@ -32,7 +32,7 @@ const profileData: ProfileData = {
 		'ミニマリストUI',
 		'コンテンツ戦略'
 	],
-	contactEmail: 'contact@essence.editorial',
+	contactEmail: 'contact@buildlog.dev',
 	finalQuote: '「物語は、余白の中で最も力強く響く。あなたの想いを聞かせてください。」'
 };
 

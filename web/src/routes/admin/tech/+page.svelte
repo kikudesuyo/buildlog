@@ -17,7 +17,7 @@
 	}
 </script>
 
-<svelte:head><title>Essence — Admin Tech Feed</title></svelte:head>
+<svelte:head><title>Buildlog — Admin Tech Feed</title></svelte:head>
 <TechFeed
 	featuredArticle={data.featuredArticle}
 	techArticles={data.techArticles}

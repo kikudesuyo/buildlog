@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>Essence — Apps Showcase</title>
+	<title>Buildlog — Apps Showcase</title>
 </svelte:head>
 
 <div class="editorial-container mx-auto px-gutter">

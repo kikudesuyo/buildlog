@@ -25,7 +25,7 @@ import { resolve } from '$app/paths';
 <nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 transition-all duration-300">
 	<div class="flex justify-between items-center max-w-container-max mx-auto h-16 px-gutter">
 		<a href={resolve('/')} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
-			Essence
+			Buildlog
 		</a>
 		<div class="flex items-center gap-stack-lg">
 			{#each navItems as item (item.href)}

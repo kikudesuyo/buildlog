@@ -29,7 +29,7 @@
 		<a href={resolve('/admin')} class="flex items-center gap-3 text-primary transition-opacity hover:opacity-80">
 			<span class="material-symbols-outlined text-2xl">dashboard_customize</span>
 			<div>
-				<div class="font-headline-md text-headline-md font-bold tracking-tight">Essence</div>
+				<div class="font-headline-md text-headline-md font-bold tracking-tight">Buildlog</div>
 				<div class="font-label-sm text-label-sm tracking-widest text-outline uppercase">Admin Console</div>
 			</div>
 		</a>
@@ -81,7 +81,7 @@
 		>
 			menu
 		</button>
-		<a href={resolve('/admin')} class="font-headline-md text-headline-md font-bold tracking-tight text-primary">Essence <span class="font-label-sm text-label-sm ml-2 text-outline">Admin</span></a>
+		<a href={resolve('/admin')} class="font-headline-md text-headline-md font-bold tracking-tight text-primary">Buildlog <span class="font-label-sm text-label-sm ml-2 text-outline">Admin</span></a>
 	</div>
 	<a href={resolve('/')} class="material-symbols-outlined rounded-lg p-2 text-on-surface-variant hover:bg-surface-container">visibility</a>
 </header>

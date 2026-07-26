@@ -18,7 +18,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Essence — Quietude Editorial</title>
+	<title>Buildlog</title>
 </svelte:head>
 
 <div class="min-h-screen flex flex-col justify-between bg-surface text-on-surface">

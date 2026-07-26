@@ -3,5 +3,5 @@
 	let { data } = $props();
 </script>
 
-<svelte:head><title>Essence — Tech Feed</title></svelte:head>
+<svelte:head><title>Buildlog — Tech Feed</title></svelte:head>
 <TechFeed {...data} />
