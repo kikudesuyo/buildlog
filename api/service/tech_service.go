@@ -19,26 +19,22 @@ func GetTechByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePos
 
 func CreateTech(ctx context.Context, db *gorm.DB, req entity.CreateTechRequest) (entity.CreateTechResponse, error) {
 	tech := entity.DBTablePost{
-		Title:        req.Title,
-		Excerpt:      req.Excerpt,
-		Category:     req.Category,
-		ReadTime:     req.ReadTime,
-		Views:        req.Views,
-		IsNewsletter: req.IsNewsletter,
+		Title:    req.Title,
+		Excerpt:  req.Excerpt,
+		Category: req.Category,
+		Views:    req.Views,
 	}
 	if err := repository.CreateTech(ctx, db, &tech); err != nil {
 		return entity.CreateTechResponse{}, err
 	}
 	return entity.CreateTechResponse{
-		ID:           tech.ID,
-		Title:        tech.Title,
-		Excerpt:      tech.Excerpt,
-		Category:     tech.Category,
-		ReadTime:     tech.ReadTime,
-		Views:        tech.Views,
-		IsNewsletter: tech.IsNewsletter,
-		CreatedAt:    tech.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:    tech.UpdatedAt.Format(time.RFC3339),
+		ID:        tech.ID,
+		Title:     tech.Title,
+		Excerpt:   tech.Excerpt,
+		Category:  tech.Category,
+		Views:     tech.Views,
+		CreatedAt: tech.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: tech.UpdatedAt.Format(time.RFC3339),
 	}, nil
 }
 
@@ -51,24 +47,20 @@ func UpdateTech(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateTec
 	tech.Title = req.Title
 	tech.Excerpt = req.Excerpt
 	tech.Category = req.Category
-	tech.ReadTime = req.ReadTime
 	tech.Views = req.Views
-	tech.IsNewsletter = req.IsNewsletter
 
 	if err := repository.UpdateTech(ctx, db, tech); err != nil {
 		return entity.UpdateTechResponse{}, err
 	}
 
 	return entity.UpdateTechResponse{
-		ID:           tech.ID,
-		Title:        tech.Title,
-		Excerpt:      tech.Excerpt,
-		Category:     tech.Category,
-		ReadTime:     tech.ReadTime,
-		Views:        tech.Views,
-		IsNewsletter: tech.IsNewsletter,
-		CreatedAt:    tech.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:    tech.UpdatedAt.Format(time.RFC3339),
+		ID:        tech.ID,
+		Title:     tech.Title,
+		Excerpt:   tech.Excerpt,
+		Category:  tech.Category,
+		Views:     tech.Views,
+		CreatedAt: tech.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: tech.UpdatedAt.Format(time.RFC3339),
 	}, nil
 }
 

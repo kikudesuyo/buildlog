@@ -3,23 +3,20 @@
 	import { resolve } from '$app/paths';
 	import { createTech } from '$lib/api/client';
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
+	import { defaultTechCategory, techCategories } from '$lib/tech/categories';
 
 	let title = $state('');
 	let excerpt = $state('');
-	let category = $state('Development');
-	let readTime = $state('5 min read');
+	let category = $state(defaultTechCategory);
 	let views = $state('');
-	let isNewsletter = $state(false);
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
 	let isDirty = $derived(
 		title.trim().length > 0 ||
 		excerpt.trim().length > 0 ||
-		category !== 'Development' ||
-		readTime !== '5 min read' ||
-		views.trim().length > 0 ||
-		isNewsletter
+		category !== defaultTechCategory ||
+		views.trim().length > 0
 	);
 
 	// ダミーのUIステート (image.pngの再現用)
@@ -42,8 +39,8 @@
 	}
 
 	async function handleSave() {
-		if (!title.trim() || !excerpt.trim() || !category || !readTime.trim()) {
-			errorMessage = '必須項目（タイトル、概要、カテゴリ、読了目安）を入力してください。';
+		if (!title.trim() || !excerpt.trim() || !category) {
+			errorMessage = '必須項目（タイトル、概要、カテゴリ）を入力してください。';
 			return;
 		}
 
@@ -54,9 +51,7 @@
 				title,
 				excerpt,
 				category,
-				readTime,
-				views,
-				isNewsletter
+				views
 			});
 			goto(resolve('/admin/tech'));
 		} catch {
@@ -170,10 +165,9 @@
 						disabled={isSubmitting}
 						class="w-full rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md cursor-pointer"
 					>
-						<option value="Architecture">Architecture</option>
-						<option value="Development">Development</option>
-						<option value="Data Science">Data Science</option>
-						<option value="Newsletter">Newsletter</option>
+						{#each techCategories as techCategory (techCategory)}
+							<option value={techCategory}>{techCategory}</option>
+						{/each}
 					</select>
 				</div>
 
@@ -202,19 +196,7 @@
 			<div class="flex flex-col gap-5">
 				<h3 class="font-label-md text-label-md font-bold text-on-surface">記事設定</h3>
 				
-				<div class="grid grid-cols-2 gap-4">
-					<div class="flex flex-col gap-1.5">
-						<label for="tech-readtime" class="font-label-xs text-[11px] text-outline">読了目安時間 *</label>
-						<input
-							id="tech-readtime"
-							type="text"
-							bind:value={readTime}
-							placeholder="例: 5 min read"
-							disabled={isSubmitting}
-							class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md"
-						/>
-					</div>
-
+				<div class="grid grid-cols-1 gap-4">
 					<div class="flex flex-col gap-1.5">
 						<label for="tech-views" class="font-label-xs text-[11px] text-outline">閲覧数（任意）</label>
 						<input
@@ -229,19 +211,6 @@
 				</div>
 
 				<div class="flex flex-col gap-4 mt-2 border-t border-outline-variant/10 pt-4">
-					<!-- トグル 1 (Weekly Pick) -->
-					<div class="flex items-center justify-between">
-						<span class="text-body-md text-on-surface-variant">Weekly Pick (特集カード表示)</span>
-						<button
-							type="button"
-							aria-label="Weekly Pickトグル"
-							onclick={() => (isNewsletter = !isNewsletter)}
-							class="w-10 h-6 rounded-full p-0.5 transition-colors relative flex items-center cursor-pointer {isNewsletter ? 'bg-primary' : 'bg-outline-variant/40'}"
-						>
-							<div class="w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 {isNewsletter ? 'translate-x-4' : 'translate-x-0'}"></div>
-						</button>
-					</div>
-					<!-- トグル 2 -->
 					<div class="flex items-center justify-between">
 						<span class="text-body-md text-on-surface-variant">コメントを許可する</span>
 						<button

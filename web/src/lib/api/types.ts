@@ -11,9 +11,7 @@ export interface TechArticle {
 	title: string;
 	excerpt: string;
 	category: string;
-	readTime: string;
 	views?: string;
-	isNewsletter?: boolean;
 	createdAt: string;
 	updatedAt: string;
 }

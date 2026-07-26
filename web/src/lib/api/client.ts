@@ -36,9 +36,7 @@ export type ApiPost = {
 	content: string;
 	excerpt: string;
 	category: string;
-	read_time: string;
 	views: string;
-	is_newsletter: boolean;
 	created_at: string;
 	updated_at: string;
 };
@@ -65,9 +63,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 		title: post.title,
 		excerpt: post.excerpt,
 		category: post.category,
-		readTime: post.read_time,
 		views: post.views,
-		isNewsletter: post.is_newsletter,
 		createdAt: post.created_at,
 		updatedAt: post.updated_at
 	}));
@@ -77,9 +73,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 		title: '',
 		excerpt: '',
 		category: '',
-		readTime: '',
 		views: '',
-		isNewsletter: false,
 		createdAt: '',
 		updatedAt: ''
 	};
@@ -91,7 +85,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 	};
 }
 
-async function sendRequest<T>(method: string, path: string, body?: any): Promise<T> {
+async function sendRequest<T>(method: string, path: string, body?: unknown): Promise<T> {
 	const response = await fetch(`${apiBaseUrl}${path}`, {
 		method,
 		headers: body ? { 'Content-Type': 'application/json' } : undefined,
@@ -133,26 +127,20 @@ export async function createTech(req: {
 	title: string;
 	excerpt: string;
 	category: string;
-	readTime: string;
 	views?: string;
-	isNewsletter?: boolean;
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/techs', {
 		title: req.title,
 		excerpt: req.excerpt,
 		category: req.category,
-		read_time: req.readTime,
-		views: req.views || '',
-		is_newsletter: req.isNewsletter || false
+		views: req.views || ''
 	});
 	return {
 		id: response.data.id,
 		title: response.data.title,
 		excerpt: response.data.excerpt,
 		category: response.data.category,
-		readTime: response.data.read_time,
 		views: response.data.views,
-		isNewsletter: response.data.is_newsletter,
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};
@@ -162,26 +150,20 @@ export async function updateTech(id: number, req: {
 	title: string;
 	excerpt: string;
 	category: string;
-	readTime: string;
 	views?: string;
-	isNewsletter?: boolean;
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/techs/${id}`, {
 		title: req.title,
 		excerpt: req.excerpt,
 		category: req.category,
-		read_time: req.readTime,
-		views: req.views || '',
-		is_newsletter: req.isNewsletter || false
+		views: req.views || ''
 	});
 	return {
 		id: response.data.id,
 		title: response.data.title,
 		excerpt: response.data.excerpt,
 		category: response.data.category,
-		readTime: response.data.read_time,
 		views: response.data.views,
-		isNewsletter: response.data.is_newsletter,
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};
@@ -209,9 +191,7 @@ export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArti
 		title: response.data.title,
 		excerpt: response.data.excerpt,
 		category: response.data.category,
-		readTime: response.data.read_time,
 		views: response.data.views,
-		isNewsletter: response.data.is_newsletter,
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};

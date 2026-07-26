@@ -10,7 +10,6 @@
 		</div>
 		<div class="flex gap-stack-lg">
 			<a href="#rss" class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors">RSS</a>
-			<a href="#newsletter" class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors">Newsletter</a>
 			<a href={resolve('/profile')} class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors">Contact</a>
 		</div>
 		<div class="font-label-sm text-label-sm text-on-surface-variant opacity-80">

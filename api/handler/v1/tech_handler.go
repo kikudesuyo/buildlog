@@ -44,7 +44,7 @@ func HandleCreateTech(db *gorm.DB) handler.ProcessFunc {
 			return nil, err
 		}
 
-		if req.Title == "" || req.Excerpt == "" || req.Category == "" || req.ReadTime == "" {
+		if req.Title == "" || req.Excerpt == "" || !entity.IsValidTechCategory(req.Category) {
 			return nil, http.ErrBodyNotAllowed
 		}
 
@@ -70,7 +70,7 @@ func HandleUpdateTech(db *gorm.DB) handler.ProcessFunc {
 			return nil, err
 		}
 
-		if req.Title == "" || req.Excerpt == "" || req.Category == "" || req.ReadTime == "" {
+		if req.Title == "" || req.Excerpt == "" || !entity.IsValidTechCategory(req.Category) {
 			return nil, http.ErrBodyNotAllowed
 		}
 

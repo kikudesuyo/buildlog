@@ -12,21 +12,18 @@ type DiaryEntry struct {
 }
 
 type TechArticle struct {
-	ID           string `json:"id"`
-	Title        string `json:"title"`
-	Excerpt      string `json:"excerpt"`
-	Category     string `json:"category"`
-	ReadTime     string `json:"read_time"`
-	Date         string `json:"date"`
-	Views        string `json:"views,omitempty"`
-	IsNewsletter bool   `json:"is_newsletter,omitempty"`
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	Excerpt  string `json:"excerpt"`
+	Category string `json:"category"`
+	Date     string `json:"date"`
+	Views    string `json:"views,omitempty"`
 }
 
 type FeaturedTechArticle struct {
 	Title    string `json:"title"`
 	Excerpt  string `json:"excerpt"`
 	Category string `json:"category"`
-	ReadTime string `json:"read_time"`
 	Date     string `json:"date"`
 }
 
