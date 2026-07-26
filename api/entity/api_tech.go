@@ -2,7 +2,7 @@ package entity
 
 type CreateTechRequest struct {
 	Title    string `json:"title"`
-	Excerpt  string `json:"excerpt"`
+	Content  string `json:"content"`
 	Category string `json:"category"`
 	Views    string `json:"views"`
 }
@@ -10,7 +10,7 @@ type CreateTechRequest struct {
 type CreateTechResponse struct {
 	ID        int64  `json:"id"`
 	Title     string `json:"title"`
-	Excerpt   string `json:"excerpt"`
+	Content   string `json:"content"`
 	Category  string `json:"category"`
 	Views     string `json:"views"`
 	CreatedAt string `json:"created_at"`
@@ -19,7 +19,7 @@ type CreateTechResponse struct {
 
 type UpdateTechRequest struct {
 	Title    string `json:"title"`
-	Excerpt  string `json:"excerpt"`
+	Content  string `json:"content"`
 	Category string `json:"category"`
 	Views    string `json:"views"`
 }
@@ -27,7 +27,7 @@ type UpdateTechRequest struct {
 type UpdateTechResponse struct {
 	ID        int64  `json:"id"`
 	Title     string `json:"title"`
-	Excerpt   string `json:"excerpt"`
+	Content   string `json:"content"`
 	Category  string `json:"category"`
 	Views     string `json:"views"`
 	CreatedAt string `json:"created_at"`

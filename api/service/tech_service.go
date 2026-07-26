@@ -20,7 +20,7 @@ func GetTechByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePos
 func CreateTech(ctx context.Context, db *gorm.DB, req entity.CreateTechRequest) (entity.CreateTechResponse, error) {
 	tech := entity.DBTablePost{
 		Title:    req.Title,
-		Excerpt:  req.Excerpt,
+		Content:  req.Content,
 		Category: req.Category,
 		Views:    req.Views,
 	}
@@ -30,7 +30,7 @@ func CreateTech(ctx context.Context, db *gorm.DB, req entity.CreateTechRequest) 
 	return entity.CreateTechResponse{
 		ID:        tech.ID,
 		Title:     tech.Title,
-		Excerpt:   tech.Excerpt,
+		Content:   tech.Content,
 		Category:  tech.Category,
 		Views:     tech.Views,
 		CreatedAt: tech.CreatedAt.Format(time.RFC3339),
@@ -45,7 +45,7 @@ func UpdateTech(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateTec
 	}
 
 	tech.Title = req.Title
-	tech.Excerpt = req.Excerpt
+	tech.Content = req.Content
 	tech.Category = req.Category
 	tech.Views = req.Views
 
@@ -56,7 +56,7 @@ func UpdateTech(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateTec
 	return entity.UpdateTechResponse{
 		ID:        tech.ID,
 		Title:     tech.Title,
-		Excerpt:   tech.Excerpt,
+		Content:   tech.Content,
 		Category:  tech.Category,
 		Views:     tech.Views,
 		CreatedAt: tech.CreatedAt.Format(time.RFC3339),

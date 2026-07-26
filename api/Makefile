@@ -50,3 +50,10 @@ __deploy:
 	  --config=_cloudbuild.all.yaml \
 	  --project ${project} \
 	  --substitutions=_BUCKET_PREFIX=${bucketprefix},_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production}
+
+migrate_hash:
+	cd ../sql && atlas migrate hash
+
+migrate_apply:
+	$(LOAD_ENV) ; \
+	cd ../sql && atlas migrate apply --env local

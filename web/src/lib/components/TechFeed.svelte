@@ -63,8 +63,10 @@
 				<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>
 				{#if isAdmin}<div class="ml-auto flex gap-2"><button type="button" onclick={() => onEdit?.(featured.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(featured.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}
 			</div>
-			<h2 class="font-display-lg mb-stack-md text-[40px] leading-tight text-primary transition-colors group-hover:text-primary/80">{featured.title}</h2>
-			<p class="font-body-lg text-body-lg mb-6 text-on-surface-variant">{featured.excerpt}</p>
+			<h2 class="font-display-lg mb-stack-md text-[40px] leading-tight text-primary transition-colors group-hover:text-primary/80">
+				<a href={resolve(`/tech/${featured.id}`)} class="hover:underline">{featured.title}</a>
+			</h2>
+			<p class="font-body-lg text-body-lg mb-6 text-on-surface-variant line-clamp-3">{featured.content}</p>
 			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
 		</article>
 	{/if}
@@ -76,8 +78,10 @@
 					<div class="flex items-center gap-stack-sm"><span class="font-label-sm text-label-sm rounded bg-primary-fixed px-2 py-0.5 text-primary">{article.category}</span></div>
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>{#if isAdmin}<div class="flex gap-2"><button type="button" onclick={() => onEdit?.(article.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(article.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}</div>
 				</div>
-				<h3 class="font-headline-lg text-headline-lg text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline">{article.title}</h3>
-				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.excerpt}</p>
+				<h3 class="font-headline-lg text-headline-lg text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline">
+					<a href={resolve(`/tech/${article.id}`)}>{article.title}</a>
+				</h3>
+				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
 				{#if article.views}<div class="mt-2 flex items-center gap-4"><span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views}</span></div>{/if}
 			</article>
 		{/each}

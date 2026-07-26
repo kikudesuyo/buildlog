@@ -9,7 +9,7 @@ export interface DiaryEntry {
 export interface TechArticle {
 	id: number;
 	title: string;
-	excerpt: string;
+	content: string;
 	category: string;
 	views?: string;
 	createdAt: string;

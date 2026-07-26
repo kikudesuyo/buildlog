@@ -7,11 +7,7 @@ env "local" {
   url = var.database_url
   dev = "docker://postgres/18/dev?search_path=public"
 
-  schema {
-    src = "file://sql/schema.sql"
-  }
-
   migration {
-    dir = "file://sql/migrations"
+    dir = "file://migrations"
   }
 }

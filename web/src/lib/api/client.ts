@@ -61,7 +61,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 	const allArticles: TechArticle[] = response.data_list.map((post) => ({
 		id: post.id,
 		title: post.title,
-		excerpt: post.excerpt,
+		content: post.content,
 		category: post.category,
 		views: post.views,
 		createdAt: post.created_at,
@@ -71,7 +71,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 	const featured = allArticles.length > 0 ? allArticles[0] : {
 		id: 0,
 		title: '',
-		excerpt: '',
+		content: '',
 		category: '',
 		views: '',
 		createdAt: '',
@@ -125,20 +125,20 @@ export async function deleteDiary(id: number): Promise<void> {
 
 export async function createTech(req: {
 	title: string;
-	excerpt: string;
+	content: string;
 	category: string;
 	views?: string;
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/techs', {
 		title: req.title,
-		excerpt: req.excerpt,
+		content: req.content,
 		category: req.category,
 		views: req.views || ''
 	});
 	return {
 		id: response.data.id,
 		title: response.data.title,
-		excerpt: response.data.excerpt,
+		content: response.data.content,
 		category: response.data.category,
 		views: response.data.views,
 		createdAt: response.data.created_at,
@@ -148,20 +148,20 @@ export async function createTech(req: {
 
 export async function updateTech(id: number, req: {
 	title: string;
-	excerpt: string;
+	content: string;
 	category: string;
 	views?: string;
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/techs/${id}`, {
 		title: req.title,
-		excerpt: req.excerpt,
+		content: req.content,
 		category: req.category,
 		views: req.views || ''
 	});
 	return {
 		id: response.data.id,
 		title: response.data.title,
-		excerpt: response.data.excerpt,
+		content: response.data.content,
 		category: response.data.category,
 		views: response.data.views,
 		createdAt: response.data.created_at,
@@ -189,7 +189,7 @@ export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArti
 	return {
 		id: response.data.id,
 		title: response.data.title,
-		excerpt: response.data.excerpt,
+		content: response.data.content,
 		category: response.data.category,
 		views: response.data.views,
 		createdAt: response.data.created_at,

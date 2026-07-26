@@ -7,7 +7,6 @@ type DBTablePost struct {
 	Type      string    `gorm:"column:type" json:"type"` // "diary" または "tech"
 	Title     string    `gorm:"column:title" json:"title"`
 	Content   string    `gorm:"column:content" json:"content"`
-	Excerpt   string    `gorm:"column:excerpt" json:"excerpt"`
 	Category  string    `gorm:"column:category" json:"category"`
 	Views     string    `gorm:"column:views" json:"views"`
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`

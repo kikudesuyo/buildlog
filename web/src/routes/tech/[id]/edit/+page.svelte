@@ -8,7 +8,7 @@
 	let { data } = $props();
 
 	let title = $state(data.tech.title);
-	let excerpt = $state(data.tech.excerpt);
+	let content = $state(data.tech.content || '');
 	let category = $state(data.tech.category);
 	let views = $state(data.tech.views || '');
 
@@ -16,7 +16,7 @@
 	let errorMessage = $state('');
 	let isDirty = $derived(
 		title !== data.tech.title ||
-		excerpt !== data.tech.excerpt ||
+		content !== (data.tech.content || '') ||
 		category !== data.tech.category ||
 		views !== (data.tech.views || '')
 	);
@@ -41,8 +41,8 @@
 	}
 
 	async function handleSave() {
-		if (!title.trim() || !excerpt.trim() || !category) {
-			errorMessage = '必須項目（タイトル、概要、カテゴリ）を入力してください。';
+		if (!title.trim() || !content.trim() || !category) {
+			errorMessage = '必須項目（タイトル、本文、カテゴリ）を入力してください。';
 			return;
 		}
 
@@ -51,7 +51,7 @@
 		try {
 			await updateTech(data.tech.id, {
 				title,
-				excerpt,
+				content,
 				category,
 				views
 			});
@@ -145,14 +145,18 @@
 			/>
 		</div>
 
-		<!-- 記事概要 / 本文 -->
-		<textarea
-			use:autogrow
-			bind:value={excerpt}
-			placeholder="物語を書き始めましょう..."
-			class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
-			disabled={isSubmitting}
-		></textarea>
+		<!-- 本文 -->
+		<div class="flex flex-col gap-1.5">
+			<label for="tech-content" class="font-label-md text-label-md font-bold text-on-surface">本文 *</label>
+			<textarea
+				id="tech-content"
+				use:autogrow
+				bind:value={content}
+				placeholder="本文を書き始めましょう..."
+				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
+				disabled={isSubmitting}
+			></textarea>
+		</div>
 
 		<!-- 下部設定セクション -->
 		<footer class="border-t border-outline-variant/10 pt-8 mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
