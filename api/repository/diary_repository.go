@@ -7,10 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListDiaries(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
+func ListDiaries(ctx context.Context, db *gorm.DB, all bool) ([]entity.DBTablePost, error) {
 	diaries := make([]entity.DBTablePost, 0)
-	err := db.WithContext(ctx).
-		Where("type = ?", "diary").
+	query := db.WithContext(ctx).Where("type = ?", "diary")
+	if !all {
+		query = query.Where("status = ?", "published")
+	}
+	err := query.
 		Order("created_at DESC").
 		Order("id DESC").
 		Find(&diaries).Error

@@ -8,9 +8,14 @@
 
 	let title = $state(data.diary.title);
 	let content = $state(data.diary.content);
+	let status = $state(data.diary.status || 'draft');
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
-	let isDirty = $derived(title !== data.diary.title || content !== data.diary.content);
+	let isDirty = $derived(
+		title !== data.diary.title ||
+		content !== data.diary.content ||
+		status !== (data.diary.status || 'draft')
+	);
 
 	// ダミーのUIステート (image.pngの再現用)
 	let tags = $state(['エッセイ', '創作']);
@@ -32,7 +37,7 @@
 		};
 	}
 
-	async function handleSave() {
+	async function handleSave(statusVal: 'draft' | 'published') {
 		if (!title.trim() || !content.trim()) {
 			errorMessage = 'タイトルと本文を入力してください。';
 			return;
@@ -41,7 +46,7 @@
 		isSubmitting = true;
 		errorMessage = '';
 		try {
-			await updateDiary(data.diary.id, title, content);
+			await updateDiary(data.diary.id, title, content, statusVal);
 			goto(resolve('/admin'));
 		} catch {
 			errorMessage = 'つぶやきの更新に失敗しました。';
@@ -83,7 +88,7 @@
 		{/if}
 		<button
 			type="button"
-			onclick={handleSave}
+			onclick={() => handleSave('draft')}
 			disabled={isSubmitting}
 			class="text-outline font-label-md text-label-md hover:text-primary transition-colors cursor-pointer"
 		>
@@ -91,7 +96,7 @@
 		</button>
 		<button
 			type="button"
-			onclick={handleSave}
+			onclick={() => handleSave('published')}
 			disabled={isSubmitting}
 			class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-lg font-medium hover:bg-primary/95 transition-colors cursor-pointer disabled:opacity-50"
 		>

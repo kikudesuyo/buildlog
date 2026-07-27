@@ -11,6 +11,7 @@
 	let content = $state(data.tech.content || '');
 	let category = $state(data.tech.category);
 	let views = $state(data.tech.views || '');
+	let status = $state(data.tech.status || 'draft');
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
@@ -18,7 +19,8 @@
 		title !== data.tech.title ||
 		content !== (data.tech.content || '') ||
 		category !== data.tech.category ||
-		views !== (data.tech.views || '')
+		views !== (data.tech.views || '') ||
+		status !== (data.tech.status || 'draft')
 	);
 
 	// ダミーのUIステート (image.pngの再現用)
@@ -40,7 +42,7 @@
 		};
 	}
 
-	async function handleSave() {
+	async function handleSave(statusVal: 'draft' | 'published') {
 		if (!title.trim() || !content.trim() || !category) {
 			errorMessage = '必須項目（タイトル、本文、カテゴリ）を入力してください。';
 			return;
@@ -53,7 +55,8 @@
 				title,
 				content,
 				category,
-				views
+				views,
+				status: statusVal
 			});
 			goto(resolve('/admin/tech'));
 		} catch {
@@ -96,7 +99,7 @@
 		{/if}
 		<button
 			type="button"
-			onclick={handleSave}
+			onclick={() => handleSave('draft')}
 			disabled={isSubmitting}
 			class="text-outline font-label-md text-label-md hover:text-primary transition-colors cursor-pointer"
 		>
@@ -104,7 +107,7 @@
 		</button>
 		<button
 			type="button"
-			onclick={handleSave}
+			onclick={() => handleSave('published')}
 			disabled={isSubmitting}
 			class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-lg font-medium hover:bg-primary/95 transition-colors cursor-pointer disabled:opacity-50"
 		>

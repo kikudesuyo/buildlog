@@ -38,7 +38,7 @@
 		};
 	}
 
-	async function handleSave() {
+	async function handleSave(status: 'draft' | 'published') {
 		if (!title.trim() || !content.trim() || !category) {
 			errorMessage = '必須項目（タイトル、本文、カテゴリ）を入力してください。';
 			return;
@@ -51,7 +51,8 @@
 				title,
 				content,
 				category,
-				views
+				views,
+				status
 			});
 			goto(resolve('/admin/tech'));
 		} catch {
@@ -94,7 +95,7 @@
 		{/if}
 		<button
 			type="button"
-			onclick={handleSave}
+			onclick={() => handleSave('draft')}
 			disabled={isSubmitting}
 			class="text-outline font-label-md text-label-md hover:text-primary transition-colors cursor-pointer"
 		>
@@ -102,7 +103,7 @@
 		</button>
 		<button
 			type="button"
-			onclick={handleSave}
+			onclick={() => handleSave('published')}
 			disabled={isSubmitting}
 			class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-lg font-medium hover:bg-primary/95 transition-colors cursor-pointer disabled:opacity-50"
 		>

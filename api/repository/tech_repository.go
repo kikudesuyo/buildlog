@@ -7,10 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListTechs(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
+func ListTechs(ctx context.Context, db *gorm.DB, all bool) ([]entity.DBTablePost, error) {
 	techs := make([]entity.DBTablePost, 0)
-	err := db.WithContext(ctx).
-		Where("type = ?", "tech").
+	query := db.WithContext(ctx).Where("type = ?", "tech")
+	if !all {
+		query = query.Where("status = ?", "published")
+	}
+	err := query.
 		Order("created_at DESC").
 		Order("id DESC").
 		Find(&techs).Error
