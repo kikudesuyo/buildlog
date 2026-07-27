@@ -1,3 +1,4 @@
+import * as env from '$env/static/public';
 import type { PageLoad } from './$types';
 import type { ProfileData } from '$lib/api/types';
 
@@ -32,7 +33,9 @@ const profileData: ProfileData = {
 		'ミニマリストUI',
 		'コンテンツ戦略'
 	],
-	contactEmail: 'contact@buildlog.dev',
+	contactEmail: env.PUBLIC_CONTACT_EMAIL || 'contact@buildlog.dev',
+	githubUrl: env.PUBLIC_GITHUB_URL || 'https://github.com/kikudesuyo',
+	xUrl: env.PUBLIC_X_URL || 'https://x.com/kikudesuyo',
 	finalQuote: '「物語は、余白の中で最も力強く響く。あなたの想いを聞かせてください。」'
 };
 
