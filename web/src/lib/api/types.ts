@@ -50,6 +50,8 @@ export interface ProfileData {
 	award?: string;
 	expertise: string[];
 	contactEmail: string;
+	githubUrl?: string;
+	xUrl?: string;
 	finalQuote: string;
 }
 
