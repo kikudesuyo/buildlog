@@ -43,18 +43,21 @@ export type ApiPost = {
 	excerpt: string;
 	category: string;
 	views: string;
+	status: 'draft' | 'published';
 	created_at: string;
 	updated_at: string;
 	likes_count: number;
 	has_liked: boolean;
 };
 
-export async function fetchDiaryEntries(fetchFn: ApiFetch): Promise<DiaryEntry[]> {
-	const response = await get<ApiListResponse<ApiPost>>(fetchFn, '/diaries');
+export async function fetchDiaryEntries(fetchFn: ApiFetch, all = false): Promise<DiaryEntry[]> {
+	const url = all ? '/diaries?all=true' : '/diaries';
+	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);
 	return response.data_list.map((post) => ({
 		id: post.id,
 		title: post.title,
 		content: post.content,
+		status: post.status,
 		createdAt: post.created_at,
 		updatedAt: post.updated_at,
 		likesCount: post.likes_count,
@@ -62,11 +65,12 @@ export async function fetchDiaryEntries(fetchFn: ApiFetch): Promise<DiaryEntry[]
 	}));
 }
 
-export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
+export async function fetchTechFeed(fetchFn: ApiFetch, all = false): Promise<{
 	featuredArticle: FeaturedTechArticle;
 	techArticles: TechArticle[];
 }> {
-	const response = await get<ApiListResponse<ApiPost>>(fetchFn, '/techs');
+	const url = all ? '/techs?all=true' : '/techs';
+	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);
 	
 	const allArticles: TechArticle[] = response.data_list.map((post) => ({
 		id: post.id,
@@ -74,6 +78,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 		content: post.content,
 		category: post.category,
 		views: post.views,
+		status: post.status,
 		createdAt: post.created_at,
 		updatedAt: post.updated_at,
 		likesCount: post.likes_count,
@@ -86,6 +91,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 		content: '',
 		category: '',
 		views: '',
+		status: 'draft' as const,
 		createdAt: '',
 		updatedAt: '',
 		likesCount: 0,
@@ -111,12 +117,13 @@ async function sendRequest<T>(method: string, path: string, body?: unknown): Pro
 	return response.json() as Promise<T>;
 }
 
-export async function createDiary(title: string, content: string): Promise<DiaryEntry> {
-	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/diaries', { title, content });
+export async function createDiary(title: string, content: string, status?: 'draft' | 'published'): Promise<DiaryEntry> {
+	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/diaries', { title, content, status: status || 'draft' });
 	return {
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
+		status: response.data.status,
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
@@ -124,12 +131,13 @@ export async function createDiary(title: string, content: string): Promise<Diary
 	};
 }
 
-export async function updateDiary(id: number, title: string, content: string): Promise<DiaryEntry> {
-	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/diaries/${id}`, { title, content });
+export async function updateDiary(id: number, title: string, content: string, status?: 'draft' | 'published'): Promise<DiaryEntry> {
+	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/diaries/${id}`, { title, content, status: status || 'draft' });
 	return {
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
+		status: response.data.status,
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
@@ -146,12 +154,14 @@ export async function createTech(req: {
 	content: string;
 	category: string;
 	views?: string;
+	status?: 'draft' | 'published';
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/techs', {
 		title: req.title,
 		content: req.content,
 		category: req.category,
-		views: req.views || ''
+		views: req.views || '',
+		status: req.status || 'draft'
 	});
 	return {
 		id: response.data.id,
@@ -159,6 +169,7 @@ export async function createTech(req: {
 		content: response.data.content,
 		category: response.data.category,
 		views: response.data.views,
+		status: response.data.status,
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
@@ -171,12 +182,14 @@ export async function updateTech(id: number, req: {
 	content: string;
 	category: string;
 	views?: string;
+	status?: 'draft' | 'published';
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/techs/${id}`, {
 		title: req.title,
 		content: req.content,
 		category: req.category,
-		views: req.views || ''
+		views: req.views || '',
+		status: req.status || 'draft'
 	});
 	return {
 		id: response.data.id,
@@ -184,6 +197,7 @@ export async function updateTech(id: number, req: {
 		content: response.data.content,
 		category: response.data.category,
 		views: response.data.views,
+		status: response.data.status,
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
@@ -201,6 +215,7 @@ export async function fetchDiary(fetchFn: ApiFetch, id: number): Promise<DiaryEn
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
+		status: response.data.status,
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
@@ -216,6 +231,7 @@ export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArti
 		content: response.data.content,
 		category: response.data.category,
 		views: response.data.views,
+		status: response.data.status,
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,

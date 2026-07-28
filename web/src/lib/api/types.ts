@@ -2,6 +2,7 @@ export interface DiaryEntry {
 	id: number;
 	title: string;
 	content: string;
+	status?: 'draft' | 'published';
 	createdAt: string;
 	updatedAt: string;
 	likesCount: number;
@@ -14,6 +15,7 @@ export interface TechArticle {
 	content: string;
 	category: string;
 	views?: string;
+	status?: 'draft' | 'published';
 	createdAt: string;
 	updatedAt: string;
 	likesCount: number;

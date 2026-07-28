@@ -49,7 +49,12 @@
 		{#each displayEntries as entry (entry.id)}
 			<article class="group relative rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20">
 				<div class="mb-stack-sm flex items-center justify-between">
-					<span class="font-label-sm text-label-sm text-outline">{formatDate(entry.createdAt)}</span>
+					<div class="flex items-center gap-3">
+						<span class="font-label-sm text-label-sm text-outline">{formatDate(entry.createdAt)}</span>
+						{#if entry.status === 'draft'}
+							<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
+						{/if}
+					</div>
 					{#if isAdmin}
 						<div class="flex gap-2">
 							<button type="button" onclick={() => onEdit?.(entry.id)} class="p-1 text-outline opacity-60 transition-all duration-200 hover:text-primary hover:opacity-100" title="編集">

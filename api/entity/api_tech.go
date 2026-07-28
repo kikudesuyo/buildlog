@@ -5,6 +5,7 @@ type CreateTechRequest struct {
 	Content  string `json:"content"`
 	Category string `json:"category"`
 	Views    string `json:"views"`
+	Status   string `json:"status"`
 }
 
 type CreateTechResponse struct {
@@ -13,6 +14,7 @@ type CreateTechResponse struct {
 	Content   string `json:"content"`
 	Category  string `json:"category"`
 	Views     string `json:"views"`
+	Status    string `json:"status"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
@@ -22,6 +24,7 @@ type UpdateTechRequest struct {
 	Content  string `json:"content"`
 	Category string `json:"category"`
 	Views    string `json:"views"`
+	Status   string `json:"status"`
 }
 
 type UpdateTechResponse struct {
@@ -30,6 +33,7 @@ type UpdateTechResponse struct {
 	Content   string `json:"content"`
 	Category  string `json:"category"`
 	Views     string `json:"views"`
+	Status    string `json:"status"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }

@@ -62,6 +62,9 @@
 			<div class="mb-stack-sm flex flex-wrap items-center gap-stack-sm">
 				<span class="font-label-sm text-label-sm rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container">{featured.category}</span>
 				<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>
+				{#if featured.status === 'draft'}
+					<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
+				{/if}
 				{#if isAdmin}<div class="ml-auto flex gap-2"><button type="button" onclick={() => onEdit?.(featured.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(featured.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}
 			</div>
 			<h2 class="font-display-lg mb-stack-md text-[28px] leading-tight text-primary transition-colors group-hover:text-primary/80">
@@ -79,7 +82,12 @@
 		{#each filteredArticles as article (article.id)}
 			<article class="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-6 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20">
 				<div class="flex items-center justify-between">
-					<div class="flex items-center gap-stack-sm"><span class="font-label-sm text-label-sm rounded bg-primary-fixed px-2 py-0.5 text-primary">{article.category}</span></div>
+					<div class="flex items-center gap-stack-sm">
+						<span class="font-label-sm text-label-sm rounded bg-primary-fixed px-2 py-0.5 text-primary">{article.category}</span>
+						{#if article.status === 'draft'}
+							<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
+						{/if}
+					</div>
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>{#if isAdmin}<div class="flex gap-2"><button type="button" onclick={() => onEdit?.(article.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(article.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}</div>
 				</div>
 				<h3 class="font-headline-lg text-headline-lg text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline">

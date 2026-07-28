@@ -14,8 +14,9 @@ import (
 
 func HandleGetTechList(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
+		all := r.URL.Query().Get("all") == "true"
 		ipAddress := getClientIP(r)
-		techs, err := service.ListTechs(r.Context(), db, ipAddress)
+		techs, err := service.ListTechs(r.Context(), db, all, ipAddress)
 		if err != nil {
 			return nil, err
 		}

@@ -30,7 +30,7 @@
 		};
 	}
 
-	async function handleSave() {
+	async function handleSave(status: 'draft' | 'published') {
 		if (!title.trim() || !content.trim()) {
 			errorMessage = 'タイトルと本文を入力してください。';
 			return;
@@ -39,7 +39,7 @@
 		isSubmitting = true;
 		errorMessage = '';
 		try {
-			await createDiary(title, content);
+			await createDiary(title, content, status);
 			goto(resolve('/admin'));
 		} catch {
 			errorMessage = 'つぶやきの保存に失敗しました。';
@@ -81,7 +81,7 @@
 		{/if}
 		<button
 			type="button"
-			onclick={handleSave}
+			onclick={() => handleSave('draft')}
 			disabled={isSubmitting}
 			class="text-outline font-label-md text-label-md hover:text-primary transition-colors cursor-pointer"
 		>
@@ -89,7 +89,7 @@
 		</button>
 		<button
 			type="button"
-			onclick={handleSave}
+			onclick={() => handleSave('published')}
 			disabled={isSubmitting}
 			class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-lg font-medium hover:bg-primary/95 transition-colors cursor-pointer disabled:opacity-50"
 		>

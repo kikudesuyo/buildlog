@@ -13,10 +13,11 @@ type DBTablePost struct {
 	Content    string         `gorm:"column:content" json:"content"`
 	Category   string         `gorm:"column:category" json:"category"`
 	Views      string         `gorm:"column:views" json:"views"`
-	LikesCount int64          `gorm:"-" json:"likes_count"`
-	HasLiked   bool           `gorm:"-" json:"has_liked"`
+	Status     string         `gorm:"column:status;default:draft" json:"status"`
 	CreatedAt  time.Time      `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt  time.Time      `gorm:"column:updated_at" json:"updated_at"`
+	LikesCount int64          `gorm:"-" json:"likes_count"`
+	HasLiked   bool           `gorm:"-" json:"has_liked"`
 	DeletedAt  gorm.DeletedAt `gorm:"column:deleted_at;index" json:"deleted_at,omitempty"`
 }
 

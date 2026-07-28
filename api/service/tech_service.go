@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListTechs(ctx context.Context, db *gorm.DB, ipAddress string) ([]entity.DBTablePost, error) {
-	techs, err := repository.ListTechs(ctx, db)
+func ListTechs(ctx context.Context, db *gorm.DB, all bool, ipAddress string) ([]entity.DBTablePost, error) {
+	techs, err := repository.ListTechs(ctx, db, all)
 	if err != nil {
 		return nil, err
 	}
@@ -21,6 +21,7 @@ func ListTechs(ctx context.Context, db *gorm.DB, ipAddress string) ([]entity.DBT
 		techs[i].HasLiked = liked
 	}
 	return techs, nil
+}
 }
 
 func GetTechByID(ctx context.Context, db *gorm.DB, id int64, ipAddress string) (*entity.DBTablePost, error) {
@@ -36,11 +37,16 @@ func GetTechByID(ctx context.Context, db *gorm.DB, id int64, ipAddress string) (
 }
 
 func CreateTech(ctx context.Context, db *gorm.DB, req entity.CreateTechRequest) (entity.CreateTechResponse, error) {
+	status := req.Status
+	if status == "" {
+		status = "draft"
+	}
 	tech := entity.DBTablePost{
 		Title:    req.Title,
 		Content:  req.Content,
 		Category: req.Category,
 		Views:    req.Views,
+		Status:   status,
 	}
 	if err := repository.CreateTech(ctx, db, &tech); err != nil {
 		return entity.CreateTechResponse{}, err
@@ -51,6 +57,7 @@ func CreateTech(ctx context.Context, db *gorm.DB, req entity.CreateTechRequest) 
 		Content:   tech.Content,
 		Category:  tech.Category,
 		Views:     tech.Views,
+		Status:    tech.Status,
 		CreatedAt: tech.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: tech.UpdatedAt.Format(time.RFC3339),
 	}, nil
@@ -66,6 +73,9 @@ func UpdateTech(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateTec
 	tech.Content = req.Content
 	tech.Category = req.Category
 	tech.Views = req.Views
+	if req.Status != "" {
+		tech.Status = req.Status
+	}
 
 	if err := repository.UpdateTech(ctx, db, tech); err != nil {
 		return entity.UpdateTechResponse{}, err
@@ -77,6 +87,7 @@ func UpdateTech(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateTec
 		Content:   tech.Content,
 		Category:  tech.Category,
 		Views:     tech.Views,
+		Status:    tech.Status,
 		CreatedAt: tech.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: tech.UpdatedAt.Format(time.RFC3339),
 	}, nil
