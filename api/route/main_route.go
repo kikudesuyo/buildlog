@@ -3,7 +3,6 @@ package route
 import (
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -92,27 +91,13 @@ func NewRouter(db *gorm.DB) http.Handler {
 	return r
 }
 func corsMiddleware(next http.Handler) http.Handler {
-	var allowedOrigins []string
-	if origins := os.Getenv("ALLOWED_ORIGINS"); origins != "" {
-		for _, o := range strings.Split(origins, ",") {
-			allowedOrigins = append(allowedOrigins, strings.TrimSpace(o))
-		}
+	allowedOrigin := os.Getenv("ALLOWED_ORIGINS")
+	if allowedOrigin == "" {
+		allowedOrigin = "*"
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := r.Header.Get("Origin")
-
-		if len(allowedOrigins) == 0 {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-		} else {
-			for _, o := range allowedOrigins {
-				if o == origin {
-					w.Header().Set("Access-Control-Allow-Origin", origin)
-					break
-				}
-			}
-		}
-
+		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
