@@ -49,7 +49,7 @@
 	}
 
 	function removeHighlight(index: number) {
-		highlights = highlights.filter((_, i) => i !== index);
+		highlights = highlights.filter((_: unknown, i: number) => i !== index);
 	}
 
 	async function handleSave() {
