@@ -2,6 +2,7 @@
 	import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
 	import { resolve } from '$app/paths';
 	import { techCategories } from '$lib/tech/categories';
+	import LikeButton from './LikeButton.svelte';
 
 	type Props = {
 		featuredArticle: FeaturedTechArticle;
@@ -67,6 +68,9 @@
 				<a href={resolve(`/tech/${featured.id}`)} class="hover:underline">{featured.title}</a>
 			</h2>
 			<p class="font-body-md text-body-md mb-6 text-on-surface-variant line-clamp-3">{featured.content}</p>
+			<div class="flex items-center justify-between mb-4">
+				<LikeButton postId={featured.id} initialLikesCount={featured.likesCount} initialHasLiked={featured.hasLiked} />
+			</div>
 			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
 		</article>
 	{/if}
@@ -82,7 +86,10 @@
 					<a href={resolve(`/tech/${article.id}`)}>{article.title}</a>
 				</h3>
 				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
-				{#if article.views}<div class="mt-2 flex items-center gap-4"><span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views}</span></div>{/if}
+				<div class="mt-3 flex items-center gap-4">
+					<LikeButton postId={article.id} initialLikesCount={article.likesCount} initialHasLiked={article.hasLiked} />
+					{#if article.views}<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views}</span>{/if}
+				</div>
 			</article>
 		{/each}
 	</div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import LikeButton from '$lib/components/LikeButton.svelte';
 	let { data } = $props();
 
 	function formatDate(dateStr: string) {
@@ -56,8 +57,12 @@
 		</header>
 
 		<!-- 本文 (Content) -->
-		<section class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface pt-4">
+		<section class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface pt-4 mb-8">
 			{data.tech.content}
 		</section>
+
+		<div class="flex items-center gap-4 border-t border-outline-variant/10 pt-6">
+			<LikeButton postId={data.tech.id} initialLikesCount={data.tech.likesCount} initialHasLiked={data.tech.hasLiked} />
+		</div>
 	</article>
 </div>

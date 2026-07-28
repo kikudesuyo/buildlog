@@ -9,12 +9,30 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListDiaries(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
-	return repository.ListDiaries(ctx, db)
+func ListDiaries(ctx context.Context, db *gorm.DB, ipAddress string) ([]entity.DBTablePost, error) {
+	diaries, err := repository.ListDiaries(ctx, db)
+	if err != nil {
+		return nil, err
+	}
+	for i := range diaries {
+		count, _ := repository.CountLikesByPostID(ctx, db, diaries[i].ID)
+		liked, _ := repository.HasLiked(ctx, db, diaries[i].ID, ipAddress)
+		diaries[i].LikesCount = count
+		diaries[i].HasLiked = liked
+	}
+	return diaries, nil
 }
 
-func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePost, error) {
-	return repository.GetDiaryByID(ctx, db, id)
+func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64, ipAddress string) (*entity.DBTablePost, error) {
+	diary, err := repository.GetDiaryByID(ctx, db, id)
+	if err != nil {
+		return nil, err
+	}
+	count, _ := repository.CountLikesByPostID(ctx, db, diary.ID)
+	liked, _ := repository.HasLiked(ctx, db, diary.ID, ipAddress)
+	diary.LikesCount = count
+	diary.HasLiked = liked
+	return diary, nil
 }
 
 func CreateDiary(ctx context.Context, db *gorm.DB, title, content string) (entity.CreateDiaryResponse, error) {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DiaryEntry } from '$lib/api/types';
 	import { resolve } from '$app/paths';
+	import LikeButton from './LikeButton.svelte';
 
 	type Props = {
 		entries: DiaryEntry[];
@@ -61,7 +62,10 @@
 					{/if}
 				</div>
 				<h2 class="font-headline-lg text-headline-lg mb-stack-md text-primary transition-colors group-hover:text-primary-container">{entry.title}</h2>
-				<p class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface-variant">{entry.content}</p>
+				<p class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface-variant mb-4">{entry.content}</p>
+				<div class="flex items-center justify-between">
+					<LikeButton postId={entry.id} initialLikesCount={entry.likesCount} initialHasLiked={entry.hasLiked} />
+				</div>
 			</article>
 		{/each}
 	</div>

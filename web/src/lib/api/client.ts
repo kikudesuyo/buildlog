@@ -45,6 +45,8 @@ export type ApiPost = {
 	views: string;
 	created_at: string;
 	updated_at: string;
+	likes_count: number;
+	has_liked: boolean;
 };
 
 export async function fetchDiaryEntries(fetchFn: ApiFetch): Promise<DiaryEntry[]> {
@@ -54,7 +56,9 @@ export async function fetchDiaryEntries(fetchFn: ApiFetch): Promise<DiaryEntry[]
 		title: post.title,
 		content: post.content,
 		createdAt: post.created_at,
-		updatedAt: post.updated_at
+		updatedAt: post.updated_at,
+		likesCount: post.likes_count,
+		hasLiked: post.has_liked
 	}));
 }
 
@@ -71,7 +75,9 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 		category: post.category,
 		views: post.views,
 		createdAt: post.created_at,
-		updatedAt: post.updated_at
+		updatedAt: post.updated_at,
+		likesCount: post.likes_count,
+		hasLiked: post.has_liked
 	}));
 
 	const featured = allArticles.length > 0 ? allArticles[0] : {
@@ -81,7 +87,9 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 		category: '',
 		views: '',
 		createdAt: '',
-		updatedAt: ''
+		updatedAt: '',
+		likesCount: 0,
+		hasLiked: false
 	};
 	const remaining = allArticles.length > 1 ? allArticles.slice(1) : [];
 
@@ -110,7 +118,9 @@ export async function createDiary(title: string, content: string): Promise<Diary
 		title: response.data.title,
 		content: response.data.content,
 		createdAt: response.data.created_at,
-		updatedAt: response.data.updated_at
+		updatedAt: response.data.updated_at,
+		likesCount: response.data.likes_count,
+		hasLiked: response.data.has_liked
 	};
 }
 
@@ -121,7 +131,9 @@ export async function updateDiary(id: number, title: string, content: string): P
 		title: response.data.title,
 		content: response.data.content,
 		createdAt: response.data.created_at,
-		updatedAt: response.data.updated_at
+		updatedAt: response.data.updated_at,
+		likesCount: response.data.likes_count,
+		hasLiked: response.data.has_liked
 	};
 }
 
@@ -148,7 +160,9 @@ export async function createTech(req: {
 		category: response.data.category,
 		views: response.data.views,
 		createdAt: response.data.created_at,
-		updatedAt: response.data.updated_at
+		updatedAt: response.data.updated_at,
+		likesCount: response.data.likes_count,
+		hasLiked: response.data.has_liked
 	};
 }
 
@@ -171,7 +185,9 @@ export async function updateTech(id: number, req: {
 		category: response.data.category,
 		views: response.data.views,
 		createdAt: response.data.created_at,
-		updatedAt: response.data.updated_at
+		updatedAt: response.data.updated_at,
+		likesCount: response.data.likes_count,
+		hasLiked: response.data.has_liked
 	};
 }
 
@@ -186,7 +202,9 @@ export async function fetchDiary(fetchFn: ApiFetch, id: number): Promise<DiaryEn
 		title: response.data.title,
 		content: response.data.content,
 		createdAt: response.data.created_at,
-		updatedAt: response.data.updated_at
+		updatedAt: response.data.updated_at,
+		likesCount: response.data.likes_count,
+		hasLiked: response.data.has_liked
 	};
 }
 
@@ -199,8 +217,25 @@ export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArti
 		category: response.data.category,
 		views: response.data.views,
 		createdAt: response.data.created_at,
-		updatedAt: response.data.updated_at
+		updatedAt: response.data.updated_at,
+		likesCount: response.data.likes_count,
+		hasLiked: response.data.has_liked
 	};
+}
+
+export type ApiLikeStatus = {
+	likes_count: number;
+	has_liked: boolean;
+};
+
+export async function likePost(id: number): Promise<ApiLikeStatus> {
+	const response = await sendRequest<ApiObjectResponse<ApiLikeStatus>>('POST', `/posts/${id}/like`);
+	return response.data;
+}
+
+export async function unlikePost(id: number): Promise<ApiLikeStatus> {
+	const response = await sendRequest<ApiObjectResponse<ApiLikeStatus>>('DELETE', `/posts/${id}/like`);
+	return response.data;
 }
 
 export type ApiTrashPost = {
@@ -427,4 +462,3 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 		finalQuote: response.data.final_quote
 	};
 }
-
