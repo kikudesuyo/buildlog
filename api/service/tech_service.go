@@ -22,7 +22,6 @@ func ListTechs(ctx context.Context, db *gorm.DB, all bool, ipAddress string) ([]
 	}
 	return techs, nil
 }
-}
 
 func GetTechByID(ctx context.Context, db *gorm.DB, id int64, ipAddress string) (*entity.DBTablePost, error) {
 	tech, err := repository.GetTechByID(ctx, db, id)
