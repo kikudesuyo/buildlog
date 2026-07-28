@@ -18,7 +18,7 @@ env "local" {
 }
 
 env "prod" {
-  url = var.prod_database_url
+  url = "${var.prod_database_url}&search_path=public"
   dev = "docker://postgres/18/dev?search_path=public"
 
   migration {
