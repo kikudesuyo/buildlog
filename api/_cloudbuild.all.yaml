@@ -42,7 +42,7 @@ steps:
       - '1'
       # 環境変数の設定 (DATABASE_URLを除外)
       - '--update-env-vars'
-      - 'IS_PRODUCTION=$_IS_PRODUCTION,API_DOMAIN=$_API_DOMAIN'
+      - 'IS_PRODUCTION=$_IS_PRODUCTION,API_DOMAIN=$_API_DOMAIN,ALLOWED_ORIGINS=$_ALLOWED_ORIGINS'
       # Secret Managerから環境変数へマウント
       - '--set-secrets'
       - 'DATABASE_URL=DATABASE_URL:latest'
@@ -52,3 +52,4 @@ images:
 
 substitutions:
   _COMMIT_SHA: 'latest'
+  _ALLOWED_ORIGINS: ''

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import LikeButton from '$lib/components/LikeButton.svelte';
 	let { data } = $props();
 
 	function formatDate(dateStr: string) {
@@ -11,6 +12,13 @@
 
 <svelte:head>
 	<title>{data.tech.title} — Buildlog</title>
+	<meta name="description" content={data.tech.content ? data.tech.content.substring(0, 120) + '...' : ''} />
+	<meta property="og:title" content={data.tech.title} />
+	<meta property="og:description" content={data.tech.content ? data.tech.content.substring(0, 120) + '...' : ''} />
+	<meta property="og:type" content="article" />
+	<meta property="og:image" content="https://buildlog.dev/ogp-tech.png" />
+	<meta name="twitter:title" content={data.tech.title} />
+	<meta name="twitter:description" content={data.tech.content ? data.tech.content.substring(0, 120) + '...' : ''} />
 </svelte:head>
 
 <div class="editorial-container mx-auto px-gutter pt-24 pb-20 max-w-[800px]">
@@ -49,8 +57,12 @@
 		</header>
 
 		<!-- 本文 (Content) -->
-		<section class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface pt-4">
+		<section class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface pt-4 mb-8">
 			{data.tech.content}
 		</section>
+
+		<div class="flex items-center gap-4 border-t border-outline-variant/10 pt-6">
+			<LikeButton postId={data.tech.id} initialLikesCount={data.tech.likesCount} initialHasLiked={data.tech.hasLiked} />
+		</div>
 	</article>
 </div>
