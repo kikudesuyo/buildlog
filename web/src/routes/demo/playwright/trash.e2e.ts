@@ -24,7 +24,8 @@ test('capture trash and soft delete screenshots', async ({ page }) => {
 	await page.goto('http://localhost:5173/admin/trash');
 	await page.waitForLoadState('networkidle');
 
-	await expect(page.locator(`h3:has-text("${articleTitle}")`)).toBeVisible();
+	// 複数の一致があった場合でも strict mode 違反にならないよう first() を指定
+	await expect(page.locator(`h3:has-text("${articleTitle}")`).first()).toBeVisible();
 
 	await page.screenshot({ path: 'static/screenshots/admin-trash.png', fullPage: true });
 
@@ -33,5 +34,6 @@ test('capture trash and soft delete screenshots', async ({ page }) => {
 
 	await page.waitForTimeout(500);
 
-	await expect(page.locator(`h3:has-text("${articleTitle}")`)).not.toBeVisible();
+	// 復元後は非表示になること（または first も存在しなくなること）を検証
+	await expect(page.locator(`h3:has-text("${articleTitle}")`).first()).not.toBeVisible();
 });
