@@ -1,9 +1,28 @@
 <script lang="ts">
+import { onMount } from 'svelte';
 import { page } from '$app/state';
 import { resolve } from '$app/paths';
 
 	let isSearchOpen = $state(false);
 	let searchQuery = $state('');
+	let isDarkMode = $state(false);
+
+	onMount(() => {
+		isDarkMode = document.documentElement.classList.contains('dark');
+	});
+
+	function toggleTheme() {
+		isDarkMode = !isDarkMode;
+		if (isDarkMode) {
+			document.documentElement.classList.add('dark');
+			document.documentElement.classList.remove('light');
+			localStorage.setItem('theme', 'dark');
+		} else {
+			document.documentElement.classList.add('light');
+			document.documentElement.classList.remove('dark');
+			localStorage.setItem('theme', 'light');
+		}
+	}
 
 	const navItems = [
 		{ href: '/', label: 'Diary' },
@@ -57,10 +76,12 @@ import { resolve } from '$app/paths';
 			</button>
 			<button
 				type="button"
-				aria-label="Settings"
+				aria-label="Toggle Theme"
+				onclick={toggleTheme}
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
+				title={isDarkMode ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
 			>
-				settings
+				{isDarkMode ? 'light_mode' : 'dark_mode'}
 			</button>
 		</div>
 	</div>

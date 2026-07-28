@@ -2,6 +2,18 @@
 <html lang="ja" class="light">
 	<head>
 		<meta charset="utf-8" />
+		<script>
+			try {
+				const theme = localStorage.getItem('theme');
+				if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+					document.documentElement.classList.add('dark');
+					document.documentElement.classList.remove('light');
+				} else {
+					document.documentElement.classList.add('light');
+					document.documentElement.classList.remove('dark');
+				}
+			} catch (e) {}
+		</script>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />

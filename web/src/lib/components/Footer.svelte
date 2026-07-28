@@ -2,8 +2,8 @@
 	import * as env from '$env/static/public';
 	import { resolve } from '$app/paths';
 
-	const githubUrl = env.PUBLIC_GITHUB_URL || 'https://github.com/kikudesuyo';
-	const xUrl = env.PUBLIC_X_URL || 'https://x.com/kikudesuyo';
+	const githubUrl = (env as any).PUBLIC_GITHUB_URL || 'https://github.com/kikudesuyo';
+	const xUrl = (env as any).PUBLIC_X_URL || 'https://x.com/kikudesuyo';
 </script>
 
 <!-- Footer -->

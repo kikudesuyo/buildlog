@@ -1,5 +1,14 @@
 <script lang="ts">
 	let { data } = $props();
+	let copied = $state(false);
+
+	function copyEmail() {
+		navigator.clipboard.writeText(data.profileData.contactEmail);
+		copied = true;
+		setTimeout(() => {
+			copied = false;
+		}, 2000);
+	}
 </script>
 
 <svelte:head>
@@ -104,13 +113,22 @@
 		</h2>
 		<div class="flex flex-col gap-6 md:flex-row md:items-center md:gap-12 mt-6">
 			<!-- Email Link -->
-			<a
-				href="mailto:{data.profileData.contactEmail}"
-				class="flex items-center gap-3 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200"
+			<button
+				type="button"
+				onclick={copyEmail}
+				class="flex items-center gap-3 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200 cursor-pointer bg-transparent border-none p-0 text-left"
+				title="メールアドレスをコピー"
 			>
-				<span class="material-symbols-outlined text-[20px]">mail</span>
-				{data.profileData.contactEmail}
-			</a>
+				<span class="material-symbols-outlined text-[20px]">
+					{copied ? 'check' : 'mail'}
+				</span>
+				<span class="flex items-center gap-2">
+					{data.profileData.contactEmail}
+					{#if copied}
+						<span class="text-primary font-label-sm text-label-sm tracking-wider">(コピーしました)</span>
+					{/if}
+				</span>
+			</button>
 
 			<!-- Social Links -->
 			<div class="flex items-center gap-6">
