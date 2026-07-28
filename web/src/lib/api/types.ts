@@ -24,6 +24,7 @@ export type FeaturedTechArticle = TechArticle;
 
 export interface AppProject {
 	id: string;
+	slug?: string;
 	name: string;
 	category: string;
 	tags: string[];
@@ -50,4 +51,14 @@ export interface ProfileData {
 	expertise: string[];
 	contactEmail: string;
 	finalQuote: string;
+}
+
+export interface TrashEntry {
+	id: number;
+	type: string;
+	title: string;
+	content: string;
+	category?: string;
+	createdAt: string;
+	deletedAt: string;
 }
