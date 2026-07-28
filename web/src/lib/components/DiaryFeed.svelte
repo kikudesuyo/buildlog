@@ -46,7 +46,7 @@
 
 	<div class="flex flex-col gap-6">
 		{#each displayEntries as entry (entry.id)}
-			<article class="group relative -mx-4 rounded-xl border border-transparent p-4">
+			<article class="group relative rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20">
 				<div class="mb-stack-sm flex items-center justify-between">
 					<span class="font-label-sm text-label-sm text-outline">{formatDate(entry.createdAt)}</span>
 					{#if isAdmin}
