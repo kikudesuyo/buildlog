@@ -49,6 +49,12 @@ func NewRouter(db *gorm.DB) http.Handler {
 			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteTech(db))
 		})
 
+		r.Get("/trash", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetDeletedPosts(db))
+		})
+		r.Put("/trash/{id}/restore", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleRestorePost(db))
+		})
 		r.Get("/apps", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleGetAppList(db))
 		})
@@ -63,6 +69,7 @@ func NewRouter(db *gorm.DB) http.Handler {
 		})
 		r.Delete("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteApp(db))
+		})
 		r.Get("/profile", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleGetProfile(db))
 		})
@@ -73,7 +80,6 @@ func NewRouter(db *gorm.DB) http.Handler {
 
 	return r
 }
-
 func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")

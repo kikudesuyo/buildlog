@@ -5,7 +5,8 @@
 	const navItems = [
 		{ href: '/admin', label: 'Diary', description: 'つぶやきを管理', icon: 'edit_note' },
 		{ href: '/admin/tech', label: 'Tech', description: '技術記事を管理', icon: 'article' },
-		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' }
+		{ href: '/admin/trash', label: 'Trash', description: 'ゴミ箱', icon: 'delete_outline' },
+		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' },
 		{ href: '/admin/profile', label: 'Profile', description: '自己紹介を管理', icon: 'person' }
 	] as const;
 
@@ -42,7 +43,7 @@
 		<nav aria-label="管理メニュー" class="flex flex-col gap-1">
 			{#each navItems as item (item.href)}
 				<a
-					href={resolve(item.href)}
+					href={resolve(item.href as any)}
 					onclick={() => (isOpen = false)}
 					class="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors {isActive(item.href) ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'}"
 				>

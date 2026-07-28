@@ -48,3 +48,13 @@ export interface ProfileData {
 	contactEmail: string;
 	finalQuote: string;
 }
+
+export interface TrashEntry {
+	id: number;
+	type: string;
+	title: string;
+	content: string;
+	category?: string;
+	createdAt: string;
+	deletedAt: string;
+}
