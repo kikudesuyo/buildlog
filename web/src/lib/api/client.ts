@@ -325,3 +325,77 @@ export async function deleteApp(id: number): Promise<void> {
 	await sendRequest<void>('DELETE', `/apps/${id}`);
 }
 
+export async function fetchProfile(fetchFn: ApiFetch): Promise<ProfileData> {
+	const response = await get<ApiObjectResponse<{
+		id: number;
+		name: string;
+		subtitle: string;
+		title: string;
+		avatar_url: string;
+		quote: string;
+		bio: string[];
+		highlights: { title: string; period: string; description: string }[];
+		award: string;
+		expertise: string[];
+		contact_email: string;
+		final_quote: string;
+	}>>(fetchFn, '/profile');
+
+	return {
+		name: response.data.name,
+		subtitle: response.data.subtitle,
+		title: response.data.title,
+		avatarUrl: response.data.avatar_url,
+		quote: response.data.quote,
+		bio: response.data.bio,
+		highlights: response.data.highlights,
+		award: response.data.award,
+		expertise: response.data.expertise,
+		contactEmail: response.data.contact_email,
+		finalQuote: response.data.final_quote
+	};
+}
+
+export async function updateProfile(profile: ProfileData): Promise<ProfileData> {
+	const response = await sendRequest<ApiObjectResponse<{
+		id: number;
+		name: string;
+		subtitle: string;
+		title: string;
+		avatar_url: string;
+		quote: string;
+		bio: string[];
+		highlights: { title: string; period: string; description: string }[];
+		award: string;
+		expertise: string[];
+		contact_email: string;
+		final_quote: string;
+	}>>('PUT', '/profile', {
+		name: profile.name,
+		subtitle: profile.subtitle,
+		title: profile.title,
+		avatar_url: profile.avatarUrl,
+		quote: profile.quote,
+		bio: profile.bio,
+		highlights: profile.highlights,
+		award: profile.award || '',
+		expertise: profile.expertise,
+		contact_email: profile.contactEmail,
+		final_quote: profile.finalQuote
+	});
+
+	return {
+		name: response.data.name,
+		subtitle: response.data.subtitle,
+		title: response.data.title,
+		avatarUrl: response.data.avatar_url,
+		quote: response.data.quote,
+		bio: response.data.bio,
+		highlights: response.data.highlights,
+		award: response.data.award,
+		expertise: response.data.expertise,
+		contactEmail: response.data.contact_email,
+		finalQuote: response.data.final_quote
+	};
+}
+
