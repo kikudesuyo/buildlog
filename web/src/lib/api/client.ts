@@ -23,7 +23,7 @@ type ApiObjectResponse<T> = {
 
 
 const apiBaseUrl = (() => {
-	const rawUrl = import.meta.env.PUBLIC_API_BASE_URL || 'http://localhost:8081';
+	const rawUrl = env.PUBLIC_API_BASE_URL 
 	return rawUrl.endsWith('/api/v1') ? rawUrl : `${rawUrl}/api/v1`;
 })();
 
