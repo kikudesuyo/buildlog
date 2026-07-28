@@ -11,6 +11,13 @@
 
 <svelte:head>
 	<title>{data.tech.title} — Buildlog</title>
+	<meta name="description" content={data.tech.content ? data.tech.content.substring(0, 120) + '...' : ''} />
+	<meta property="og:title" content={data.tech.title} />
+	<meta property="og:description" content={data.tech.content ? data.tech.content.substring(0, 120) + '...' : ''} />
+	<meta property="og:type" content="article" />
+	<meta property="og:image" content="https://buildlog.dev/ogp-tech.png" />
+	<meta name="twitter:title" content={data.tech.title} />
+	<meta name="twitter:description" content={data.tech.content ? data.tech.content.substring(0, 120) + '...' : ''} />
 </svelte:head>
 
 <div class="editorial-container mx-auto px-gutter pt-24 pb-20 max-w-[800px]">

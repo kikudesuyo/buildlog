@@ -20,6 +20,7 @@ export type FeaturedTechArticle = TechArticle;
 
 export interface AppProject {
 	id: string;
+	slug?: string;
 	name: string;
 	category: string;
 	tags: string[];
