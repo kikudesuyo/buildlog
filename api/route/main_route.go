@@ -2,6 +2,7 @@ package route
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -48,16 +49,58 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Delete("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteTech(db))
 		})
+
+		r.Post("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandlePostLike(db))
+		})
+		r.Delete("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteLike(db))
+		})
+		r.Get("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetLikeStatus(db))
+		})
+		r.Get("/trash", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetDeletedPosts(db))
+		})
+		r.Put("/trash/{id}/restore", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleRestorePost(db))
+		})
+		r.Get("/apps", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetAppList(db))
+		})
+		r.Get("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetApp(db))
+		})
+		r.Post("/apps", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleCreateApp(db))
+		})
+		r.Put("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateApp(db))
+		})
+		r.Delete("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteApp(db))
+		})
+		r.Get("/profile", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetProfile(db))
+		})
+		r.Put("/profile", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateProfile(db))
+		})
 	})
 
 	return r
 }
-
 func corsMiddleware(next http.Handler) http.Handler {
+	allowedOrigin := os.Getenv("ALLOWED_ORIGINS")
+	if allowedOrigin == "" {
+		allowedOrigin = "*"
+	}
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
