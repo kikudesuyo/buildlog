@@ -48,6 +48,13 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Delete("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteTech(db))
 		})
+
+		r.Get("/profile", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetProfile(db))
+		})
+		r.Put("/profile", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateProfile(db))
+		})
 	})
 
 	return r
