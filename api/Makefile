@@ -53,6 +53,11 @@ migrate_apply:
 	$(LOAD_ENV) ; \
 	cd ../sql && atlas migrate apply --env local
 
+# 本番環境マイグレーション実行
+migrate_apply_prod:
+	@PROD_DATABASE_URL=$$(gcloud secrets versions access latest --secret=DATABASE_URL --project=${GCP_PROJECT_PROD}) ; \
+	cd ../sql && PROD_DATABASE_URL="$$PROD_DATABASE_URL" atlas migrate apply --env prod
+
 # テストデータ注入
 db_seed:
 	$(LOAD_ENV) ; \
