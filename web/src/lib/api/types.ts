@@ -4,6 +4,8 @@ export interface DiaryEntry {
 	content: string;
 	createdAt: string;
 	updatedAt: string;
+	likesCount: number;
+	hasLiked?: boolean;
 }
 
 export interface TechArticle {
@@ -14,12 +16,15 @@ export interface TechArticle {
 	views?: string;
 	createdAt: string;
 	updatedAt: string;
+	likesCount: number;
+	hasLiked?: boolean;
 }
 
 export type FeaturedTechArticle = TechArticle;
 
 export interface AppProject {
 	id: string;
+	slug?: string;
 	name: string;
 	category: string;
 	tags: string[];
@@ -45,5 +50,17 @@ export interface ProfileData {
 	award?: string;
 	expertise: string[];
 	contactEmail: string;
+	githubUrl?: string;
+	xUrl?: string;
 	finalQuote: string;
+}
+
+export interface TrashEntry {
+	id: number;
+	type: string;
+	title: string;
+	content: string;
+	category?: string;
+	createdAt: string;
+	deletedAt: string;
 }

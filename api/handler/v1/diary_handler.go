@@ -14,7 +14,8 @@ import (
 
 func HandleGetDiaryList(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		diaries, err := service.ListDiaries(r.Context(), db)
+		ipAddress := getClientIP(r)
+		diaries, err := service.ListDiaries(r.Context(), db, ipAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -29,7 +30,8 @@ func HandleGetDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, err
 		}
 
-		diary, err := service.GetDiaryByID(r.Context(), db, id)
+		ipAddress := getClientIP(r)
+		diary, err := service.GetDiaryByID(r.Context(), db, id, ipAddress)
 		if err != nil {
 			return nil, err
 		}
