@@ -10,18 +10,17 @@ import (
 )
 
 func ListTechs(ctx context.Context, db *gorm.DB, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	techs, err := repository.ListTechs(ctx, db, all)
+	techList, err := repository.ListTechs(ctx, db, all)
 	if err != nil {
 		return nil, err
 	}
-	for i := range techs {
-		count, _ := repository.CountLikesByPostID(ctx, db, techs[i].ID)
-		liked, _ := repository.HasLiked(ctx, db, techs[i].ID, ipAddress)
-		techs[i].LikesCount = count
-		techs[i].HasLiked = liked
+	for i := range techList {
+		count, _ := repository.CountLikesByPostID(ctx, db, techList[i].ID)
+		liked, _ := repository.HasLiked(ctx, db, techList[i].ID, ipAddress)
+		techList[i].LikesCount = count
+		techList[i].HasLiked = liked
 	}
-	return techs, nil
-}
+	return techList, nil
 }
 
 func GetTechByID(ctx context.Context, db *gorm.DB, id int64, ipAddress string) (*entity.DBTablePost, error) {

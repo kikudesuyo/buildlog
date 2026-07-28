@@ -8,9 +8,9 @@ import (
 )
 
 func ListApps(ctx context.Context, db *gorm.DB) ([]entity.DBTableApp, error) {
-	apps := make([]entity.DBTableApp, 0)
-	err := db.WithContext(ctx).Order("id ASC").Find(&apps).Error
-	return apps, err
+	appList := make([]entity.DBTableApp, 0)
+	err := db.WithContext(ctx).Order("id ASC").Find(&appList).Error
+	return appList, err
 }
 
 func GetAppByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTableApp, error) {

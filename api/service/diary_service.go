@@ -10,17 +10,17 @@ import (
 )
 
 func ListDiaries(ctx context.Context, db *gorm.DB, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	diaries, err := repository.ListDiaries(ctx, db, all)
+	diaryList, err := repository.ListDiaries(ctx, db, all)
 	if err != nil {
 		return nil, err
 	}
-	for i := range diaries {
-		count, _ := repository.CountLikesByPostID(ctx, db, diaries[i].ID)
-		liked, _ := repository.HasLiked(ctx, db, diaries[i].ID, ipAddress)
-		diaries[i].LikesCount = count
-		diaries[i].HasLiked = liked
+	for i := range diaryList {
+		count, _ := repository.CountLikesByPostID(ctx, db, diaryList[i].ID)
+		liked, _ := repository.HasLiked(ctx, db, diaryList[i].ID, ipAddress)
+		diaryList[i].LikesCount = count
+		diaryList[i].HasLiked = liked
 	}
-	return diaries, nil
+	return diaryList, nil
 }
 
 func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64, ipAddress string) (*entity.DBTablePost, error) {

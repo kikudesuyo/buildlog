@@ -8,7 +8,7 @@ import (
 )
 
 func ListDiaries(ctx context.Context, db *gorm.DB, all bool) ([]entity.DBTablePost, error) {
-	diaries := make([]entity.DBTablePost, 0)
+	diaryList := make([]entity.DBTablePost, 0)
 	query := db.WithContext(ctx).Where("type = ?", "diary")
 	if !all {
 		query = query.Where("status = ?", "published")
@@ -16,8 +16,8 @@ func ListDiaries(ctx context.Context, db *gorm.DB, all bool) ([]entity.DBTablePo
 	err := query.
 		Order("created_at DESC").
 		Order("id DESC").
-		Find(&diaries).Error
-	return diaries, err
+		Find(&diaryList).Error
+	return diaryList, err
 }
 
 func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePost, error) {
