@@ -4,11 +4,15 @@
 	import { createTech } from '$lib/api/client';
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 	import { defaultTechCategory, techCategories } from '$lib/tech/categories';
+	import { marked } from 'marked';
 
 	let title = $state('');
 	let content = $state('');
 	let category = $state(defaultTechCategory);
 	let views = $state('');
+
+	let previewMode = $state<'edit' | 'preview' | 'split'>('edit');
+	let parsedContent = $derived(marked.parse(content) as string);
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
@@ -143,17 +147,57 @@
 			/>
 		</div>
 
-		<!-- 本文 -->
-		<div class="flex flex-col gap-1.5">
-			<label for="tech-content" class="font-label-md text-label-md font-bold text-on-surface">本文 *</label>
-			<textarea
-				id="tech-content"
-				use:autogrow
-				bind:value={content}
-				placeholder="本文を書き始めましょう..."
-				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
-				disabled={isSubmitting}
-			></textarea>
+		<!-- レイアウト切替タブ -->
+		<div class="flex items-center gap-1 bg-surface-container-high p-1 rounded-lg border border-outline-variant/20 w-fit self-end">
+			<button
+				type="button"
+				onclick={() => (previewMode = 'edit')}
+				class="px-3 py-1.5 rounded text-label-md font-label-md cursor-pointer transition-all {previewMode === 'edit' ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-highest'}"
+			>
+				✍️ 編集
+			</button>
+			<button
+				type="button"
+				onclick={() => (previewMode = 'preview')}
+				class="px-3 py-1.5 rounded text-label-md font-label-md cursor-pointer transition-all {previewMode === 'preview' ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-highest'}"
+			>
+				👁️ プレビュー
+			</button>
+			<button
+				type="button"
+				onclick={() => (previewMode = 'split')}
+				class="hidden md:block px-3 py-1.5 rounded text-label-md font-label-md cursor-pointer transition-all {previewMode === 'split' ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-highest'}"
+			>
+				📖 2カラム
+			</button>
+		</div>
+
+		<!-- 編集・プレビューエリア -->
+		<div class="grid gap-6 {previewMode === 'split' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}">
+			<!-- 編集エリア (edit または split の時表示) -->
+			{#if previewMode === 'edit' || previewMode === 'split'}
+				<div class="flex flex-col gap-1.5 border border-outline-variant/10 rounded-xl p-4 bg-surface-container-lowest">
+					<label for="tech-content" class="font-label-md text-label-md font-bold text-on-surface border-b border-outline-variant/10 pb-2 mb-2">本文 *</label>
+					<textarea
+						id="tech-content"
+						use:autogrow
+						bind:value={content}
+						placeholder="本文を書き始めましょう..."
+						class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
+						disabled={isSubmitting}
+					></textarea>
+				</div>
+			{/if}
+
+			<!-- プレビューエリア (preview または split の時表示) -->
+			{#if previewMode === 'preview' || previewMode === 'split'}
+				<div class="flex flex-col gap-1.5 border border-outline-variant/10 rounded-xl p-4 bg-surface-container-lowest overflow-y-auto">
+					<span class="font-label-md text-label-md font-bold text-primary border-b border-outline-variant/10 pb-2 mb-2">リアルタイムプレビュー</span>
+					<div class="prose max-w-none text-on-surface min-h-[300px] text-body-lg leading-relaxed">
+						{@html parsedContent}
+					</div>
+				</div>
+			{/if}
 		</div>
 
 		<!-- 下部設定セクション -->
