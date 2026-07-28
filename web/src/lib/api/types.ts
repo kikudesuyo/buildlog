@@ -66,3 +66,10 @@ export interface TrashEntry {
 	createdAt: string;
 	deletedAt: string;
 }
+
+export interface HistoryItem {
+	id: number;
+	type: 'diary' | 'tech';
+	title: string;
+	createdAt: string;
+}

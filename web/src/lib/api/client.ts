@@ -6,7 +6,8 @@ import type {
 	TechArticle,
 	TrashEntry,
 	AppProject,
-	ProfileData
+	ProfileData,
+	HistoryItem
 } from '$lib/api/types';
 
 type ApiFetch = LoadEvent['fetch'];
@@ -23,7 +24,7 @@ type ApiObjectResponse<T> = {
 
 
 const apiBaseUrl = (() => {
-	const rawUrl = env.PUBLIC_API_BASE_URL 
+	const rawUrl = env.PUBLIC_API_BASE_URL || 'http://localhost:8081';
 	return rawUrl.endsWith('/api/v1') ? rawUrl : `${rawUrl}/api/v1`;
 })();
 
@@ -477,4 +478,20 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 		contactEmail: response.data.contact_email,
 		finalQuote: response.data.final_quote
 	};
+}
+
+export async function fetchPostHistory(fetchFn?: ApiFetch): Promise<HistoryItem[]> {
+	const response = await get<ApiListResponse<{
+		id: number;
+		type: string;
+		title: string;
+		created_at: string;
+	}>>(fetchFn || fetch, '/posts/history');
+
+	return response.data_list.map((item) => ({
+		id: item.id,
+		type: item.type as 'diary' | 'tech',
+		title: item.title,
+		createdAt: item.created_at
+	}));
 }
