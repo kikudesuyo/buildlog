@@ -7,11 +7,19 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListTechs(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
+func ListTechs(ctx context.Context, db *gorm.DB, tag string) ([]entity.DBTablePost, error) {
 	techs := make([]entity.DBTablePost, 0)
-	err := db.WithContext(ctx).
-		Where("type = ?", "tech").
-		Order("created_at DESC").
+	query := db.WithContext(ctx).
+		Preload("Tags").
+		Where("type = ?", "tech")
+
+	if tag != "" {
+		query = query.Joins("JOIN post_tags ON post_tags.post_id = posts.id").
+			Joins("JOIN tags ON tags.id = post_tags.tag_id").
+			Where("tags.name = ?", tag)
+	}
+
+	err := query.Order("created_at DESC").
 		Order("id DESC").
 		Find(&techs).Error
 	return techs, err
@@ -19,7 +27,7 @@ func ListTechs(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
 
 func GetTechByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePost, error) {
 	var tech entity.DBTablePost
-	err := db.WithContext(ctx).Where("type = ?", "tech").First(&tech, id).Error
+	err := db.WithContext(ctx).Preload("Tags").Where("type = ?", "tech").First(&tech, id).Error
 	return &tech, err
 }
 

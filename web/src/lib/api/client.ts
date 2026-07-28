@@ -40,26 +40,30 @@ export type ApiPost = {
 	excerpt: string;
 	category: string;
 	views: string;
+	tags: { id: number; name: string }[];
 	created_at: string;
 	updated_at: string;
 };
 
-export async function fetchDiaryEntries(fetchFn: ApiFetch): Promise<DiaryEntry[]> {
-	const response = await get<ApiListResponse<ApiPost>>(fetchFn, '/diaries');
+export async function fetchDiaryEntries(fetchFn: ApiFetch, tag?: string): Promise<DiaryEntry[]> {
+	const url = tag ? `/diaries?tag=${encodeURIComponent(tag)}` : '/diaries';
+	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);
 	return response.data_list.map((post) => ({
 		id: post.id,
 		title: post.title,
 		content: post.content,
+		tags: post.tags ? post.tags.map((t) => t.name) : [],
 		createdAt: post.created_at,
 		updatedAt: post.updated_at
 	}));
 }
 
-export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
+export async function fetchTechFeed(fetchFn: ApiFetch, tag?: string): Promise<{
 	featuredArticle: FeaturedTechArticle;
 	techArticles: TechArticle[];
 }> {
-	const response = await get<ApiListResponse<ApiPost>>(fetchFn, '/techs');
+	const url = tag ? `/techs?tag=${encodeURIComponent(tag)}` : '/techs';
+	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);
 	
 	const allArticles: TechArticle[] = response.data_list.map((post) => ({
 		id: post.id,
@@ -67,6 +71,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 		content: post.content,
 		category: post.category,
 		views: post.views,
+		tags: post.tags ? post.tags.map((t) => t.name) : [],
 		createdAt: post.created_at,
 		updatedAt: post.updated_at
 	}));
@@ -77,6 +82,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch): Promise<{
 		content: '',
 		category: '',
 		views: '',
+		tags: [],
 		createdAt: '',
 		updatedAt: ''
 	};
@@ -100,23 +106,25 @@ async function sendRequest<T>(method: string, path: string, body?: unknown): Pro
 	return response.json() as Promise<T>;
 }
 
-export async function createDiary(title: string, content: string): Promise<DiaryEntry> {
-	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/diaries', { title, content });
+export async function createDiary(title: string, content: string, tags: string[] = []): Promise<DiaryEntry> {
+	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/diaries', { title, content, tags });
 	return {
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
+		tags: response.data.tags ? response.data.tags.map((t) => t.name) : [],
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};
 }
 
-export async function updateDiary(id: number, title: string, content: string): Promise<DiaryEntry> {
-	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/diaries/${id}`, { title, content });
+export async function updateDiary(id: number, title: string, content: string, tags: string[] = []): Promise<DiaryEntry> {
+	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/diaries/${id}`, { title, content, tags });
 	return {
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
+		tags: response.data.tags ? response.data.tags.map((t) => t.name) : [],
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};
@@ -131,12 +139,14 @@ export async function createTech(req: {
 	content: string;
 	category: string;
 	views?: string;
+	tags?: string[];
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/techs', {
 		title: req.title,
 		content: req.content,
 		category: req.category,
-		views: req.views || ''
+		views: req.views || '',
+		tags: req.tags || []
 	});
 	return {
 		id: response.data.id,
@@ -144,6 +154,7 @@ export async function createTech(req: {
 		content: response.data.content,
 		category: response.data.category,
 		views: response.data.views,
+		tags: response.data.tags ? response.data.tags.map((t) => t.name) : [],
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};
@@ -154,12 +165,14 @@ export async function updateTech(id: number, req: {
 	content: string;
 	category: string;
 	views?: string;
+	tags?: string[];
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/techs/${id}`, {
 		title: req.title,
 		content: req.content,
 		category: req.category,
-		views: req.views || ''
+		views: req.views || '',
+		tags: req.tags || []
 	});
 	return {
 		id: response.data.id,
@@ -167,6 +180,7 @@ export async function updateTech(id: number, req: {
 		content: response.data.content,
 		category: response.data.category,
 		views: response.data.views,
+		tags: response.data.tags ? response.data.tags.map((t) => t.name) : [],
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};
@@ -182,6 +196,7 @@ export async function fetchDiary(fetchFn: ApiFetch, id: number): Promise<DiaryEn
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
+		tags: response.data.tags ? response.data.tags.map((t) => t.name) : [],
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};
@@ -195,6 +210,7 @@ export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArti
 		content: response.data.content,
 		category: response.data.category,
 		views: response.data.views,
+		tags: response.data.tags ? response.data.tags.map((t) => t.name) : [],
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at
 	};

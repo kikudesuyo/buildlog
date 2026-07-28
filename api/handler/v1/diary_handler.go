@@ -14,7 +14,8 @@ import (
 
 func HandleGetDiaryList(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		diaries, err := service.ListDiaries(r.Context(), db)
+		tag := r.URL.Query().Get("tag")
+		diaries, err := service.ListDiaries(r.Context(), db, tag)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +49,7 @@ func HandleCreateDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.CreateDiary(r.Context(), db, req.Title, req.Content)
+		resp, err := service.CreateDiary(r.Context(), db, req)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +75,7 @@ func HandleUpdateDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.UpdateDiary(r.Context(), db, id, req.Title, req.Content)
+		resp, err := service.UpdateDiary(r.Context(), db, id, req)
 		if err != nil {
 			return nil, err
 		}

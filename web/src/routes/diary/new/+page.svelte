@@ -8,10 +8,9 @@
 	let content = $state('');
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
-	let isDirty = $derived(title.trim().length > 0 || content.trim().length > 0);
+	let isDirty = $derived(title.trim().length > 0 || content.trim().length > 0 || tags.length > 0);
 
-	// ダミーのUIステート (image.pngの再現用)
-	let tags = $state(['エッセイ', '創作']);
+	let tags = $state<string[]>([]);
 	let isPublicLimited = $state(false);
 	let isCommentsAllowed = $state(true);
 
@@ -39,7 +38,7 @@
 		isSubmitting = true;
 		errorMessage = '';
 		try {
-			await createDiary(title, content);
+			await createDiary(title, content, tags);
 			goto(resolve('/admin'));
 		} catch {
 			errorMessage = 'つぶやきの保存に失敗しました。';

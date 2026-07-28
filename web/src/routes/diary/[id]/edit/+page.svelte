@@ -8,12 +8,24 @@
 
 	let title = $state(data.diary.title);
 	let content = $state(data.diary.content);
+	let tags = $state<string[]>(data.diary.tags || []);
+
+	function areTagsEqual(a: string[], b: string[]) {
+		if (a.length !== b.length) return false;
+		for (let i = 0; i < a.length; i++) {
+			if (a[i] !== b[i]) return false;
+		}
+		return true;
+	}
+
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
-	let isDirty = $derived(title !== data.diary.title || content !== data.diary.content);
+	let isDirty = $derived(
+		title !== data.diary.title ||
+		content !== data.diary.content ||
+		!areTagsEqual(tags, data.diary.tags || [])
+	);
 
-	// ダミーのUIステート (image.pngの再現用)
-	let tags = $state(['エッセイ', '創作']);
 	let isPublicLimited = $state(false);
 	let isCommentsAllowed = $state(true);
 
@@ -41,7 +53,7 @@
 		isSubmitting = true;
 		errorMessage = '';
 		try {
-			await updateDiary(data.diary.id, title, content);
+			await updateDiary(data.diary.id, title, content, tags);
 			goto(resolve('/admin'));
 		} catch {
 			errorMessage = 'つぶやきの更新に失敗しました。';

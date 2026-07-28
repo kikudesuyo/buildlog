@@ -42,6 +42,20 @@
 				{/if}
 			</div>
 
+			<!-- タグリスト -->
+			{#if data.tech.tags && data.tech.tags.length > 0}
+				<div class="flex flex-wrap gap-1.5 mt-1">
+					{#each data.tech.tags as tag (tag)}
+						<a
+							href={resolve('/tech?tag=' + encodeURIComponent(tag))}
+							class="font-label-sm text-[11px] px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-primary hover:text-on-primary transition-all cursor-pointer"
+						>
+							#{tag}
+						</a>
+					{/each}
+				</div>
+			{/if}
+
 			<!-- タイトル -->
 			<h1 class="font-display-lg text-[40px] leading-tight text-primary font-bold tracking-tight">
 				{data.tech.title}

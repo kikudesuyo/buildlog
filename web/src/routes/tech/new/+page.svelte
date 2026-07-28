@@ -16,11 +16,11 @@
 		title.trim().length > 0 ||
 		content.trim().length > 0 ||
 		category !== defaultTechCategory ||
-		views.trim().length > 0
+		views.trim().length > 0 ||
+		tags.length > 0
 	);
 
-	// ダミーのUIステート (image.pngの再現用)
-	let tags = $state(['技術', 'プログラミング']);
+	let tags = $state<string[]>([]);
 	let isCommentsAllowed = $state(true);
 
 	// オートリサイズ用のアクション
@@ -51,7 +51,8 @@
 				title,
 				content,
 				category,
-				views
+				views,
+				tags
 			});
 			goto(resolve('/admin/tech'));
 		} catch {

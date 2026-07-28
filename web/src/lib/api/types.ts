@@ -2,6 +2,7 @@ export interface DiaryEntry {
 	id: number;
 	title: string;
 	content: string;
+	tags?: string[];
 	createdAt: string;
 	updatedAt: string;
 }
@@ -12,6 +13,7 @@ export interface TechArticle {
 	content: string;
 	category: string;
 	views?: string;
+	tags?: string[];
 	createdAt: string;
 	updatedAt: string;
 }

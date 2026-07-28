@@ -7,11 +7,19 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListDiaries(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
+func ListDiaries(ctx context.Context, db *gorm.DB, tag string) ([]entity.DBTablePost, error) {
 	diaries := make([]entity.DBTablePost, 0)
-	err := db.WithContext(ctx).
-		Where("type = ?", "diary").
-		Order("created_at DESC").
+	query := db.WithContext(ctx).
+		Preload("Tags").
+		Where("type = ?", "diary")
+
+	if tag != "" {
+		query = query.Joins("JOIN post_tags ON post_tags.post_id = posts.id").
+			Joins("JOIN tags ON tags.id = post_tags.tag_id").
+			Where("tags.name = ?", tag)
+	}
+
+	err := query.Order("created_at DESC").
 		Order("id DESC").
 		Find(&diaries).Error
 	return diaries, err
@@ -19,7 +27,7 @@ func ListDiaries(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error)
 
 func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePost, error) {
 	var diary entity.DBTablePost
-	err := db.WithContext(ctx).Where("type = ?", "diary").First(&diary, id).Error
+	err := db.WithContext(ctx).Preload("Tags").Where("type = ?", "diary").First(&diary, id).Error
 	return &diary, err
 }
 

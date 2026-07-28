@@ -62,6 +62,18 @@
 				</div>
 				<h2 class="font-headline-lg text-headline-lg mb-stack-md text-primary transition-colors group-hover:text-primary-container">{entry.title}</h2>
 				<p class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface-variant">{entry.content}</p>
+				{#if entry.tags && entry.tags.length > 0}
+					<div class="mt-3 flex flex-wrap gap-1.5">
+						{#each entry.tags as tag (tag)}
+							<a
+								href={resolve('/?tag=' + encodeURIComponent(tag))}
+								class="font-label-sm text-[11px] px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant hover:bg-primary hover:text-on-primary transition-all cursor-pointer"
+							>
+								#{tag}
+							</a>
+						{/each}
+					</div>
+				{/if}
 			</article>
 		{/each}
 	</div>

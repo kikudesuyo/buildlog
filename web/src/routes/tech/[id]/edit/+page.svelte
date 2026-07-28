@@ -11,6 +11,15 @@
 	let content = $state(data.tech.content || '');
 	let category = $state(data.tech.category);
 	let views = $state(data.tech.views || '');
+	let tags = $state<string[]>(data.tech.tags || []);
+
+	function areTagsEqual(a: string[], b: string[]) {
+		if (a.length !== b.length) return false;
+		for (let i = 0; i < a.length; i++) {
+			if (a[i] !== b[i]) return false;
+		}
+		return true;
+	}
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
@@ -18,11 +27,10 @@
 		title !== data.tech.title ||
 		content !== (data.tech.content || '') ||
 		category !== data.tech.category ||
-		views !== (data.tech.views || '')
+		views !== (data.tech.views || '') ||
+		!areTagsEqual(tags, data.tech.tags || [])
 	);
 
-	// ダミーのUIステート (image.pngの再現用)
-	let tags = $state(['技術', 'プログラミング']);
 	let isCommentsAllowed = $state(true);
 
 	// オートリサイズ用のアクション
@@ -53,7 +61,8 @@
 				title,
 				content,
 				category,
-				views
+				views,
+				tags
 			});
 			goto(resolve('/admin/tech'));
 		} catch {
