@@ -18,7 +18,16 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>Buildlog</title>
+	<title>Buildlog — テクノロジーと美学をつなぐ開発録</title>
+	<meta name="description" content="日々の開発プロセス、思考の断片、そして設計思想をミニマルかつ洗練されたデザインで綴る個人開発ログ。" />
+	<meta property="og:title" content="Buildlog" />
+	<meta property="og:description" content="日々の開発プロセス、思考の断片、そして設計思想をミニマルかつ洗練されたデザインで綴る個人開発ログ。" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://buildlog.dev{$page.url.pathname}" />
+	<meta property="og:image" content="https://buildlog.dev/ogp.png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Buildlog" />
+	<meta name="twitter:description" content="日々の開発プロセス、思考の断片、そして設計思想をミニマルかつ洗練されたデザインで綴る個人開発ログ。" />
 </svelte:head>
 
 <div class="min-h-screen flex flex-col justify-between bg-surface text-on-surface">
