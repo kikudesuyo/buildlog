@@ -40,13 +40,6 @@ import { resolve } from '$app/paths';
 			{/each}
 		</div>
 		<div class="flex items-center gap-stack-md">
-			<a
-				href={resolve('/admin')}
-				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300 flex items-center justify-center"
-				title="管理画面に切り替え"
-			>
-				admin_panel_settings
-			</a>
 			<button
 				type="button"
 				aria-label="Search"
@@ -54,13 +47,6 @@ import { resolve } from '$app/paths';
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
 			>
 				search
-			</button>
-			<button
-				type="button"
-				aria-label="Settings"
-				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
-			>
-				settings
 			</button>
 		</div>
 	</div>
