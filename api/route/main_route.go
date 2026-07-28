@@ -49,6 +49,20 @@ func NewRouter(db *gorm.DB) http.Handler {
 			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteTech(db))
 		})
 
+		r.Get("/apps", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetAppList(db))
+		})
+		r.Get("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetApp(db))
+		})
+		r.Post("/apps", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleCreateApp(db))
+		})
+		r.Put("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateApp(db))
+		})
+		r.Delete("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteApp(db))
 		r.Get("/profile", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleGetProfile(db))
 		})
