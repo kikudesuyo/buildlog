@@ -8,88 +8,57 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	v1 "github.com/kikudesuyo/buildlog/api/handler/v1"
+	"github.com/kikudesuyo/buildlog/api/service"
 	"gorm.io/gorm"
 )
 
 func NewRouter(db *gorm.DB) http.Handler {
+	service.InitDB(db)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(corsMiddleware)
 
+	handle := func(h handler.ProcessFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, h)
+		}
+	}
+
 	r.Route("/api/v1", func(r chi.Router) {
-		r.Get("/diaries", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetDiaryList(db))
-		})
-		r.Get("/diaries/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetDiary(db))
-		})
-		r.Post("/diaries", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleCreateDiary(db))
-		})
-		r.Put("/diaries/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateDiary(db))
-		})
-		r.Delete("/diaries/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteDiary(db))
-		})
+		r.Get("/diaries", handle(v1.HandleGetDiaryList()))
+		r.Get("/diaries/{id}", handle(v1.HandleGetDiary()))
+		r.Post("/diaries", handle(v1.HandleCreateDiary()))
+		r.Put("/diaries/{id}", handle(v1.HandleUpdateDiary()))
+		r.Delete("/diaries/{id}", handle(v1.HandleDeleteDiary()))
 
-		r.Get("/techs", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetTechList(db))
-		})
-		r.Get("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetTech(db))
-		})
-		r.Post("/techs", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleCreateTech(db))
-		})
-		r.Put("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateTech(db))
-		})
-		r.Delete("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteTech(db))
-		})
+		r.Get("/techs", handle(v1.HandleGetTechList()))
+		r.Get("/techs/{id}", handle(v1.HandleGetTech()))
+		r.Post("/techs", handle(v1.HandleCreateTech()))
+		r.Put("/techs/{id}", handle(v1.HandleUpdateTech()))
+		r.Delete("/techs/{id}", handle(v1.HandleDeleteTech()))
 
-		r.Post("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandlePostLike(db))
-		})
-		r.Delete("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteLike(db))
-		})
-		r.Get("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetLikeStatus(db))
-		})
-		r.Get("/trash", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetDeletedPosts(db))
-		})
-		r.Put("/trash/{id}/restore", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleRestorePost(db))
-		})
-		r.Get("/apps", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetAppList(db))
-		})
-		r.Get("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetApp(db))
-		})
-		r.Post("/apps", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleCreateApp(db))
-		})
-		r.Put("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateApp(db))
-		})
-		r.Delete("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteApp(db))
-		})
-		r.Get("/profile", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetProfile(db))
-		})
-		r.Put("/profile", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateProfile(db))
-		})
+		r.Post("/posts/{id}/like", handle(v1.HandlePostLike()))
+		r.Delete("/posts/{id}/like", handle(v1.HandleDeleteLike()))
+		r.Get("/posts/{id}/like", handle(v1.HandleGetLikeStatus()))
+
+		r.Get("/trash", handle(v1.HandleGetDeletedPosts()))
+		r.Put("/trash/{id}/restore", handle(v1.HandleRestorePost()))
+
+		r.Get("/apps", handle(v1.HandleGetAppList()))
+		r.Get("/apps/{id}", handle(v1.HandleGetApp()))
+		r.Post("/apps", handle(v1.HandleCreateApp()))
+		r.Put("/apps/{id}", handle(v1.HandleUpdateApp()))
+		r.Delete("/apps/{id}", handle(v1.HandleDeleteApp()))
+
+		r.Get("/profile", handle(v1.HandleGetProfile()))
+		r.Put("/profile", handle(v1.HandleUpdateProfile()))
 	})
 
 	return r
 }
+
 func corsMiddleware(next http.Handler) http.Handler {
 	allowedOrigin := os.Getenv("ALLOWED_ORIGINS")
 	if allowedOrigin == "" {

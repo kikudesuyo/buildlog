@@ -7,17 +7,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
-	"gorm.io/gorm"
+	"github.com/kikudesuyo/buildlog/api/service"
 )
 
-func HandleGetDeletedPosts(db *gorm.DB) handler.ProcessFunc {
+func HandleGetDeletedPosts() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		var posts []entity.DBTablePost
-		err := db.WithContext(r.Context()).
-			Unscoped().
-			Where("deleted_at IS NOT NULL").
-			Order("deleted_at DESC").
-			Find(&posts).Error
+		posts, err := service.ListDeletedPosts(r.Context())
 		if err != nil {
 			return nil, err
 		}
@@ -26,18 +21,14 @@ func HandleGetDeletedPosts(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleRestorePost(db *gorm.DB) handler.ProcessFunc {
+func HandleRestorePost() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
 			return nil, err
 		}
 
-		err = db.WithContext(r.Context()).
-			Unscoped().
-			Model(&entity.DBTablePost{}).
-			Where("id = ?", id).
-			Update("deleted_at", nil).Error
+		err = service.RestorePost(r.Context(), id)
 		if err != nil {
 			return nil, err
 		}

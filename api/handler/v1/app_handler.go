@@ -9,12 +9,11 @@ import (
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
-	"gorm.io/gorm"
 )
 
-func HandleGetAppList(db *gorm.DB) handler.ProcessFunc {
+func HandleGetAppList() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		apps, err := service.ListApps(r.Context(), db)
+		apps, err := service.ListApps(r.Context())
 		if err != nil {
 			return nil, err
 		}
@@ -22,14 +21,14 @@ func HandleGetAppList(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleGetApp(db *gorm.DB) handler.ProcessFunc {
+func HandleGetApp() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
 			return nil, err
 		}
 
-		app, err := service.GetAppByID(r.Context(), db, id)
+		app, err := service.GetAppByID(r.Context(), id)
 		if err != nil {
 			return nil, err
 		}
@@ -37,7 +36,7 @@ func HandleGetApp(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleCreateApp(db *gorm.DB) handler.ProcessFunc {
+func HandleCreateApp() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		var req entity.CreateAppRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -48,7 +47,7 @@ func HandleCreateApp(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.CreateApp(r.Context(), db, req)
+		resp, err := service.CreateApp(r.Context(), req)
 		if err != nil {
 			return nil, err
 		}
@@ -57,7 +56,7 @@ func HandleCreateApp(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleUpdateApp(db *gorm.DB) handler.ProcessFunc {
+func HandleUpdateApp() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -73,7 +72,7 @@ func HandleUpdateApp(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.UpdateApp(r.Context(), db, id, req)
+		resp, err := service.UpdateApp(r.Context(), id, req)
 		if err != nil {
 			return nil, err
 		}
@@ -82,14 +81,14 @@ func HandleUpdateApp(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleDeleteApp(db *gorm.DB) handler.ProcessFunc {
+func HandleDeleteApp() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
 			return nil, err
 		}
 
-		if err := service.DeleteApp(r.Context(), db, id); err != nil {
+		if err := service.DeleteApp(r.Context(), id); err != nil {
 			return nil, err
 		}
 

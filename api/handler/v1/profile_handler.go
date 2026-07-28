@@ -7,12 +7,11 @@ import (
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
-	"gorm.io/gorm"
 )
 
-func HandleGetProfile(db *gorm.DB) handler.ProcessFunc {
+func HandleGetProfile() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		profile, err := service.GetProfile(r.Context(), db)
+		profile, err := service.GetProfile(r.Context())
 		if err != nil {
 			return nil, err
 		}
@@ -20,7 +19,7 @@ func HandleGetProfile(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleUpdateProfile(db *gorm.DB) handler.ProcessFunc {
+func HandleUpdateProfile() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		var req entity.UpdateProfileRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -32,7 +31,7 @@ func HandleUpdateProfile(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.UpdateProfile(r.Context(), db, req)
+		resp, err := service.UpdateProfile(r.Context(), req)
 		if err != nil {
 			return nil, err
 		}

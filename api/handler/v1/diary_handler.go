@@ -9,14 +9,13 @@ import (
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
-	"gorm.io/gorm"
 )
 
-func HandleGetDiaryList(db *gorm.DB) handler.ProcessFunc {
+func HandleGetDiaryList() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		all := r.URL.Query().Get("all") == "true"
 		ipAddress := getClientIP(r)
-		diaries, err := service.ListDiaries(r.Context(), db, all, ipAddress)
+		diaries, err := service.ListDiaries(r.Context(), all, ipAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -24,7 +23,7 @@ func HandleGetDiaryList(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleGetDiary(db *gorm.DB) handler.ProcessFunc {
+func HandleGetDiary() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -32,7 +31,7 @@ func HandleGetDiary(db *gorm.DB) handler.ProcessFunc {
 		}
 
 		ipAddress := getClientIP(r)
-		diary, err := service.GetDiaryByID(r.Context(), db, id, ipAddress)
+		diary, err := service.GetDiaryByID(r.Context(), id, ipAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -40,7 +39,7 @@ func HandleGetDiary(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleCreateDiary(db *gorm.DB) handler.ProcessFunc {
+func HandleCreateDiary() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		var req entity.CreateDiaryRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -51,7 +50,7 @@ func HandleCreateDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.CreateDiary(r.Context(), db, req)
+		resp, err := service.CreateDiary(r.Context(), req)
 		if err != nil {
 			return nil, err
 		}
@@ -60,7 +59,7 @@ func HandleCreateDiary(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleUpdateDiary(db *gorm.DB) handler.ProcessFunc {
+func HandleUpdateDiary() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.ParseInt(idStr, 10, 64)
@@ -77,7 +76,7 @@ func HandleUpdateDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.UpdateDiary(r.Context(), db, id, req)
+		resp, err := service.UpdateDiary(r.Context(), id, req)
 		if err != nil {
 			return nil, err
 		}
@@ -86,7 +85,7 @@ func HandleUpdateDiary(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleDeleteDiary(db *gorm.DB) handler.ProcessFunc {
+func HandleDeleteDiary() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.ParseInt(idStr, 10, 64)
@@ -94,7 +93,7 @@ func HandleDeleteDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, err
 		}
 
-		if err := service.DeleteDiary(r.Context(), db, id); err != nil {
+		if err := service.DeleteDiary(r.Context(), id); err != nil {
 			return nil, err
 		}
 

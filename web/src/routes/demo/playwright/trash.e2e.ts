@@ -8,10 +8,15 @@ test('capture trash and soft delete screenshots', async ({ page }) => {
 	await page.goto('http://localhost:5173/admin/tech');
 	await page.waitForLoadState('networkidle');
 
-	const articleTitleEl = page.locator('h3').first();
-	const articleTitle = await articleTitleEl.innerText();
+	// 最初の記事要素を取得
+	const firstArticle = page.locator('article').first();
+	
+	// その記事要素の中の見出し (h2 または h3) を取得
+	const articleTitleEl = firstArticle.locator('h2, h3').first();
+	const articleTitle = (await articleTitleEl.innerText()).trim();
 
-	const deleteButton = page.locator('button[title="削除"]').first();
+	// その記事要素の中の削除ボタンをクリック
+	const deleteButton = firstArticle.locator('button[title="削除"]').first();
 	await deleteButton.click();
 
 	await page.waitForTimeout(500);

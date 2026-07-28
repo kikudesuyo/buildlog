@@ -6,11 +6,10 @@ import (
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/repository"
-	"gorm.io/gorm"
 )
 
-func GetProfile(ctx context.Context, db *gorm.DB) (*entity.ProfileResponse, error) {
-	dbProfile, err := repository.GetProfile(ctx, db)
+func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
+	dbProfile, err := repository.GetProfile(ctx, DB)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +50,7 @@ func GetProfile(ctx context.Context, db *gorm.DB) (*entity.ProfileResponse, erro
 	}, nil
 }
 
-func UpdateProfile(ctx context.Context, db *gorm.DB, req entity.UpdateProfileRequest) (*entity.ProfileResponse, error) {
+func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entity.ProfileResponse, error) {
 	bioJSON, err := json.Marshal(req.Bio)
 	if err != nil {
 		return nil, err
@@ -82,7 +81,7 @@ func UpdateProfile(ctx context.Context, db *gorm.DB, req entity.UpdateProfileReq
 		FinalQuote:   req.FinalQuote,
 	}
 
-	if err := repository.UpdateProfile(ctx, db, &dbProfile); err != nil {
+	if err := repository.UpdateProfile(ctx, DB, &dbProfile); err != nil {
 		return nil, err
 	}
 

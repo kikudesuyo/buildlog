@@ -9,7 +9,6 @@ import (
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
-	"gorm.io/gorm"
 )
 
 func getClientIP(r *http.Request) string {
@@ -26,7 +25,7 @@ func getClientIP(r *http.Request) string {
 	return host
 }
 
-func HandlePostLike(db *gorm.DB) handler.ProcessFunc {
+func HandlePostLike() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		postID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -34,7 +33,7 @@ func HandlePostLike(db *gorm.DB) handler.ProcessFunc {
 		}
 
 		ipAddress := getClientIP(r)
-		resp, err := service.LikePost(r.Context(), db, postID, ipAddress)
+		resp, err := service.LikePost(r.Context(), postID, ipAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +42,7 @@ func HandlePostLike(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleDeleteLike(db *gorm.DB) handler.ProcessFunc {
+func HandleDeleteLike() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		postID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -51,7 +50,7 @@ func HandleDeleteLike(db *gorm.DB) handler.ProcessFunc {
 		}
 
 		ipAddress := getClientIP(r)
-		resp, err := service.UnlikePost(r.Context(), db, postID, ipAddress)
+		resp, err := service.UnlikePost(r.Context(), postID, ipAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -60,7 +59,7 @@ func HandleDeleteLike(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleGetLikeStatus(db *gorm.DB) handler.ProcessFunc {
+func HandleGetLikeStatus() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		postID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -68,7 +67,7 @@ func HandleGetLikeStatus(db *gorm.DB) handler.ProcessFunc {
 		}
 
 		ipAddress := getClientIP(r)
-		resp, err := service.GetLikeStatus(r.Context(), db, postID, ipAddress)
+		resp, err := service.GetLikeStatus(r.Context(), postID, ipAddress)
 		if err != nil {
 			return nil, err
 		}

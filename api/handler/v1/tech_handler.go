@@ -9,14 +9,13 @@ import (
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
-	"gorm.io/gorm"
 )
 
-func HandleGetTechList(db *gorm.DB) handler.ProcessFunc {
+func HandleGetTechList() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		all := r.URL.Query().Get("all") == "true"
 		ipAddress := getClientIP(r)
-		techs, err := service.ListTechs(r.Context(), db, all, ipAddress)
+		techs, err := service.ListTechs(r.Context(), all, ipAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -24,7 +23,7 @@ func HandleGetTechList(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleGetTech(db *gorm.DB) handler.ProcessFunc {
+func HandleGetTech() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 		if err != nil {
@@ -32,7 +31,7 @@ func HandleGetTech(db *gorm.DB) handler.ProcessFunc {
 		}
 
 		ipAddress := getClientIP(r)
-		tech, err := service.GetTechByID(r.Context(), db, id, ipAddress)
+		tech, err := service.GetTechByID(r.Context(), id, ipAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -40,7 +39,7 @@ func HandleGetTech(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleCreateTech(db *gorm.DB) handler.ProcessFunc {
+func HandleCreateTech() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		var req entity.CreateTechRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -51,7 +50,7 @@ func HandleCreateTech(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.CreateTech(r.Context(), db, req)
+		resp, err := service.CreateTech(r.Context(), req)
 		if err != nil {
 			return nil, err
 		}
@@ -60,7 +59,7 @@ func HandleCreateTech(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleUpdateTech(db *gorm.DB) handler.ProcessFunc {
+func HandleUpdateTech() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.ParseInt(idStr, 10, 64)
@@ -77,7 +76,7 @@ func HandleUpdateTech(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.UpdateTech(r.Context(), db, id, req)
+		resp, err := service.UpdateTech(r.Context(), id, req)
 		if err != nil {
 			return nil, err
 		}
@@ -86,7 +85,7 @@ func HandleUpdateTech(db *gorm.DB) handler.ProcessFunc {
 	}
 }
 
-func HandleDeleteTech(db *gorm.DB) handler.ProcessFunc {
+func HandleDeleteTech() handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		idStr := chi.URLParam(r, "id")
 		id, err := strconv.ParseInt(idStr, 10, 64)
@@ -94,7 +93,7 @@ func HandleDeleteTech(db *gorm.DB) handler.ProcessFunc {
 			return nil, err
 		}
 
-		if err := service.DeleteTech(r.Context(), db, id); err != nil {
+		if err := service.DeleteTech(r.Context(), id); err != nil {
 			return nil, err
 		}
 
