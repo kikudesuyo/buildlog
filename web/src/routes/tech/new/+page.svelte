@@ -80,7 +80,7 @@
 </svelte:head>
 
 <!-- ヘッダー（全幅） -->
-	<header class="fixed top-0 left-0 z-50 flex h-16 w-full items-center justify-between border-b border-outline-variant/20 bg-white px-gutter">
+	<header class="fixed top-0 left-0 z-50 flex h-16 w-full items-center justify-between border-b border-outline-variant/20 bg-surface-container-lowest px-gutter">
 	<div class="flex items-center gap-3">
 		<a href={resolve('/admin/tech')} class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
 			Buildlog
@@ -129,7 +129,7 @@
 <div class="editorial-container relative mx-auto px-gutter pb-36 pt-24 md:pb-20">
 	
 	<!-- 左フローティングツールバー (絶対配置) -->
-	<aside class="absolute -left-12 top-24 hidden md:flex flex-col items-center gap-1.5 bg-white border border-outline-variant/20 rounded-xl p-1.5 shadow-xs w-11">
+	<aside class="absolute -left-12 top-24 hidden md:flex flex-col items-center gap-1.5 bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-1.5 shadow-xs w-11">
 		<button type="button" class="w-8 h-8 flex items-center justify-center font-bold text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="太字">B</button>
 		<button type="button" class="w-8 h-8 flex items-center justify-center italic text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="斜体">I</button>
 		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="リスト">
