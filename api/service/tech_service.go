@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
@@ -10,9 +11,17 @@ import (
 )
 
 func ListTechs(ctx context.Context, db *gorm.DB, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	techList, err := repository.ListTechs(ctx, db, all)
-	if err != nil {
-		return nil, err
+	cacheKey := fmt.Sprintf("tech:list:%t", all)
+	var techList []entity.DBTablePost
+	if cached, ok := contentCache.Get(cacheKey); ok {
+		techList = append([]entity.DBTablePost(nil), cached.([]entity.DBTablePost)...)
+	} else {
+		var err error
+		techList, err = repository.ListTechs(ctx, db, all)
+		if err != nil {
+			return nil, err
+		}
+		contentCache.Set(cacheKey, append([]entity.DBTablePost(nil), techList...))
 	}
 	for i := range techList {
 		count, _ := repository.CountLikesByPostID(ctx, db, techList[i].ID)
@@ -50,6 +59,7 @@ func CreateTech(ctx context.Context, db *gorm.DB, req entity.CreateTechRequest) 
 	if err := repository.CreateTech(ctx, db, &tech); err != nil {
 		return entity.CreateTechResponse{}, err
 	}
+	contentCache.Delete("tech:list:false", "tech:list:true")
 	return entity.CreateTechResponse{
 		ID:        tech.ID,
 		Title:     tech.Title,
@@ -79,6 +89,7 @@ func UpdateTech(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateTec
 	if err := repository.UpdateTech(ctx, db, tech); err != nil {
 		return entity.UpdateTechResponse{}, err
 	}
+	contentCache.Delete("tech:list:false", "tech:list:true")
 
 	return entity.UpdateTechResponse{
 		ID:        tech.ID,
@@ -93,5 +104,9 @@ func UpdateTech(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateTec
 }
 
 func DeleteTech(ctx context.Context, db *gorm.DB, id int64) error {
-	return repository.DeleteTech(ctx, db, id)
+	if err := repository.DeleteTech(ctx, db, id); err != nil {
+		return err
+	}
+	contentCache.Delete("tech:list:false", "tech:list:true")
+	return nil
 }
