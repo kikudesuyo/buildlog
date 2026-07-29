@@ -20,7 +20,6 @@
 	// ダミーのUIステート (image.pngの再現用)
 	let tags = $state(['エッセイ', '創作']);
 	let isPublicLimited = $state(false);
-	let isCommentsAllowed = $state(true);
 
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
@@ -163,19 +162,6 @@
 							<div class="w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 {isPublicLimited ? 'translate-x-4' : 'translate-x-0'}"></div>
 						</button>
 					</div>
-					<!-- トグル 2 -->
-					<div class="flex items-center justify-between">
-						<span class="text-body-md text-on-surface-variant">コメントを許可する</span>
-						<button
-							type="button"
-							aria-label="コメント許可トグル"
-							onclick={() => (isCommentsAllowed = !isCommentsAllowed)}
-							class="w-10 h-6 rounded-full p-0.5 transition-colors relative flex items-center cursor-pointer {isCommentsAllowed ? 'bg-primary' : 'bg-outline-variant/40'}"
-						>
-							<div class="w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 {isCommentsAllowed ? 'translate-x-4' : 'translate-x-0'}"></div>
-						</button>
-					</div>
-				</div>
 			</div>
 		</footer>
 	</main>
