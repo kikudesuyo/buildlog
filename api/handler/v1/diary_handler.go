@@ -16,11 +16,11 @@ func HandleGetDiaryList(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
 		all := r.URL.Query().Get("all") == "true"
 		ipAddress := getClientIP(r)
-		diaries, err := service.ListDiaries(r.Context(), db, all, ipAddress)
+		diaryList, err := service.ListDiaries(r.Context(), db, all, ipAddress)
 		if err != nil {
 			return nil, err
 		}
-		return entity.NewListResponse(diaries), nil
+		return entity.NewListResponse(diaryList), nil
 	}
 }
 

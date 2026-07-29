@@ -20,6 +20,7 @@
 	<link rel="apple-touch-icon" href="/favicon.svg" />
 	<link rel="manifest" href="/manifest.webmanifest" />
 	<meta name="theme-color" content="#12201c" />
+	<link rel="alternate" type="application/rss+xml" title="Buildlog RSS Feed" href="/rss.xml" />
 	<title>Buildlog — テクノロジーと美学をつなぐ開発録</title>
 	<meta name="description" content="日々の開発プロセス、思考の断片、そして設計思想をミニマルかつ洗練されたデザインで綴る個人開発ログ。" />
 	<meta property="og:title" content="Buildlog" />
