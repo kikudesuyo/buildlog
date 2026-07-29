@@ -84,13 +84,14 @@
 			</div>
 
 			<!-- タイトル -->
-			<h1 class="font-display-lg text-[40px] leading-tight text-primary font-bold tracking-tight">
+		<h1 class="font-display-lg text-[clamp(2rem,8vw,2.5rem)] leading-tight text-primary font-bold tracking-tight md:text-[40px]">
 				{data.tech.title}
 			</h1>
 		</header>
 
 		<!-- 本文 (Content) -->
-		<section class="font-body-md text-body-md leading-relaxed text-on-surface pt-4 mb-8 prose dark:prose-invert max-w-none">
+		<section class="font-body-md text-body-md prose dark:prose-invert max-w-none break-words pt-4 text-[1.0625rem] leading-8 text-on-surface md:text-body-md md:leading-relaxed">
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html parsedHtml}
 		</section>
 
@@ -99,3 +100,14 @@
 		</div>
 	</article>
 </div>
+
+<style>
+	:global(.prose pre) {
+		max-width: 100%;
+		overflow-x: auto;
+	}
+
+	:global(.prose code) {
+		overflow-wrap: anywhere;
+	}
+</style>
