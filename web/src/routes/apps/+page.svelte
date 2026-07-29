@@ -29,6 +29,7 @@
 					target="_blank"
 					rel="noopener noreferrer"
 					class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-outline-variant/30 bg-surface-container-low p-1.5 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-md cursor-pointer"
+					aria-label={`${project.name}の${project.codeUrl ? 'コード' : 'デモ'}を開く（外部サイト）`}
 				>
 					{#if project.iconUrl && !failedImages[project.id]}
 						<img
@@ -58,9 +59,7 @@
 									{project.name}
 								</a>
 							</h2>
-							<p
-								class="font-label-sm text-label-sm mt-1 tracking-widest text-on-surface-variant uppercase"
-							>
+					<p class="font-label-sm text-label-sm mt-1 tracking-widest text-on-surface-variant uppercase">
 								{project.category}
 							</p>
 						</div>
@@ -74,16 +73,29 @@
 							{/each}
 						</div>
 					</div>
-					<p class="font-body-md text-body-md max-w-[560px] text-on-surface-variant">
+					<p class="font-body-md text-body-md line-clamp-3 max-w-[560px] text-on-surface-variant">
 						{project.description}
 					</p>
-					<div class="mt-2 flex gap-stack-md">
+					<div class="mt-2 flex flex-wrap gap-2">
+						{#if project.demoUrl}
+							<a
+								href={project.demoUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-label-md font-label-md flex min-h-11 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-on-primary transition-colors hover:bg-primary-container"
+								aria-label={`${project.name}のデモを開く（外部サイト）`}
+							>
+								<span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>
+								View Demo
+							</a>
+						{/if}
 						{#if project.codeUrl}
 							<a
 								href={project.codeUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								class="text-label-md font-label-md flex items-center gap-1.5 text-on-surface-variant transition-colors hover:text-primary"
+								class="text-label-md font-label-md flex min-h-11 items-center gap-1.5 rounded-lg border border-outline-variant/30 px-3 py-2 text-on-surface-variant transition-colors hover:border-primary hover:text-primary"
+								aria-label={`${project.name}のソースコードを開く（外部サイト）`}
 							>
 								<svg class="h-4 w-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
 									<path
@@ -106,4 +118,3 @@
 	</div>
 
 </div>
-
