@@ -58,7 +58,7 @@
 	</div>
 
 	{#if (!selectedCategory || selectedCategory === featured?.category) && featured}
-		<article class="group relative rounded-xl border border-outline-variant/40 bg-surface-container-low p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20">
+		<article aria-label="Featured article" class="group relative rounded-xl border border-outline-variant/40 bg-surface-container-low p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 			<div class="mb-stack-sm flex flex-wrap items-center gap-stack-sm">
 				<span class="font-label-sm text-label-sm rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container">{featured.category}</span>
 				<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>
@@ -67,10 +67,10 @@
 				{/if}
 				{#if isAdmin}<div class="ml-auto flex gap-2"><button type="button" onclick={() => onEdit?.(featured.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(featured.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}
 			</div>
-			<h2 class="font-display-lg mb-stack-md text-[28px] leading-tight text-primary transition-colors group-hover:text-primary/80">
+			<h2 class="font-display-lg mb-stack-md text-[24px] leading-tight text-primary transition-colors group-hover:text-primary/80 md:text-[28px]">
 				<a href={resolve(`/tech/${featured.id}`)} class="hover:underline">{featured.title}</a>
 			</h2>
-			<p class="font-body-md text-body-md mb-6 text-on-surface-variant line-clamp-3">{featured.content}</p>
+			<p class="font-body-md text-body-md mb-4 text-on-surface-variant line-clamp-2 md:mb-6 md:line-clamp-3">{featured.content}</p>
 			<div class="flex items-center justify-between mb-4">
 				<LikeButton postId={featured.id} initialLikesCount={featured.likesCount} initialHasLiked={featured.hasLiked} />
 			</div>
@@ -78,9 +78,9 @@
 		</article>
 	{/if}
 
-	<div class="space-y-12">
+	<div class="space-y-6 md:space-y-12">
 		{#each filteredArticles as article (article.id)}
-			<article class="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-6 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20">
+			<article class="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-stack-sm">
 						<span class="font-label-sm text-label-sm rounded bg-primary-fixed px-2 py-0.5 text-primary">{article.category}</span>
@@ -90,7 +90,7 @@
 					</div>
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>{#if isAdmin}<div class="flex gap-2"><button type="button" onclick={() => onEdit?.(article.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(article.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}</div>
 				</div>
-				<h3 class="font-headline-lg text-headline-lg text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline">
+				<h3 class="font-headline-lg text-[22px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-headline-lg">
 					<a href={resolve(`/tech/${article.id}`)}>{article.title}</a>
 				</h3>
 				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
