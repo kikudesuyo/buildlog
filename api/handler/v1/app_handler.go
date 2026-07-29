@@ -14,11 +14,11 @@ import (
 
 func HandleGetAppList(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		apps, err := service.ListApps(r.Context(), db)
+		appList, err := service.ListApps(r.Context(), db)
 		if err != nil {
 			return nil, err
 		}
-		return entity.NewListResponse(apps), nil
+		return entity.NewListResponse(appList), nil
 	}
 }
 
