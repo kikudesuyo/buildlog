@@ -10,6 +10,11 @@ import (
 )
 
 func GetProfile(ctx context.Context, db *gorm.DB) (*entity.ProfileResponse, error) {
+	if cached, ok := contentCache.Get("profile"); ok {
+		profile := *(cached.(*entity.ProfileResponse))
+		return &profile, nil
+	}
+
 	dbProfile, err := repository.GetProfile(ctx, db)
 	if err != nil {
 		return nil, err
@@ -36,7 +41,7 @@ func GetProfile(ctx context.Context, db *gorm.DB) (*entity.ProfileResponse, erro
 		}
 	}
 
-	return &entity.ProfileResponse{
+	profile := &entity.ProfileResponse{
 		Name:         dbProfile.Name,
 		Subtitle:     dbProfile.Subtitle,
 		Title:        dbProfile.Title,
@@ -48,7 +53,9 @@ func GetProfile(ctx context.Context, db *gorm.DB) (*entity.ProfileResponse, erro
 		Expertise:    expertise,
 		ContactEmail: dbProfile.ContactEmail,
 		FinalQuote:   dbProfile.FinalQuote,
-	}, nil
+	}
+	contentCache.Set("profile", profile)
+	return profile, nil
 }
 
 func UpdateProfile(ctx context.Context, db *gorm.DB, req entity.UpdateProfileRequest) (*entity.ProfileResponse, error) {
@@ -85,6 +92,7 @@ func UpdateProfile(ctx context.Context, db *gorm.DB, req entity.UpdateProfileReq
 	if err := repository.UpdateProfile(ctx, db, &dbProfile); err != nil {
 		return nil, err
 	}
+	contentCache.Delete("profile")
 
 	return &entity.ProfileResponse{
 		Name:         dbProfile.Name,
