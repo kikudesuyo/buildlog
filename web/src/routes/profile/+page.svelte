@@ -3,7 +3,7 @@
 	let copied = $state(false);
 
 	function copyEmail() {
-		navigator.clipboard.writeText(data.profileData.contactEmail);
+		navigator.clipboard?.writeText(data.profileData.contactEmail);
 		copied = true;
 		setTimeout(() => {
 			copied = false;
@@ -111,24 +111,27 @@
 		<h2 class="font-label-md text-label-md mb-stack-md tracking-widest text-outline uppercase">
 			連絡先と繋がり / Contact & Socials
 		</h2>
-		<div class="flex flex-col gap-6 md:flex-row md:items-center md:gap-12 mt-6">
-			<!-- Email Link -->
-			<button
-				type="button"
-				onclick={copyEmail}
-				class="flex items-center gap-3 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200 cursor-pointer bg-transparent border-none p-0 text-left"
-				title="メールアドレスをコピー"
-			>
-				<span class="material-symbols-outlined text-[20px]">
-					{copied ? 'check' : 'mail'}
-				</span>
-				<span class="flex items-center gap-2">
-					{data.profileData.contactEmail}
-					{#if copied}
-						<span class="text-primary font-label-sm text-label-sm tracking-wider">(コピーしました)</span>
-					{/if}
-				</span>
-			</button>
+		<div class="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
+			<!-- Email actions -->
+			<div class="flex flex-wrap items-center gap-3">
+				<a
+					href={`mailto:${data.profileData.contactEmail}`}
+					class="flex min-h-11 items-center gap-2 rounded-lg border border-outline-variant/30 px-3 py-2 font-body-md text-on-surface-variant transition-colors duration-200 hover:border-primary hover:text-primary"
+					aria-label={`メールを作成: ${data.profileData.contactEmail}`}
+				>
+					<span class="material-symbols-outlined text-[20px]">mail</span>
+					<span>{data.profileData.contactEmail}</span>
+				</a>
+				<button
+					type="button"
+					onclick={copyEmail}
+					class="flex min-h-11 items-center gap-2 rounded-lg border border-outline-variant/30 px-3 py-2 font-label-md text-on-surface-variant transition-colors duration-200 hover:border-primary hover:text-primary"
+					aria-label="メールアドレスをコピー"
+				>
+					<span class="material-symbols-outlined text-[20px]">{copied ? 'check' : 'content_copy'}</span>
+					{copied ? 'コピーしました' : 'コピー'}
+				</button>
+			</div>
 
 			<!-- Social Links -->
 			<div class="flex items-center gap-6">
@@ -166,4 +169,3 @@
 	</section>
 
 </div>
-
