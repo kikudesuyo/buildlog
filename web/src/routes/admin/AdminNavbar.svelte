@@ -12,23 +12,59 @@
 	] as const;
 
 	let isOpen = $state(false);
+	let menuButton: HTMLButtonElement | null = null;
+	let closeButton = $state<HTMLButtonElement | null>(null);
+	let previouslyFocused: HTMLElement | null = null;
 
 	function isActive(href: string) {
 		if (href === '/admin') return page.url.pathname === '/admin';
 		return page.url.pathname.startsWith(href);
 	}
+
+	function openMenu() {
+		previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : menuButton;
+		isOpen = true;
+	}
+
+	function closeMenu() {
+		isOpen = false;
+		requestAnimationFrame(() => previouslyFocused?.focus());
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && isOpen) closeMenu();
+	}
+
+	$effect(() => {
+		document.body.style.overflow = isOpen ? 'hidden' : '';
+		if (isOpen) requestAnimationFrame(() => closeButton?.focus());
+		return () => {
+			document.body.style.overflow = '';
+		};
+	});
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 {#if isOpen}
 	<button
 		type="button"
 		aria-label="管理メニューを閉じる"
 		class="fixed inset-0 z-40 bg-primary/20 md:hidden"
-		onclick={() => (isOpen = false)}
+		onclick={closeMenu}
 	></button>
 {/if}
 
-<aside class="fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-outline-variant/20 bg-surface-container-lowest {isOpen ? 'flex' : 'hidden'} md:flex">
+<aside aria-label="管理メニュー" aria-modal={isOpen ? 'true' : undefined} class="fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-outline-variant/20 bg-surface-container-lowest {isOpen ? 'flex' : 'hidden'} md:flex">
+	<button
+		bind:this={closeButton}
+		type="button"
+		aria-label="管理メニューを閉じる"
+		onclick={closeMenu}
+		class="material-symbols-outlined absolute right-3 top-3 z-10 min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container md:hidden"
+	>
+		close
+	</button>
 	<div class="flex h-20 items-center border-b border-outline-variant/20 px-6">
 		<a href={resolve('/admin')} class="flex items-center gap-3 text-primary transition-opacity hover:opacity-80">
 			<span class="material-symbols-outlined text-2xl">dashboard_customize</span>
@@ -44,8 +80,8 @@
 		<nav aria-label="管理メニュー" class="flex flex-col gap-1">
 			{#each navItems as item (item.href)}
 				<a
-					href={resolve(item.href as any)}
-					onclick={() => (isOpen = false)}
+					href={resolve(item.href as never)}
+					onclick={closeMenu}
 					class="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors {isActive(item.href) ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'}"
 				>
 					<span class="material-symbols-outlined text-[21px]">{item.icon}</span>
@@ -67,7 +103,7 @@
 	</div>
 
 	<div class="border-t border-outline-variant/20 p-4">
-		<a href={resolve('/')} onclick={() => (isOpen = false)} class="font-label-md text-label-md flex items-center gap-2 rounded-lg px-3 py-2 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary">
+		<a href={resolve('/')} onclick={closeMenu} class="font-label-md text-label-md flex items-center gap-2 rounded-lg px-3 py-2 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary">
 			<span class="material-symbols-outlined text-[18px]">visibility</span>
 			公開サイトを見る
 		</a>
@@ -77,11 +113,12 @@
 <header class="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-outline-variant/20 bg-surface-container-lowest px-gutter md:hidden">
 	<div class="flex items-center gap-3">
 		<button
+			bind:this={menuButton}
 			type="button"
 			aria-label="管理メニューを開く"
 			aria-expanded={isOpen}
-			onclick={() => (isOpen = true)}
-			class="material-symbols-outlined rounded-lg p-2 text-on-surface-variant hover:bg-surface-container"
+			onclick={openMenu}
+			class="material-symbols-outlined min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container"
 		>
 			menu
 		</button>
