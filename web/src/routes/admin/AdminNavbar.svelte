@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from "svelte";
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 
@@ -16,14 +16,14 @@
 	let isDarkMode = $state(false);
 
 	onMount(() => {
-		isDarkMode = document.documentElement.classList.contains("dark");
+		isDarkMode = document.documentElement.classList.contains('dark');
 	});
 
 	function toggleTheme() {
 		isDarkMode = !isDarkMode;
-		document.documentElement.classList.toggle("dark", isDarkMode);
-		document.documentElement.classList.toggle("light", !isDarkMode);
-		localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+		document.documentElement.classList.toggle('dark', isDarkMode);
+		document.documentElement.classList.toggle('light', !isDarkMode);
+		localStorage.setItem('theme', isDarkMode ? "dark" : "light");
 	}
 	let menuButton: HTMLButtonElement | null = null;
 	let closeButton = $state<HTMLButtonElement | null>(null);
@@ -139,6 +139,6 @@
 	</div>
 	<a href={resolve('/')} class="material-symbols-outlined rounded-lg p-2 text-on-surface-variant hover:bg-surface-container">visibility</a>
 	<button type="button" aria-label="テーマを切り替える" onclick={toggleTheme} class="material-symbols-outlined min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container" title={isDarkMode ? "ライトモードに切り替え" : "ダークモードに切り替え"}>
-		{isDarkMode ? "light_mode" : "dark_mode"}
+		{isDarkMode ? 'light_mode' : 'dark_mode'}
 	</button>
 </header>
