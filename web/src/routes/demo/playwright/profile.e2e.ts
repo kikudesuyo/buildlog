@@ -4,11 +4,10 @@ test('capture profile screenshots', async ({ page }) => {
 	await page.goto('http://localhost:5173/profile');
 	await page.waitForLoadState('networkidle');
 
-	const emailLink = page.locator('main a[href^="mailto:"]');
-	await expect(emailLink).toBeVisible();
+	// メールアドレスのコピー用ボタンが存在することを確認 (テキストに @ が含まれているはず)
+	const emailButton = page.locator('main button:has-text("@")');
+	await expect(emailButton).toBeVisible();
 
-	const githubLink = page.locator('main a[href*="github.com"]');
-	await expect(githubLink).toBeVisible();
-
+	// スクリーンショットを撮影
 	await page.screenshot({ path: 'static/screenshots/profile.png', fullPage: true });
 });

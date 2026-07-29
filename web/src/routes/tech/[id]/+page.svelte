@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { onMount, mount } from 'svelte';
 	import { resolve } from '$app/paths';
+	import { marked } from 'marked';
 	import LikeButton from '$lib/components/LikeButton.svelte';
+	import LinkCard from '$lib/components/LinkCard.svelte';
 	let { data } = $props();
 
 	function formatDate(dateStr: string) {
@@ -8,6 +11,36 @@
 		const date = new Date(dateStr);
 		return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 	}
+
+	// 単独行のURLをLinkCardプレースホルダーに置き換える処理
+	function parseContent(content: string): string {
+		if (!content) return '';
+		const lines = content.split('\n');
+		const processedLines = lines.map(line => {
+			const trimmed = line.trim();
+			// 単独行のURL
+			if (/^https?:\/\/[^\s]+$/.test(trimmed)) {
+				return `<div class="link-card-placeholder" data-url="${trimmed}"></div>`;
+			}
+			return line;
+		});
+		return marked.parse(processedLines.join('\n'), { async: false }) as string;
+	}
+
+	let parsedHtml = $derived(parseContent(data.tech.content));
+
+	onMount(() => {
+		const placeholders = document.querySelectorAll('.link-card-placeholder');
+		placeholders.forEach(el => {
+			const url = el.getAttribute('data-url');
+			if (url) {
+				mount(LinkCard, {
+					target: el,
+					props: { url }
+				});
+			}
+		});
+	});
 </script>
 
 <svelte:head>
@@ -57,8 +90,8 @@
 		</header>
 
 		<!-- 本文 (Content) -->
-		<section class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface pt-4 mb-8">
-			{data.tech.content}
+		<section class="font-body-md text-body-md leading-relaxed text-on-surface pt-4 mb-8 prose dark:prose-invert max-w-none">
+			{@html parsedHtml}
 		</section>
 
 		<div class="flex items-center gap-4 border-t border-outline-variant/10 pt-6">

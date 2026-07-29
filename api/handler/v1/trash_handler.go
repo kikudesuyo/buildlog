@@ -12,17 +12,17 @@ import (
 
 func HandleGetDeletedPosts(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		var posts []entity.DBTablePost
+		var postList []entity.DBTablePost
 		err := db.WithContext(r.Context()).
 			Unscoped().
 			Where("deleted_at IS NOT NULL").
 			Order("deleted_at DESC").
-			Find(&posts).Error
+			Find(&postList).Error
 		if err != nil {
 			return nil, err
 		}
 
-		return entity.NewListResponse(posts), nil
+		return entity.NewListResponse(postList), nil
 	}
 }
 
