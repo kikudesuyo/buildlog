@@ -41,7 +41,7 @@ import { resolve } from '$app/paths';
 </script>
 
 <!-- TopNavBar -->
-<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 transition-all duration-300">
+<nav class="site-nav fixed top-0 z-50 w-full border-b border-outline-variant/30 bg-surface/80 backdrop-blur-md transition-all duration-300">
 	<div class="flex justify-between items-center max-w-container-max mx-auto h-16 px-gutter">
 		<a href={resolve('/')} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
 			Buildlog
@@ -61,7 +61,7 @@ import { resolve } from '$app/paths';
 		<div class="flex items-center gap-stack-md">
 			<button
 				type="button"
-				aria-label="Search"
+				aria-label="検索を開く"
 				onclick={() => (isSearchOpen = !isSearchOpen)}
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
 			>
@@ -69,7 +69,7 @@ import { resolve } from '$app/paths';
 			</button>
 			<button
 				type="button"
-				aria-label="Toggle Theme"
+				aria-label="テーマを切り替える"
 				onclick={toggleTheme}
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
 				title={isDarkMode ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
@@ -79,6 +79,18 @@ import { resolve } from '$app/paths';
 		</div>
 	</div>
 </nav>
+
+<style>
+	.site-nav {
+		padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+		padding-block-start: env(safe-area-inset-top);
+	}
+
+	.site-nav button {
+		min-block-size: 2.75rem;
+		min-inline-size: 2.75rem;
+	}
+</style>
 
 <!-- Search Modal (Minimalist) -->
 {#if isSearchOpen}
