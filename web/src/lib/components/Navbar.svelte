@@ -4,8 +4,12 @@ import { page } from '$app/state';
 import { resolve } from '$app/paths';
 
 	let isSearchOpen = $state(false);
+	let isMenuOpen = $state(false);
 	let searchQuery = $state('');
 	let isDarkMode = $state(false);
+	let menuButton: HTMLButtonElement | null = null;
+	let closeButton = $state<HTMLButtonElement | null>(null);
+	let previouslyFocused: HTMLElement | null = null;
 
 	onMount(() => {
 		isDarkMode = document.documentElement.classList.contains('dark');
@@ -24,6 +28,40 @@ import { resolve } from '$app/paths';
 		}
 	}
 
+	function toggleMenu() {
+		if (isMenuOpen) {
+			closeMenu();
+			return;
+		}
+
+		previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : menuButton;
+		isMenuOpen = true;
+	}
+
+	function closeMenu() {
+		isMenuOpen = false;
+		requestAnimationFrame(() => previouslyFocused?.focus());
+	}
+
+	function handleWindowKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && isMenuOpen) {
+			closeMenu();
+		}
+	}
+
+	$effect(() => {
+		if (isMenuOpen) {
+			document.body.style.overflow = 'hidden';
+			requestAnimationFrame(() => closeButton?.focus());
+		} else {
+			document.body.style.overflow = '';
+		}
+
+		return () => {
+			document.body.style.overflow = '';
+		};
+	});
+
 	const navItems = [
 		{ href: '/', label: 'Diary' },
 		{ href: '/tech', label: 'Tech' },
@@ -40,13 +78,15 @@ import { resolve } from '$app/paths';
 	}
 </script>
 
+<svelte:window onkeydown={handleWindowKeydown} />
+
 <!-- TopNavBar -->
-<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 transition-all duration-300">
+<nav class="fixed top-0 z-50 w-full border-b border-outline-variant/30 bg-surface/80 backdrop-blur-md transition-all duration-300">
 	<div class="flex justify-between items-center max-w-container-max mx-auto h-16 px-gutter">
 		<a href={resolve('/')} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
 			Buildlog
 		</a>
-		<div class="flex items-center gap-stack-lg">
+		<div class="hidden items-center gap-stack-lg md:flex" aria-label="メインナビゲーション">
 			{#each navItems as item (item.href)}
 				<a
 					href={resolve(item.href)}
@@ -76,9 +116,59 @@ import { resolve } from '$app/paths';
 			>
 				{isDarkMode ? 'light_mode' : 'dark_mode'}
 			</button>
+			<button
+				bind:this={menuButton}
+				type="button"
+				aria-label={isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'}
+				aria-controls="mobile-navigation"
+				aria-expanded={isMenuOpen}
+				onclick={toggleMenu}
+				class="material-symbols-outlined min-h-11 min-w-11 cursor-pointer rounded-lg p-2 text-on-surface-variant transition-all duration-300 hover:bg-surface-container-low md:hidden"
+			>
+				{isMenuOpen ? 'close' : 'menu'}
+			</button>
 		</div>
 	</div>
 </nav>
+
+{#if isMenuOpen}
+	<div id="mobile-navigation" class="fixed inset-0 z-40 md:hidden" role="presentation">
+		<button
+			type="button"
+			aria-label="メニューを閉じる"
+			class="absolute inset-0 bg-primary/20 backdrop-blur-xs"
+			onclick={closeMenu}
+		></button>
+		<nav
+			class="absolute right-0 top-0 flex h-full w-[min(84vw,22rem)] flex-col border-l border-outline-variant/30 bg-surface p-6 pt-24 shadow-xl"
+			aria-label="モバイルナビゲーション"
+		>
+			<button
+				bind:this={closeButton}
+				type="button"
+				aria-label="メニューを閉じる"
+				onclick={closeMenu}
+				class="material-symbols-outlined absolute right-4 top-4 min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-low"
+			>
+				close
+			</button>
+			<div class="flex flex-col gap-2">
+				{#each navItems as item (item.href)}
+					<a
+						href={resolve(item.href)}
+						onclick={closeMenu}
+						aria-current={isActive(item.href) ? 'page' : undefined}
+						class="flex min-h-11 items-center rounded-lg px-4 font-label-md text-label-md transition-colors hover:bg-surface-container-low {isActive(item.href)
+							? 'bg-surface-container-low font-bold text-primary'
+							: 'text-on-surface-variant'}"
+					>
+						{item.label}
+					</a>
+				{/each}
+			</div>
+		</nav>
+	</div>
+{/if}
 
 <!-- Search Modal (Minimalist) -->
 {#if isSearchOpen}
