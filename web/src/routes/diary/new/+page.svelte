@@ -5,6 +5,7 @@
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
 	let title = $state('');
+	let contentElement = $state<HTMLTextAreaElement | null>(null);
 	let content = $state('');
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
@@ -47,6 +48,22 @@
 	}
 
 	}
+	function applyMarkdown(prefix: string, suffix = prefix) {
+		if (!contentElement) return;
+		const start = contentElement.selectionStart;
+		const end = contentElement.selectionEnd;
+		content = `${content.slice(0, start)}${prefix}${content.slice(start, end)}${suffix}${content.slice(end)}`;
+		requestAnimationFrame(() => {
+			contentElement?.focus();
+			contentElement?.setSelectionRange(start + prefix.length, end + prefix.length);
+		});
+	}
+
+	function insertLink() {
+		const url = window.prompt('リンクURLを入力してください：');
+		if (url?.trim()) applyMarkdown('[', `](${url.trim()})`);
+	}
+
 </script>
 
 <UnsavedChangesGuard {isDirty} {isSubmitting} />
@@ -106,12 +123,12 @@
 	
 	<!-- 左フローティングツールバー (絶対配置) -->
 	<aside class="absolute -left-12 top-24 hidden md:flex flex-col items-center gap-1.5 bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-1.5 shadow-xs w-11">
-		<button type="button" class="w-8 h-8 flex items-center justify-center font-bold text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="太字">B</button>
-		<button type="button" class="w-8 h-8 flex items-center justify-center italic text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="斜体">I</button>
-		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="リスト">
+		<button type="button" class="w-8 h-8 flex items-center justify-center font-bold text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" onclick={() => applyMarkdown('**')} title="太字">B</button>
+		<button type="button" class="w-8 h-8 flex items-center justify-center italic text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" onclick={() => applyMarkdown('*')} title="斜体">I</button>
+		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" onclick={() => applyMarkdown('- ' , '')} title="リスト">
 			<span class="material-symbols-outlined text-[18px]">format_list_bulleted</span>
 		</button>
-		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="リンク">
+		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" onclick={insertLink} title="リンク">
 			<span class="material-symbols-outlined text-[18px]">link</span>
 		</button>
 	</aside>
@@ -131,6 +148,7 @@
 		<!-- 本文 -->
 		<textarea
 			use:autogrow
+			bind:this={contentElement}
 			bind:value={content}
 			placeholder="物語を書き始めましょう..."
 			class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
