@@ -6,6 +6,7 @@
 	import { defaultTechCategory, techCategories } from '$lib/tech/categories';
 
 	let title = $state('');
+	const MAX_TITLE_LENGTH = 100;
 	let content = $state('');
 	let category = $state(defaultTechCategory);
 	let views = $state('');
@@ -145,10 +146,13 @@
 			<input
 				type="text"
 				bind:value={title}
+				maxlength={MAX_TITLE_LENGTH}
+				aria-describedby="title-count"
 				placeholder="タイトルを入力..."
 				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-[36px] font-bold tracking-tight border-none placeholder:text-outline-variant/50"
 				disabled={isSubmitting}
 			/>
+			<p id="title-count" class="text-right text-body-sm text-outline">{title.length}/{MAX_TITLE_LENGTH}</p>
 		</div>
 
 		<!-- 本文 -->
