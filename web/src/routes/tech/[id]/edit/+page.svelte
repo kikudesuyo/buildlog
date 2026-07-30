@@ -150,7 +150,7 @@
 				type="text"
 				bind:value={title}
 				placeholder="タイトルを入力..."
-				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-[36px] font-bold tracking-tight border-none placeholder:text-outline-variant/50"
+				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-[clamp(2rem,8vw,2.25rem)] md:text-[36px] font-bold tracking-tight border-none placeholder:text-outline-variant/50"
 				disabled={isSubmitting}
 			/>
 		</div>
