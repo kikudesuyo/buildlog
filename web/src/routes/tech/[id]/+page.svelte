@@ -5,6 +5,7 @@
 	import LikeButton from '$lib/components/LikeButton.svelte';
 	import LinkCard from '$lib/components/LinkCard.svelte';
 	let { data } = $props();
+	let copyStatus = $state('');
 
 	function formatDate(dateStr: string) {
 		if (!dateStr) return '';
@@ -29,6 +30,16 @@
 
 	let parsedHtml = $derived(parseContent(data.tech.content));
 
+	async function copyCode(code: string) {
+		try {
+			await navigator.clipboard.writeText(code);
+			copyStatus = 'コードをコピーしました';
+		} catch {
+			copyStatus = 'コピーできませんでした';
+		}
+		setTimeout(() => (copyStatus = ''), 2000);
+	}
+
 	onMount(() => {
 		const placeholders = document.querySelectorAll('.link-card-placeholder');
 		placeholders.forEach(el => {
@@ -40,6 +51,22 @@
 				});
 			}
 		});
+
+		const buttons: HTMLButtonElement[] = [];
+		document.querySelectorAll('pre').forEach((block) => {
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.textContent = 'コピー';
+			button.className = 'code-copy-button';
+			button.setAttribute('aria-label', 'コードをコピー');
+			button.addEventListener('click', () =>
+				copyCode(block.querySelector('code')?.textContent ?? block.textContent ?? '')
+			);
+			block.append(button);
+			buttons.push(button);
+		});
+
+		return () => buttons.forEach((button) => button.remove());
 	});
 </script>
 
@@ -90,10 +117,11 @@
 		</header>
 
 		<!-- 本文 (Content) -->
-		<section class="font-body-md text-body-md prose dark:prose-invert max-w-none break-words pt-4 text-[1.0625rem] leading-8 text-on-surface md:text-body-md md:leading-relaxed">
+		<section class="font-body-md text-body-md prose dark:prose-invert max-w-none break-words pt-4 mb-8 text-[1.0625rem] leading-8 text-on-surface md:text-body-md md:leading-relaxed">
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html parsedHtml}
 		</section>
+		<div aria-live="polite" class="min-h-6 text-label-sm text-primary">{copyStatus}</div>
 
 		<div class="flex items-center gap-4 border-t border-outline-variant/10 pt-6">
 			<LikeButton postId={data.tech.id} initialLikesCount={data.tech.likesCount} initialHasLiked={data.tech.hasLiked} />
@@ -101,13 +129,26 @@
 	</article>
 </div>
 
-<style>
+	<style>
 	:global(.prose pre) {
+		position: relative;
 		max-width: 100%;
 		overflow-x: auto;
+		padding-top: 3.25rem;
 	}
 
 	:global(.prose code) {
 		overflow-wrap: anywhere;
+	}
+
+	:global(.code-copy-button) {
+		position: absolute;
+		right: 0.75rem;
+		top: 0.75rem;
+		min-height: 2.75rem;
+		padding: 0.5rem 0.75rem;
+		border-radius: 0.5rem;
+		background: var(--color-surface-container-high);
+		color: var(--color-on-surface);
 	}
 </style>
