@@ -25,6 +25,10 @@
 
 	// ダミーのUIステート (image.pngの再現用)
 	let tags = $state(['技術', 'プログラミング']);
+	let isTagInputOpen = $state(false);
+	let tagInput = $state('');
+	let tagError = $state('');
+	let tagInputElement = $state<HTMLInputElement | null>(null);
 
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
@@ -68,10 +72,42 @@
 		tags = tags.filter(t => t !== tagToRemove);
 	}
 
+	function openTagInput() {
+		isTagInputOpen = true;
+		tagError = '';
+		requestAnimationFrame(() => tagInputElement?.focus());
+	}
+
+	function closeTagInput() {
+		isTagInputOpen = false;
+		tagInput = '';
+		tagError = '';
+	}
+
 	function addTag() {
-		const newTag = prompt('タグ名を入力してください：');
-		if (newTag && newTag.trim()) {
-			tags = [...tags, newTag.trim()];
+		const newTag = tagInput.trim();
+		if (!newTag) {
+			tagError = 'タグ名を入力してください。';
+			return;
+		}
+		if (newTag.length > 30) {
+			tagError = 'タグは30文字以内で入力してください。';
+			return;
+		}
+		if (tags.includes(newTag)) {
+			tagError = '同じタグは追加できません。';
+			return;
+		}
+		tags = [...tags, newTag];
+		closeTagInput();
+	}
+
+	function handleTagKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			addTag();
+		} else if (event.key === 'Escape') {
+			closeTagInput();
 		}
 	}
 </script>
@@ -197,13 +233,18 @@
 								<button type="button" onclick={() => removeTag(tag)} class="hover:text-error transition-colors cursor-pointer font-bold text-[10px]">×</button>
 							</span>
 						{/each}
-						<button
-							type="button"
-							onclick={addTag}
-							class="border border-dashed border-outline-variant/60 hover:border-primary px-3 py-1 rounded text-body-sm text-outline hover:text-primary transition-all cursor-pointer"
-						>
-							+ タグを追加
-						</button>
+		{#if isTagInputOpen}
+			<div class="flex w-full flex-col gap-1 sm:w-auto">
+				<div class="flex items-center gap-2">
+					<input bind:this={tagInputElement} bind:value={tagInput} onkeydown={handleTagKeydown} maxlength="30" aria-label="タグ名" placeholder="タグ名" class="min-h-11 w-40 rounded border border-outline-variant bg-surface-container-high px-3 py-1 text-body-sm text-on-surface focus:border-primary focus:outline-none" />
+					<button type="button" onclick={addTag} class="min-h-11 rounded bg-primary px-3 py-1 text-body-sm text-on-primary">追加</button>
+					<button type="button" onclick={closeTagInput} class="min-h-11 rounded border border-outline-variant/60 px-3 py-1 text-body-sm text-outline">キャンセル</button>
+				</div>
+				{#if tagError}<span class="text-body-sm text-error" role="alert">{tagError}</span>{/if}
+			</div>
+		{:else}
+			<button type="button" onclick={openTagInput} class="min-h-11 rounded border border-dashed border-outline-variant/60 px-3 py-1 text-body-sm text-outline transition-all hover:border-primary hover:text-primary">+ タグを追加</button>
+		{/if}
 					</div>
 				</div>
 			</div>
