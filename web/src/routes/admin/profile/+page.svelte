@@ -98,7 +98,7 @@
 </svelte:head>
 
 <!-- ヘッダー -->
-<header class="fixed top-0 left-0 w-full h-16 bg-surface border-b border-outline-variant/20 px-gutter flex items-center justify-between z-50">
+<header class="fixed top-16 left-0 w-full h-16 bg-surface border-b border-outline-variant/20 px-gutter flex items-center justify-between z-40 md:top-0 md:left-64 md:w-[calc(100%-16rem)] md:z-50">
 	<div class="flex items-center gap-3">
 		<a href={resolve('/admin')} class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
 			Buildlog
@@ -125,7 +125,7 @@
 	</div>
 </header>
 
-<div class="editorial-container mx-auto px-gutter pt-24 pb-20 max-w-[800px]">
+<div class="editorial-container mx-auto px-gutter pt-32 pb-20 max-w-[800px] md:pt-24">
 	<h1 class="font-display-lg text-display-lg mb-8 text-primary font-bold tracking-tight">プロフィール編集</h1>
 
 	<form class="flex flex-col gap-8 bg-surface-container-lowest p-8 rounded-2xl border border-outline-variant/20 shadow-xs" onsubmit={(e) => e.preventDefault()}>

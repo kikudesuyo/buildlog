@@ -42,11 +42,11 @@ import { resolve } from '$app/paths';
 
 <!-- TopNavBar -->
 <nav class="site-nav fixed top-0 z-50 w-full border-b border-outline-variant/30 bg-surface/80 backdrop-blur-md transition-all duration-300">
-	<div class="flex justify-between items-center max-w-container-max mx-auto h-16 px-gutter">
-		<a href={resolve('/')} class="text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
+	<div class="site-nav-inner mx-auto flex h-16 max-w-container-max items-center justify-between px-gutter">
+		<a href={resolve('/')} class="site-logo text-headline-md font-headline-md text-primary cursor-pointer transition-opacity active:opacity-70">
 			Buildlog
 		</a>
-		<div class="flex items-center gap-stack-lg">
+		<div class="site-nav-links flex items-center gap-stack-lg" aria-label="メインナビゲーション">
 			{#each navItems as item (item.href)}
 				<a
 					href={resolve(item.href)}
@@ -58,7 +58,7 @@ import { resolve } from '$app/paths';
 				</a>
 			{/each}
 		</div>
-		<div class="flex items-center gap-stack-md">
+		<div class="site-nav-actions flex items-center gap-stack-md">
 			<button
 				type="button"
 				aria-label="検索を開く"
@@ -133,5 +133,35 @@ import { resolve } from '$app/paths';
 				{/if}
 			</div>
 		</div>
-	</div>
+</div>
 {/if}
+
+<style>
+	@media (max-width: 767px) {
+		.site-nav-inner {
+			gap: 0.5rem;
+			padding-inline: 1rem;
+		}
+
+		.site-logo {
+			font-size: 1.25rem;
+			line-height: 1.5rem;
+			white-space: nowrap;
+		}
+
+		.site-nav-links {
+			display: none;
+		}
+
+		.site-nav-actions {
+			margin-left: auto;
+			gap: 0.25rem;
+		}
+
+		.site-nav-actions button {
+			min-height: 2.75rem;
+			min-width: 2.75rem;
+			padding: 0.625rem;
+		}
+	}
+</style>
