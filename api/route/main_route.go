@@ -89,6 +89,9 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Get("/posts/history", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleGetPostHistory(db))
 		})
+		r.Get("/admin/analytics", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetAnalytics(db))
+		})
 	})
 
 	return r

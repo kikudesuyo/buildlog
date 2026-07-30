@@ -25,7 +25,6 @@
 
 	// ダミーのUIステート (image.pngの再現用)
 	let tags = $state(['技術', 'プログラミング']);
-	let isCommentsAllowed = $state(true);
 
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
@@ -84,7 +83,7 @@
 </svelte:head>
 
 <!-- ヘッダー（全幅） -->
-<header class="fixed top-0 left-0 w-full h-16 bg-white border-b border-outline-variant/20 px-gutter flex items-center justify-between z-50">
+	<header class="fixed top-0 left-0 z-50 flex h-16 w-full items-center justify-between border-b border-outline-variant/20 bg-surface-container-lowest px-gutter">
 	<div class="flex items-center gap-3">
 		<a href={resolve('/admin/tech')} class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
 			Buildlog
@@ -93,7 +92,7 @@
 		<span class="text-outline font-label-md text-label-md">Drafts</span>
 	</div>
 
-	<div class="flex items-center gap-6">
+	<div class="hidden items-center gap-6 md:flex">
 		{#if errorMessage}
 			<span class="text-error font-body-sm text-body-sm">{errorMessage}</span>
 		{/if}
@@ -121,11 +120,19 @@
 	</div>
 </header>
 
+{#if errorMessage}
+	<div class="mx-auto mt-20 max-w-container-max px-gutter text-body-sm text-error md:hidden" role="alert">{errorMessage}</div>
+{/if}
+<nav class="fixed inset-x-0 bottom-0 z-50 flex gap-2 border-t border-outline-variant/20 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden" aria-label="編集アクション">
+	<button type="button" onclick={() => handleSave('draft')} disabled={isSubmitting} class="min-h-11 flex-1 rounded-lg border border-outline-variant/40 px-3 py-2 font-label-md text-outline disabled:opacity-50">下書き保存</button>
+	<button type="button" onclick={() => handleSave('published')} disabled={isSubmitting} class="min-h-11 flex-1 rounded-lg bg-primary px-3 py-2 font-label-md text-on-primary disabled:opacity-50">{isSubmitting ? '更新中...' : '更新する'}</button>
+</nav>
+
 <!-- エディタ本体 -->
-<div class="editorial-container mx-auto px-gutter pt-24 pb-20 relative">
+<div class="editorial-container relative mx-auto px-gutter pb-36 pt-24 md:pb-20">
 	
 	<!-- 左フローティングツールバー (絶対配置) -->
-	<aside class="absolute -left-12 top-24 hidden md:flex flex-col items-center gap-1.5 bg-white border border-outline-variant/20 rounded-xl p-1.5 shadow-xs w-11">
+	<aside class="absolute -left-12 top-24 hidden md:flex flex-col items-center gap-1.5 bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-1.5 shadow-xs w-11">
 		<button type="button" class="w-8 h-8 flex items-center justify-center font-bold text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="太字">B</button>
 		<button type="button" class="w-8 h-8 flex items-center justify-center italic text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="斜体">I</button>
 		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="リスト">
@@ -218,18 +225,6 @@
 					</div>
 				</div>
 
-				<div class="flex flex-col gap-4 mt-2 border-t border-outline-variant/10 pt-4">
-					<div class="flex items-center justify-between">
-						<span class="text-body-md text-on-surface-variant">コメントを許可する</span>
-						<button
-							type="button"
-							aria-label="コメント許可トグル"
-							onclick={() => (isCommentsAllowed = !isCommentsAllowed)}
-							class="w-10 h-6 rounded-full p-0.5 transition-colors relative flex items-center cursor-pointer {isCommentsAllowed ? 'bg-primary' : 'bg-outline-variant/40'}"
-						>
-							<div class="w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 {isCommentsAllowed ? 'translate-x-4' : 'translate-x-0'}"></div>
-						</button>
-					</div>
 				</div>
 			</div>
 		</footer>
