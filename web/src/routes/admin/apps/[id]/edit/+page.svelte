@@ -69,7 +69,7 @@
 </svelte:head>
 
 <!-- ヘッダー -->
-<header class="fixed top-0 left-0 w-full h-16 bg-white border-b border-outline-variant/20 px-gutter flex items-center justify-between z-50">
+<header class="fixed top-0 left-0 w-full h-16 bg-surface-container-lowest border-b border-outline-variant/20 px-gutter flex items-center justify-between z-50">
 	<div class="flex items-center gap-3">
 		<a href={resolve('/admin/apps')} class="text-headline-md font-headline-md text-primary font-bold tracking-tight">
 			Buildlog
