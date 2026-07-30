@@ -45,8 +45,6 @@
 			isSubmitting = false;
 		}
 	}
-
-	}
 </script>
 
 <UnsavedChangesGuard {isDirty} {isSubmitting} />
@@ -154,8 +152,9 @@
 						>
 							<div class="w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 {isPublicLimited ? 'translate-x-4' : 'translate-x-0'}"></div>
 						</button>
+						</div>
 					</div>
-			</div>
+				</div>
 		</footer>
 	</main>
 </div>

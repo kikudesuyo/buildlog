@@ -220,10 +220,8 @@
 							class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md"
 						/>
 					</div>
-				</div>
-
-				</div>
 			</div>
+		</div>
 		</footer>
 	</main>
 </div>
