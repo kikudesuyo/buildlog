@@ -86,6 +86,9 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Put("/profile", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateProfile(db))
 		})
+		r.Get("/admin/analytics", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetAnalytics(db))
+		})
 	})
 
 	return r

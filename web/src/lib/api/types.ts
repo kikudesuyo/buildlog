@@ -66,3 +66,27 @@ export interface TrashEntry {
 	createdAt: string;
 	deletedAt: string;
 }
+
+export interface AnalyticsArticleItem {
+	id: number;
+	type: string;
+	title: string;
+	views: number;
+	likes: number;
+}
+
+export interface MonthlyActivityItem {
+	month: string;
+	count: number;
+}
+
+export interface AnalyticsData {
+	totalViews: number;
+	totalLikes: number;
+	totalPosts: number;
+	diaryCount: number;
+	techCount: number;
+	topViewsArticles: AnalyticsArticleItem[];
+	topLikesArticles: AnalyticsArticleItem[];
+	monthlyActivities: MonthlyActivityItem[];
+}

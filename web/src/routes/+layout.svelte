@@ -1,6 +1,5 @@
 <script lang="ts">
 	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import AdminNavbar from './admin/AdminNavbar.svelte';
 	import Footer from '$lib/components/Footer.svelte';
@@ -17,7 +16,11 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+	<link rel="apple-touch-icon" href="/favicon.svg" />
+	<link rel="manifest" href="/manifest.webmanifest" />
+	<meta name="theme-color" content="#12201c" />
+	<link rel="alternate" type="application/rss+xml" title="Buildlog RSS Feed" href="/rss.xml" />
 	<title>Buildlog — テクノロジーと美学をつなぐ開発録</title>
 	<meta name="description" content="日々の開発プロセス、思考の断片、そして設計思想をミニマルかつ洗練されたデザインで綴る個人開発ログ。" />
 	<meta property="og:title" content="Buildlog" />
