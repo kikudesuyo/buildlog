@@ -35,16 +35,16 @@ func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
 		return nil, err
 	}
 
-	apps := make([]entity.AppResponse, 0, len(dbApps))
+	appList := make([]entity.AppResponse, 0, len(dbApps))
 	for _, dbApp := range dbApps {
 		app, err := mapToAppResponse(&dbApp)
 		if err != nil {
 			return nil, err
 		}
-		apps = append(apps, *app)
+		appList = append(appList, *app)
 	}
 
-	return apps, nil
+	return appList, nil
 }
 
 func GetAppByID(ctx context.Context, id int64) (*entity.AppResponse, error) {

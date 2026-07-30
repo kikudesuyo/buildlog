@@ -54,6 +54,7 @@ func NewRouter(db *gorm.DB) http.Handler {
 
 		r.Get("/profile", handle(v1.HandleGetProfile()))
 		r.Put("/profile", handle(v1.HandleUpdateProfile()))
+		r.Get("/admin/analytics", handle(v1.HandleGetAnalytics(db)))
 	})
 
 	return r

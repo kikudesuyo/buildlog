@@ -6,7 +6,8 @@ import type {
 	TechArticle,
 	TrashEntry,
 	AppProject,
-	ProfileData
+	ProfileData,
+	AnalyticsData
 } from '$lib/api/types';
 
 type ApiFetch = LoadEvent['fetch'];
@@ -476,5 +477,59 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 		expertise: response.data.expertise,
 		contactEmail: response.data.contact_email,
 		finalQuote: response.data.final_quote
+	};
+}
+
+export async function fetchAnalytics(fetchFn?: ApiFetch): Promise<AnalyticsData> {
+	const response = await get<ApiObjectResponse<{
+		total_views: number;
+		total_likes: number;
+		total_posts: number;
+		diary_count: number;
+		tech_count: number;
+		top_views_articles: {
+			id: number;
+			type: string;
+			title: string;
+			views: number;
+			likes: number;
+		}[];
+		top_likes_articles: {
+			id: number;
+			type: string;
+			title: string;
+			views: number;
+			likes: number;
+		}[];
+		monthly_activities: {
+			month: string;
+			count: number;
+		}[];
+	}>>(fetchFn || fetch, '/admin/analytics');
+
+	return {
+		totalViews: response.data.total_views,
+		totalLikes: response.data.total_likes,
+		totalPosts: response.data.total_posts,
+		diaryCount: response.data.diary_count,
+		techCount: response.data.tech_count,
+		topViewsArticles: response.data.top_views_articles.map((item) => ({
+			id: item.id,
+			type: item.type,
+			title: item.title,
+			views: item.views,
+			likes: item.likes
+		})),
+		topLikesArticles: response.data.top_likes_articles.map((item) => ({
+			id: item.id,
+			type: item.type,
+			title: item.title,
+			views: item.views,
+			likes: item.likes
+		})),
+		monthlyActivities: response.data.monthly_activities.map((item) => ({
+			month: item.month,
+			count: item.count
+		}))
 	};
 }
