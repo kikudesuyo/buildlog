@@ -144,6 +144,10 @@
 	</aside>
 
 	<main class="flex flex-col gap-6">
+		<nav class="sticky top-20 z-10 flex gap-2 rounded-lg border border-outline-variant/20 bg-surface-container-lowest/95 p-2 backdrop-blur md:hidden" aria-label="編集セクション">
+			<a href="#editor-body" class="min-h-11 flex-1 rounded px-3 py-2 text-center font-label-md text-label-md text-primary">本文</a>
+			<a href="#editor-settings" class="min-h-11 flex-1 rounded px-3 py-2 text-center font-label-md text-label-md text-primary">設定</a>
+		</nav>
 		<!-- タイトル -->
 		<div class="border-b border-outline-variant/10 pb-4 mb-4">
 			<input
@@ -158,18 +162,20 @@
 		<!-- 本文 -->
 		<div class="flex flex-col gap-1.5">
 			<label for="tech-content" class="font-label-md text-label-md font-bold text-on-surface">本文 *</label>
-			<textarea
+		<div id="editor-body">
+		<textarea
 				id="tech-content"
 				use:autogrow
 				bind:value={content}
 				placeholder="本文を書き始めましょう..."
 				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
 				disabled={isSubmitting}
-			></textarea>
+		></textarea>
+		</div>
 		</div>
 
 		<!-- 下部設定セクション -->
-		<footer class="border-t border-outline-variant/10 pt-8 mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+		<footer id="editor-settings" class="border-t border-outline-variant/10 pt-8 mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
 			<!-- 左カラム: タグ・カテゴリ設定 -->
 			<div class="flex flex-col gap-5">
 				<!-- カテゴリ選択 -->
