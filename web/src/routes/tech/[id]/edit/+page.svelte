@@ -13,7 +13,7 @@
 	let category = $state(data.tech.category);
 	let views = $state(data.tech.views || '');
 
-	let previewMode = $state<'edit' | 'preview' | 'split'>('edit');
+	let previewMode = $state<'edit' | 'preview'>('edit');
 	let parsedContent = $derived(marked.parse(content) as string);
 
 	let isSubmitting = $state(false);
@@ -149,36 +149,35 @@
 			/>
 		</div>
 
-		<!-- レイアウト切替タブ -->
-		<div class="flex items-center gap-1 bg-surface-container-high p-1 rounded-lg border border-outline-variant/20 w-fit self-end">
-			<button
+		<!-- GitHub風の編集・プレビュー切替 -->
+		<div class="overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-container-lowest">
+			<div class="flex items-center border-b border-outline-variant/20 bg-surface-container-high px-2" role="tablist" aria-label="本文表示モード">
+				<button
 				type="button"
+				role="tab"
+				aria-selected={previewMode === 'edit'}
+				aria-controls="tech-editor-panel"
 				onclick={() => (previewMode = 'edit')}
-				class="px-3 py-1.5 rounded text-label-md font-label-md cursor-pointer transition-all {previewMode === 'edit' ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-highest'}"
+				class="border-b-2 px-4 py-2.5 text-label-md font-label-md transition-colors cursor-pointer {previewMode === 'edit' ? 'border-primary bg-surface-container-lowest text-primary font-bold' : 'border-transparent text-on-surface-variant hover:bg-surface-container-highest'}"
 			>
-				✍️ 編集
-			</button>
-			<button
+				編集
+				</button>
+				<button
 				type="button"
+				role="tab"
+				aria-selected={previewMode === 'preview'}
+				aria-controls="tech-preview-panel"
 				onclick={() => (previewMode = 'preview')}
-				class="px-3 py-1.5 rounded text-label-md font-label-md cursor-pointer transition-all {previewMode === 'preview' ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-highest'}"
+				class="border-b-2 px-4 py-2.5 text-label-md font-label-md transition-colors cursor-pointer {previewMode === 'preview' ? 'border-primary bg-surface-container-lowest text-primary font-bold' : 'border-transparent text-on-surface-variant hover:bg-surface-container-highest'}"
 			>
-				👁️ プレビュー
-			</button>
-			<button
-				type="button"
-				onclick={() => (previewMode = 'split')}
-				class="hidden md:block px-3 py-1.5 rounded text-label-md font-label-md cursor-pointer transition-all {previewMode === 'split' ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-highest'}"
-			>
-				📖 2カラム
-			</button>
-		</div>
+				プレビュー
+				</button>
+			</div>
 
-		<!-- 編集・プレビューエリア -->
-		<div class="grid gap-6 {previewMode === 'split' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}">
-			<!-- 編集エリア (edit または split の時表示) -->
-			{#if previewMode === 'edit' || previewMode === 'split'}
-				<div class="flex flex-col gap-1.5 border border-outline-variant/10 rounded-xl p-4 bg-surface-container-lowest">
+		<!-- 編集とプレビューは同じパネル内で切り替えて表示 -->
+		<div class="p-4">
+			{#if previewMode === 'edit'}
+				<div id="tech-editor-panel" role="tabpanel" aria-label="本文を編集" class="flex flex-col gap-1.5">
 					<label for="tech-content" class="font-label-md text-label-md font-bold text-on-surface border-b border-outline-variant/10 pb-2 mb-2">本文 *</label>
 					<textarea
 						id="tech-content"
@@ -191,15 +190,15 @@
 				</div>
 			{/if}
 
-			<!-- プレビューエリア (preview または split の時表示) -->
-			{#if previewMode === 'preview' || previewMode === 'split'}
-				<div class="flex flex-col gap-1.5 border border-outline-variant/10 rounded-xl p-4 bg-surface-container-lowest overflow-y-auto">
+			{#if previewMode === 'preview'}
+				<div id="tech-preview-panel" role="tabpanel" aria-label="本文プレビュー" class="flex flex-col gap-1.5 min-h-[300px]">
 					<span class="font-label-md text-label-md font-bold text-primary border-b border-outline-variant/10 pb-2 mb-2">リアルタイムプレビュー</span>
 					<div class="prose max-w-none text-on-surface min-h-[300px] text-body-lg leading-relaxed">
 						{@html parsedContent}
 					</div>
 				</div>
 			{/if}
+		</div>
 		</div>
 
 		<!-- 下部設定セクション -->
