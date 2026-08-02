@@ -74,7 +74,13 @@
 					{/if}
 				</a>
 				<div class="flex items-center justify-between">
-					<LikeButton postId={entry.id} initialLikesCount={entry.likesCount} initialHasLiked={entry.hasLiked} />
+					<div class="flex items-center gap-4">
+						<LikeButton postId={entry.id} initialLikesCount={entry.likesCount} initialHasLiked={entry.hasLiked} />
+						<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant" aria-label={`コメント${entry.commentsCount}件`}>
+							<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>
+							{entry.commentsCount}
+						</span>
+					</div>
 				</div>
 			</article>
 		{/each}

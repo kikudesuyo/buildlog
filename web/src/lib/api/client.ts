@@ -50,6 +50,7 @@ export type ApiPost = {
 	created_at: string;
 	updated_at: string;
 	likes_count: number;
+	comments_count: number;
 	has_liked: boolean;
 };
 
@@ -64,6 +65,7 @@ export async function fetchDiaryEntries(fetchFn: ApiFetch, all = false): Promise
 		createdAt: post.created_at,
 		updatedAt: post.updated_at,
 		likesCount: post.likes_count,
+		commentsCount: post.comments_count,
 		hasLiked: post.has_liked
 	}));
 }
@@ -130,6 +132,7 @@ export async function createDiary(title: string, content: string, status?: 'draf
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }
@@ -144,6 +147,7 @@ export async function updateDiary(id: number, title: string, content: string, st
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }
@@ -222,6 +226,7 @@ export async function fetchDiary(fetchFn: ApiFetch, id: number): Promise<DiaryEn
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }

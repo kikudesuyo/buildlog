@@ -6,6 +6,7 @@ export interface DiaryEntry {
 	createdAt: string;
 	updatedAt: string;
 	likesCount: number;
+	commentsCount: number;
 	hasLiked?: boolean;
 }
 
