@@ -1,5 +1,6 @@
-import * as env from '$env/static/public';
-import type { LoadEvent } from '@sveltejs/kit';
+import { get, sendRequest, type ApiFetch, type ApiListResponse, type ApiObjectResponse } from './http';
+
+export type { ApiFetch } from './http';
 import type {
 	DiaryEntry,
 	FeaturedTechArticle,
@@ -12,32 +13,6 @@ import type {
 	CommentEntry,
 	GoalPeriod
 } from '$lib/api/types';
-
-export type ApiFetch = LoadEvent['fetch'];
-
-type ApiListResponse<T> = {
-	data_list: T[];
-};
-
-type ApiObjectResponse<T> = {
-	data: T;
-};
-
-
-
-
-const apiBaseUrl = (() => {
-	const rawUrl = env.PUBLIC_API_BASE_URL || 'http://localhost:8081';
-	return rawUrl.endsWith('/api/v1') ? rawUrl : `${rawUrl}/api/v1`;
-})();
-
-async function get<T>(fetchFn: ApiFetch, path: string): Promise<T> {
-	const response = await fetchFn(`${apiBaseUrl}${path}`);
-	if (!response.ok) {
-		throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-	}
-	return response.json() as Promise<T>;
-}
 
 export type ApiPost = {
 	id: number;
@@ -116,17 +91,6 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false): Promise<{
 	};
 }
 
-async function sendRequest<T>(method: string, path: string, body?: unknown): Promise<T> {
-	const response = await fetch(`${apiBaseUrl}${path}`, {
-		method,
-		headers: body ? { 'Content-Type': 'application/json' } : undefined,
-		body: body ? JSON.stringify(body) : undefined
-	});
-	if (!response.ok) {
-		throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-	}
-	return response.json() as Promise<T>;
-}
 
 export async function createDiary(title: string, content: string, status?: 'draft' | 'published'): Promise<DiaryEntry> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/diaries', { title, content, status: status || 'draft' });
