@@ -22,6 +22,7 @@ type DBTablePost struct {
 	DeletedAt     gorm.DeletedAt `gorm:"column:deleted_at;index" json:"deleted_at,omitempty"`
 }
 
+// TableName はエンティティに対応するデータベーステーブル名を返します。
 func (DBTablePost) TableName() string {
 	return "posts"
 }

@@ -11,6 +11,7 @@ type LikeStatus struct {
 	HasLiked   bool  `json:"has_liked"`
 }
 
+// LikePost はこの処理に必要な内部処理を実行します。
 func LikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
 	alreadyLiked, err := repository.HasLiked(ctx, database, postID, ipAddress)
 	if err != nil {
@@ -33,6 +34,7 @@ func LikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, 
 	}, nil
 }
 
+// UnlikePost はこの処理に必要な内部処理を実行します。
 func UnlikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
 	if err := repository.DeleteLike(ctx, database, postID, ipAddress); err != nil {
 		return LikeStatus{}, err
@@ -49,6 +51,7 @@ func UnlikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus
 	}, nil
 }
 
+// GetLikeStatus はデータを取得します。
 func GetLikeStatus(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
 	count, err := repository.CountLikesByPostID(ctx, database, postID)
 	if err != nil {

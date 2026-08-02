@@ -8,6 +8,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
+// HandleGetProfile はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetProfile(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	profile, err := service.GetProfile(r.Context())
 	if err != nil {
@@ -16,6 +17,7 @@ func HandleGetProfile(r *http.Request, requestData map[string]interface{}) (http
 	return entity.NewObjectResponse(profile), nil
 }
 
+// HandleUpdateProfile はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateProfile(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	var req entity.UpdateProfileRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

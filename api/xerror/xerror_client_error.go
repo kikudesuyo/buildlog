@@ -38,18 +38,22 @@ func ClientValidationErr(err error, meta ...map[string]string) error {
 	return generateErr(err, msg, CodeClientValidation, meta...)
 }
 
+// ClientValidationEmail はこの処理に必要な内部処理を実行します。
 func ClientValidationEmail(meta ...map[string]string) error {
 	return generateErrFromText("メールアドレスの形式が正しくありません", CodeClientValidationEmail, meta...)
 }
 
+// ClientValidationEmailDomain はこの処理に必要な内部処理を実行します。
 func ClientValidationEmailDomain(domain string, meta ...map[string]string) error {
 	return generateErrFromText(fmt.Sprintf("[%s] は利用できるメールアドレスのドメインではありません", domain), CodeClientValidationEmail, meta...)
 }
 
+// ClientValidationEmailNotMatch はこの処理に必要な内部処理を実行します。
 func ClientValidationEmailNotMatch(email string, meta ...map[string]string) error {
 	return generateErrFromText(fmt.Sprintf("登録されているメールアドレスと一致しません: [%s]", email), CodeClientValidationEmailNotMatch, meta...)
 }
 
+// ClientValidationNoPermission はこの処理に必要な内部処理を実行します。
 func ClientValidationNoPermission(perm string, meta ...map[string]string) error {
 	return generateErrFromText(fmt.Sprintf("実行権限がありません: [%s]", perm), CodeClientValidationNoPermission, meta...)
 }

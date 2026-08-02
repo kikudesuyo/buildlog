@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewRouter は値を生成します。
 func NewRouter(db *gorm.DB) http.Handler {
 	service.SetDatabase(db)
 	r := chi.NewRouter()
@@ -53,6 +54,8 @@ func NewRouter(db *gorm.DB) http.Handler {
 
 	return r
 }
+
+// corsMiddleware はこの処理に必要な内部処理を実行します。
 func corsMiddleware(next http.Handler) http.Handler {
 	allowedOrigin := os.Getenv("ALLOWED_ORIGINS")
 	if allowedOrigin == "" {

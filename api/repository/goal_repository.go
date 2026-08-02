@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// GetGoalPeriod はデータを取得します。
 func GetGoalPeriod(ctx context.Context, db *gorm.DB, periodType string, startsAt time.Time) (*entity.DBTableGoalPeriod, error) {
 	var period entity.DBTableGoalPeriod
 	err := db.WithContext(ctx).
@@ -17,6 +18,7 @@ func GetGoalPeriod(ctx context.Context, db *gorm.DB, periodType string, startsAt
 	return &period, err
 }
 
+// SaveGoalPeriod はデータを保存します。
 func SaveGoalPeriod(ctx context.Context, db *gorm.DB, period *entity.DBTableGoalPeriod) error {
 	return db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("id = ?", period.ID).Delete(&entity.DBTableGoal{}).Error; err != nil {

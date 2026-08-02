@@ -13,6 +13,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
+// HandleGetCommentList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetCommentList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	postID, err := parseCommentPostID(r)
 	if err != nil {
@@ -26,6 +27,7 @@ func HandleGetCommentList(r *http.Request, requestData map[string]interface{}) (
 	return entity.NewListResponse(commentList), nil
 }
 
+// HandleCreateComment はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleCreateComment(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	postID, err := parseCommentPostID(r)
 	if err != nil {
@@ -48,6 +50,7 @@ func HandleCreateComment(r *http.Request, requestData map[string]interface{}) (h
 	return entity.NewObjectResponse(comment), nil
 }
 
+// parseCommentPostID はこの処理に必要な内部処理を実行します。
 func parseCommentPostID(r *http.Request) (int64, error) {
 	postID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil || postID <= 0 {

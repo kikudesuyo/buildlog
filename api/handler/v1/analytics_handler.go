@@ -7,6 +7,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
+// HandleGetAnalytics はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetAnalytics(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	analytics, err := service.GetAnalytics(r.Context())
 	if err != nil {

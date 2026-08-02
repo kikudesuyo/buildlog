@@ -8,6 +8,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
+// GetProfile はデータを取得します。
 func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
 	dbProfile, err := repository.GetProfile(ctx, database)
 	if err != nil {
@@ -50,6 +51,7 @@ func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
 	}, nil
 }
 
+// UpdateProfile はデータを更新します。
 func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entity.ProfileResponse, error) {
 	bioJSON, err := json.Marshal(req.Bio)
 	if err != nil {
