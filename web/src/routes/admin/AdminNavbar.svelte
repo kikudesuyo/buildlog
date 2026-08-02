@@ -12,6 +12,23 @@
 		{ href: '/admin/trash', label: 'Trash', description: 'ゴミ箱', icon: 'delete_outline' }
 	] as const;
 
+	function resolveAdminPath(path: (typeof navItems)[number]['href']) {
+		switch (path) {
+			case '/admin/analytics':
+				return resolve('/admin/analytics');
+			case '/admin/tech':
+				return resolve('/admin/tech');
+			case '/admin/trash':
+				return resolve('/admin/trash');
+			case '/admin/apps':
+				return resolve('/admin/apps');
+			case '/admin/profile':
+				return resolve('/admin/profile');
+			default:
+				return resolve('/admin');
+		}
+	}
+
 	let isOpen = $state(false);
 	let isDarkMode = $state(false);
 
@@ -93,7 +110,7 @@
 		<nav aria-label="管理メニュー" class="flex flex-col gap-1">
 			{#each navItems as item (item.href)}
 				<a
-					href={resolve(item.href as never)}
+					href={resolveAdminPath(item.href)}
 					onclick={closeMenu}
 					class="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors {isActive(item.href) ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'}"
 				>

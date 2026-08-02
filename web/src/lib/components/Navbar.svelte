@@ -169,18 +169,6 @@ import { resolve } from '$app/paths';
 		</nav>
 	</div>
 {/if}
-<style>
-	.site-nav {
-		padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
-		padding-block-start: env(safe-area-inset-top);
-	}
-
-	.site-nav button {
-		min-block-size: 2.75rem;
-		min-inline-size: 2.75rem;
-	}
-</style>
-
 <!-- Search Modal (Minimalist) -->
 {#if isSearchOpen}
 	<div
@@ -226,6 +214,16 @@ import { resolve } from '$app/paths';
 {/if}
 
 <style>
+	.site-nav {
+		padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+		padding-block-start: env(safe-area-inset-top);
+	}
+
+	.site-nav button {
+		min-block-size: 2.75rem;
+		min-inline-size: 2.75rem;
+	}
+
 	@media (max-width: 767px) {
 		.site-nav-inner {
 			gap: 0.5rem;

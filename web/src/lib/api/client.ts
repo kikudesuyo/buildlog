@@ -8,7 +8,8 @@ import type {
 	AppProject,
 	ProfileData,
 	AnalyticsData,
-	HistoryItem
+	HistoryItem,
+	CommentEntry
 } from '$lib/api/types';
 
 type ApiFetch = LoadEvent['fetch'];
@@ -245,6 +246,44 @@ export type ApiLikeStatus = {
 	likes_count: number;
 	has_liked: boolean;
 };
+
+type ApiComment = {
+	id: number;
+	post_id: number;
+	parent_id: number | null;
+	content: string;
+	created_at: string;
+	updated_at: string;
+	replies?: ApiComment[];
+};
+
+function mapComment(comment: ApiComment): CommentEntry {
+	return {
+		id: comment.id,
+		postId: comment.post_id,
+		parentId: comment.parent_id,
+		content: comment.content,
+		createdAt: comment.created_at,
+		updatedAt: comment.updated_at,
+		replies: (comment.replies || []).map(mapComment)
+	};
+}
+
+export async function fetchComments(fetchFn: ApiFetch, postId: number): Promise<CommentEntry[]> {
+	const response = await get<ApiListResponse<ApiComment>>(fetchFn, `/posts/${postId}/comments`);
+	return response.data_list.map(mapComment);
+}
+
+export async function createComment(
+	postId: number,
+	req: { parentId: number | null; content: string }
+): Promise<CommentEntry> {
+	const response = await sendRequest<ApiObjectResponse<ApiComment>>('POST', `/posts/${postId}/comments`, {
+		parent_id: req.parentId,
+		content: req.content
+	});
+	return mapComment(response.data);
+}
 
 export async function likePost(id: number): Promise<ApiLikeStatus> {
 	const response = await sendRequest<ApiObjectResponse<ApiLikeStatus>>('POST', `/posts/${id}/like`);

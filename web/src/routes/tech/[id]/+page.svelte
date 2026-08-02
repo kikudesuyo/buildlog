@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import LikeButton from '$lib/components/LikeButton.svelte';
+	import CommentSection from '$lib/components/CommentSection.svelte';
 	import { Marked, type Tokens } from 'marked';
 	import { markedHighlight } from 'marked-highlight';
 	import hljs from 'highlight.js';
@@ -141,6 +142,7 @@
 		<div class="flex items-center gap-4 border-t border-outline-variant/10 pt-6">
 			<LikeButton postId={data.tech.id} initialLikesCount={data.tech.likesCount} initialHasLiked={data.tech.hasLiked} />
 		</div>
+		<CommentSection postId={data.tech.id} />
 	</article>
 </div>
 

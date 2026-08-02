@@ -31,7 +31,6 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Put("/techs/{id}", handleFunc(v1.HandleUpdateTech))
 		r.Delete("/techs/{id}", handleFunc(v1.HandleDeleteTech))
 
-<<<<<<< HEAD
 		r.Post("/posts/{id}/like", handleFunc(v1.HandlePostLike))
 		r.Delete("/posts/{id}/like", handleFunc(v1.HandleDeleteLike))
 		r.Get("/posts/{id}/like", handleFunc(v1.HandleGetLikeStatus))
@@ -44,51 +43,10 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Delete("/apps/{id}", handleFunc(v1.HandleDeleteApp))
 		r.Get("/profile", handleFunc(v1.HandleGetProfile))
 		r.Put("/profile", handleFunc(v1.HandleUpdateProfile))
+		r.Get("/posts/{id}/comments", handleFunc(v1.HandleGetCommentList))
+		r.Post("/posts/{id}/comments", handleFunc(v1.HandleCreateComment))
+		r.Get("/posts/history", handleFunc(v1.HandleGetPostHistory(db)))
 		r.Get("/admin/analytics", handleFunc(v1.HandleGetAnalytics))
-=======
-		r.Post("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandlePostLike(db))
-		})
-		r.Delete("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteLike(db))
-		})
-		r.Get("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetLikeStatus(db))
-		})
-		r.Get("/trash", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetDeletedPosts(db))
-		})
-		r.Put("/trash/{id}/restore", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleRestorePost(db))
-		})
-		r.Get("/apps", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetAppList(db))
-		})
-		r.Get("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetApp(db))
-		})
-		r.Post("/apps", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleCreateApp(db))
-		})
-		r.Put("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateApp(db))
-		})
-		r.Delete("/apps/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteApp(db))
-		})
-		r.Get("/profile", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetProfile(db))
-		})
-		r.Put("/profile", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateProfile(db))
-		})
-		r.Get("/posts/history", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetPostHistory(db))
-		})
-		r.Get("/admin/analytics", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetAnalytics(db))
-		})
->>>>>>> dd572d718214095f25371740a9f3d14f37de939b
 	})
 
 	return r
