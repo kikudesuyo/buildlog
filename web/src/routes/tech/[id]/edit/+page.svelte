@@ -210,7 +210,7 @@
 				maxlength={MAX_TITLE_LENGTH}
 				aria-describedby="title-count"
 				placeholder="タイトルを入力..."
-				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-[36px] font-bold tracking-tight border-none placeholder:text-outline-variant/50"
+				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-[clamp(2rem,8vw,2.25rem)] md:text-[36px] font-bold tracking-tight border-none placeholder:text-outline-variant/50"
 				disabled={isSubmitting}
 			/>
 			<p id="title-count" class="text-right text-body-sm text-outline">{title.length}/{MAX_TITLE_LENGTH}</p>
@@ -292,10 +292,8 @@
 							class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md"
 						/>
 					</div>
-				</div>
-
-				</div>
 			</div>
+		</div>
 		</footer>
 	</main>
 </div>
