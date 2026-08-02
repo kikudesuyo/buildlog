@@ -13,8 +13,12 @@ import (
 
 // NewRouter は値を生成します。
 func NewRouter(db *gorm.DB) http.Handler {
-	service.SetDatabase(db)
 	r := chi.NewRouter()
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			next.ServeHTTP(w, req.WithContext(service.WithDatabase(req.Context(), db)))
+		})
+	})
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(corsMiddleware)

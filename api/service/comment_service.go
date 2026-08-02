@@ -10,7 +10,7 @@ import (
 
 // ListCommentsByPostID は一覧を取得します。
 func ListCommentsByPostID(ctx context.Context, postID int64) ([]entity.DBTableComment, error) {
-	commentList, err := repository.ListCommentsByPostID(ctx, database, postID)
+	commentList, err := repository.ListCommentsByPostID(ctx, databaseFromContext(ctx), postID)
 	if err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
@@ -23,7 +23,7 @@ func CreateComment(ctx context.Context, postID int64, req entity.CreateCommentRe
 		PostID:  postID,
 		Content: req.Content,
 	}
-	if err := repository.CreateComment(ctx, database, comment); err != nil {
+	if err := repository.CreateComment(ctx, databaseFromContext(ctx), comment); err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
 

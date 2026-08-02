@@ -10,13 +10,13 @@ import (
 
 // ListTechs は一覧を取得します。
 func ListTechs(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	techList, err := repository.ListTechs(ctx, database, all)
+	techList, err := repository.ListTechs(ctx, databaseFromContext(ctx), all)
 	if err != nil {
 		return nil, err
 	}
 	for i := range techList {
-		count, _ := repository.CountLikesByPostID(ctx, database, techList[i].ID)
-		liked, _ := repository.HasLiked(ctx, database, techList[i].ID, ipAddress)
+		count, _ := repository.CountLikesByPostID(ctx, databaseFromContext(ctx), techList[i].ID)
+		liked, _ := repository.HasLiked(ctx, databaseFromContext(ctx), techList[i].ID, ipAddress)
 		techList[i].LikesCount = count
 		techList[i].HasLiked = liked
 	}
@@ -25,12 +25,12 @@ func ListTechs(ctx context.Context, all bool, ipAddress string) ([]entity.DBTabl
 
 // GetTechByID はデータを取得します。
 func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTablePost, error) {
-	tech, err := repository.GetTechByID(ctx, database, id)
+	tech, err := repository.GetTechByID(ctx, databaseFromContext(ctx), id)
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, database, tech.ID)
-	liked, _ := repository.HasLiked(ctx, database, tech.ID, ipAddress)
+	count, _ := repository.CountLikesByPostID(ctx, databaseFromContext(ctx), tech.ID)
+	liked, _ := repository.HasLiked(ctx, databaseFromContext(ctx), tech.ID, ipAddress)
 	tech.LikesCount = count
 	tech.HasLiked = liked
 	return tech, nil
@@ -49,7 +49,7 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 		Views:    req.Views,
 		Status:   status,
 	}
-	if err := repository.CreateTech(ctx, database, &tech); err != nil {
+	if err := repository.CreateTech(ctx, databaseFromContext(ctx), &tech); err != nil {
 		return entity.CreateTechResponse{}, err
 	}
 	return entity.CreateTechResponse{
@@ -66,7 +66,7 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 
 // UpdateTech はデータを更新します。
 func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (entity.UpdateTechResponse, error) {
-	tech, err := repository.GetTechByID(ctx, database, id)
+	tech, err := repository.GetTechByID(ctx, databaseFromContext(ctx), id)
 	if err != nil {
 		return entity.UpdateTechResponse{}, err
 	}
@@ -79,7 +79,7 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 		tech.Status = req.Status
 	}
 
-	if err := repository.UpdateTech(ctx, database, tech); err != nil {
+	if err := repository.UpdateTech(ctx, databaseFromContext(ctx), tech); err != nil {
 		return entity.UpdateTechResponse{}, err
 	}
 
@@ -97,5 +97,5 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 
 // DeleteTech はデータを削除します。
 func DeleteTech(ctx context.Context, id int64) error {
-	return repository.DeleteTech(ctx, database, id)
+	return repository.DeleteTech(ctx, databaseFromContext(ctx), id)
 }

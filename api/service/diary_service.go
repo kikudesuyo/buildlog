@@ -10,14 +10,14 @@ import (
 
 // ListDiaries は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
 func ListDiaries(ctx context.Context, all bool, offset int, limit int, ipAddress string) ([]entity.DBTablePost, error) {
-	diaryList, err := repository.ListDiaries(ctx, database, all, offset, limit)
+	diaryList, err := repository.ListDiaries(ctx, databaseFromContext(ctx), all, offset, limit)
 	if err != nil {
 		return nil, err
 	}
 	for i := range diaryList {
-		count, _ := repository.CountLikesByPostID(ctx, database, diaryList[i].ID)
-		commentsCount, _ := repository.CountCommentsByPostID(ctx, database, diaryList[i].ID)
-		liked, _ := repository.HasLiked(ctx, database, diaryList[i].ID, ipAddress)
+		count, _ := repository.CountLikesByPostID(ctx, databaseFromContext(ctx), diaryList[i].ID)
+		commentsCount, _ := repository.CountCommentsByPostID(ctx, databaseFromContext(ctx), diaryList[i].ID)
+		liked, _ := repository.HasLiked(ctx, databaseFromContext(ctx), diaryList[i].ID, ipAddress)
 		diaryList[i].LikesCount = count
 		diaryList[i].CommentsCount = commentsCount
 		diaryList[i].HasLiked = liked
@@ -27,13 +27,13 @@ func ListDiaries(ctx context.Context, all bool, offset int, limit int, ipAddress
 
 // GetDiaryByID はデータを取得します。
 func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTablePost, error) {
-	diary, err := repository.GetDiaryByID(ctx, database, id)
+	diary, err := repository.GetDiaryByID(ctx, databaseFromContext(ctx), id)
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, database, diary.ID)
-	commentsCount, _ := repository.CountCommentsByPostID(ctx, database, diary.ID)
-	liked, _ := repository.HasLiked(ctx, database, diary.ID, ipAddress)
+	count, _ := repository.CountLikesByPostID(ctx, databaseFromContext(ctx), diary.ID)
+	commentsCount, _ := repository.CountCommentsByPostID(ctx, databaseFromContext(ctx), diary.ID)
+	liked, _ := repository.HasLiked(ctx, databaseFromContext(ctx), diary.ID, ipAddress)
 	diary.LikesCount = count
 	diary.CommentsCount = commentsCount
 	diary.HasLiked = liked
@@ -51,7 +51,7 @@ func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.Cre
 		Content: req.Content,
 		Status:  status,
 	}
-	if err := repository.CreateDiary(ctx, database, &diary); err != nil {
+	if err := repository.CreateDiary(ctx, databaseFromContext(ctx), &diary); err != nil {
 		return entity.CreateDiaryResponse{}, err
 	}
 	return entity.CreateDiaryResponse{
@@ -66,7 +66,7 @@ func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.Cre
 
 // UpdateDiary はデータを更新します。
 func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (entity.UpdateDiaryResponse, error) {
-	diary, err := repository.GetDiaryByID(ctx, database, id)
+	diary, err := repository.GetDiaryByID(ctx, databaseFromContext(ctx), id)
 	if err != nil {
 		return entity.UpdateDiaryResponse{}, err
 	}
@@ -77,7 +77,7 @@ func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (
 		diary.Status = req.Status
 	}
 
-	if err := repository.UpdateDiary(ctx, database, diary); err != nil {
+	if err := repository.UpdateDiary(ctx, databaseFromContext(ctx), diary); err != nil {
 		return entity.UpdateDiaryResponse{}, err
 	}
 
@@ -93,5 +93,5 @@ func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (
 
 // DeleteDiary はデータを削除します。
 func DeleteDiary(ctx context.Context, id int64) error {
-	return repository.DeleteDiary(ctx, database, id)
+	return repository.DeleteDiary(ctx, databaseFromContext(ctx), id)
 }

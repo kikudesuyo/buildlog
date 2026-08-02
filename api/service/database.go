@@ -1,10 +1,23 @@
 package service
 
-import "gorm.io/gorm"
+import (
+	"context"
+	"errors"
 
-var database *gorm.DB
+	"gorm.io/gorm"
+)
 
-// SetDatabase はこの処理に必要な内部処理を実行します。
-func SetDatabase(db *gorm.DB) {
-	database = db
+type databaseContextKey struct{}
+
+// WithDatabase はリクエストコンテキストへ DB 依存を注入します。
+func WithDatabase(ctx context.Context, db *gorm.DB) context.Context {
+	return context.WithValue(ctx, databaseContextKey{}, db)
+}
+
+func databaseFromContext(ctx context.Context) *gorm.DB {
+	db, ok := ctx.Value(databaseContextKey{}).(*gorm.DB)
+	if !ok || db == nil {
+		panic(errors.New("database is not configured in context"))
+	}
+	return db
 }

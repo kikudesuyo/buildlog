@@ -10,7 +10,7 @@ import (
 
 // GetProfile はデータを取得します。
 func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
-	dbProfile, err := repository.GetProfile(ctx, database)
+	dbProfile, err := repository.GetProfile(ctx, databaseFromContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entit
 		FinalQuote:   req.FinalQuote,
 	}
 
-	if err := repository.UpdateProfile(ctx, database, &dbProfile); err != nil {
+	if err := repository.UpdateProfile(ctx, databaseFromContext(ctx), &dbProfile); err != nil {
 		return nil, err
 	}
 
