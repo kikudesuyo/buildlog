@@ -38,6 +38,12 @@ func HandleGetDiary(r *http.Request, requestData map[string]interface{}) (http.H
 	if err != nil {
 		return nil, err
 	}
+	if r.URL.Query().Get("count_view") == "true" {
+		if err := service.IncrementDiaryViews(r.Context(), id); err != nil {
+			return nil, err
+		}
+		diary.Views = incrementViewString(diary.Views)
+	}
 	return entity.NewObjectResponse(diary), nil
 }
 

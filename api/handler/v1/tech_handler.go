@@ -29,6 +29,12 @@ func HandleGetTech(r *http.Request, requestData map[string]interface{}) (http.Ha
 	if err != nil {
 		return nil, err
 	}
+	if r.URL.Query().Get("count_view") == "true" {
+		if err := service.IncrementTechViews(r.Context(), id); err != nil {
+			return nil, err
+		}
+		tech.Views = incrementViewString(tech.Views)
+	}
 	return entity.NewObjectResponse(tech), nil
 }
 
