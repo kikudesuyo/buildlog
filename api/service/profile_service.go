@@ -6,16 +6,14 @@ import (
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/repository"
-	"gorm.io/gorm"
 )
 
-func GetProfile(ctx context.Context, db *gorm.DB) (*entity.ProfileResponse, error) {
+func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
 	if cached, ok := contentCache.Get("profile"); ok {
-		profile := *(cached.(*entity.ProfileResponse))
-		return &profile, nil
+		return cloneProfileResponse(cached.(*entity.ProfileResponse)), nil
 	}
 
-	dbProfile, err := repository.GetProfile(ctx, db)
+	dbProfile, err := repository.GetProfile(ctx, database)
 	if err != nil {
 		return nil, err
 	}
@@ -54,11 +52,23 @@ func GetProfile(ctx context.Context, db *gorm.DB) (*entity.ProfileResponse, erro
 		ContactEmail: dbProfile.ContactEmail,
 		FinalQuote:   dbProfile.FinalQuote,
 	}
-	contentCache.Set("profile", profile)
+	contentCache.Set("profile", cloneProfileResponse(profile))
 	return profile, nil
 }
 
-func UpdateProfile(ctx context.Context, db *gorm.DB, req entity.UpdateProfileRequest) (*entity.ProfileResponse, error) {
+func cloneProfileResponse(profile *entity.ProfileResponse) *entity.ProfileResponse {
+	if profile == nil {
+		return nil
+	}
+
+	clone := *profile
+	clone.Bio = append([]string(nil), profile.Bio...)
+	clone.Highlights = append([]entity.ProfileHighlight(nil), profile.Highlights...)
+	clone.Expertise = append([]string(nil), profile.Expertise...)
+	return &clone
+}
+
+func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entity.ProfileResponse, error) {
 	bioJSON, err := json.Marshal(req.Bio)
 	if err != nil {
 		return nil, err
@@ -89,7 +99,7 @@ func UpdateProfile(ctx context.Context, db *gorm.DB, req entity.UpdateProfileReq
 		FinalQuote:   req.FinalQuote,
 	}
 
-	if err := repository.UpdateProfile(ctx, db, &dbProfile); err != nil {
+	if err := repository.UpdateProfile(ctx, database, &dbProfile); err != nil {
 		return nil, err
 	}
 	contentCache.Delete("profile")

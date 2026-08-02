@@ -6,7 +6,6 @@ import (
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/repository"
-	"gorm.io/gorm"
 )
 
 func mapToAppResponse(dbApp *entity.DBTableApp) (*entity.AppResponse, error) {
@@ -30,12 +29,12 @@ func mapToAppResponse(dbApp *entity.DBTableApp) (*entity.AppResponse, error) {
 	}, nil
 }
 
-func ListApps(ctx context.Context, db *gorm.DB) ([]entity.AppResponse, error) {
+func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
 	if cached, ok := contentCache.Get("apps:list"); ok {
 		return append([]entity.AppResponse(nil), cached.([]entity.AppResponse)...), nil
 	}
 
-	dbApps, err := repository.ListApps(ctx, db)
+	dbApps, err := repository.ListApps(ctx, database)
 	if err != nil {
 		return nil, err
 	}
@@ -53,15 +52,15 @@ func ListApps(ctx context.Context, db *gorm.DB) ([]entity.AppResponse, error) {
 	return appList, nil
 }
 
-func GetAppByID(ctx context.Context, db *gorm.DB, id int64) (*entity.AppResponse, error) {
-	dbApp, err := repository.GetAppByID(ctx, db, id)
+func GetAppByID(ctx context.Context, id int64) (*entity.AppResponse, error) {
+	dbApp, err := repository.GetAppByID(ctx, database, id)
 	if err != nil {
 		return nil, err
 	}
 	return mapToAppResponse(dbApp)
 }
 
-func CreateApp(ctx context.Context, db *gorm.DB, req entity.CreateAppRequest) (*entity.AppResponse, error) {
+func CreateApp(ctx context.Context, req entity.CreateAppRequest) (*entity.AppResponse, error) {
 	tagsJSON, err := json.Marshal(req.Tags)
 	if err != nil {
 		return nil, err
@@ -79,7 +78,7 @@ func CreateApp(ctx context.Context, db *gorm.DB, req entity.CreateAppRequest) (*
 		CodeURL:     req.CodeURL,
 	}
 
-	if err := repository.CreateApp(ctx, db, &app); err != nil {
+	if err := repository.CreateApp(ctx, database, &app); err != nil {
 		return nil, err
 	}
 	contentCache.Delete("apps:list")
@@ -87,8 +86,8 @@ func CreateApp(ctx context.Context, db *gorm.DB, req entity.CreateAppRequest) (*
 	return mapToAppResponse(&app)
 }
 
-func UpdateApp(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateAppRequest) (*entity.AppResponse, error) {
-	app, err := repository.GetAppByID(ctx, db, id)
+func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*entity.AppResponse, error) {
+	app, err := repository.GetAppByID(ctx, database, id)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +107,7 @@ func UpdateApp(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateAppR
 	app.DemoURL = req.DemoURL
 	app.CodeURL = req.CodeURL
 
-	if err := repository.UpdateApp(ctx, db, app); err != nil {
+	if err := repository.UpdateApp(ctx, database, app); err != nil {
 		return nil, err
 	}
 	contentCache.Delete("apps:list")
@@ -116,8 +115,8 @@ func UpdateApp(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateAppR
 	return mapToAppResponse(app)
 }
 
-func DeleteApp(ctx context.Context, db *gorm.DB, id int64) error {
-	if err := repository.DeleteApp(ctx, db, id); err != nil {
+func DeleteApp(ctx context.Context, id int64) error {
+	if err := repository.DeleteApp(ctx, database, id); err != nil {
 		return err
 	}
 	contentCache.Delete("apps:list")

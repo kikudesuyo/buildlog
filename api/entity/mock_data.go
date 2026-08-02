@@ -31,4 +31,3 @@ type TechFeed struct {
 	FeaturedArticle FeaturedTechArticle `json:"featured_article"`
 	Articles        []TechArticle       `json:"articles"`
 }
-

@@ -29,7 +29,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("database connection failed: %v", err)
 	}
-	defer sqlDB.Close()
+	defer func() {
+		if err := sqlDB.Close(); err != nil {
+			log.Printf("database close failed: %v", err)
+		}
+	}()
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),

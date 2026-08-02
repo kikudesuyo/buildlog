@@ -7,44 +7,43 @@ import (
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/repository"
-	"gorm.io/gorm"
 )
 
-func ListDiaries(ctx context.Context, db *gorm.DB, all bool, ipAddress string) ([]entity.DBTablePost, error) {
+func ListDiaries(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
 	cacheKey := fmt.Sprintf("diary:list:%t", all)
 	var diaryList []entity.DBTablePost
 	if cached, ok := contentCache.Get(cacheKey); ok {
 		diaryList = append([]entity.DBTablePost(nil), cached.([]entity.DBTablePost)...)
 	} else {
 		var err error
-		diaryList, err = repository.ListDiaries(ctx, db, all)
+		diaryList, err = repository.ListDiaries(ctx, database, all)
 		if err != nil {
 			return nil, err
 		}
 		contentCache.Set(cacheKey, append([]entity.DBTablePost(nil), diaryList...))
 	}
 	for i := range diaryList {
-		count, _ := repository.CountLikesByPostID(ctx, db, diaryList[i].ID)
-		liked, _ := repository.HasLiked(ctx, db, diaryList[i].ID, ipAddress)
+		count, _ := repository.CountLikesByPostID(ctx, database, diaryList[i].ID)
+		liked, _ := repository.HasLiked(ctx, database, diaryList[i].ID, ipAddress)
 		diaryList[i].LikesCount = count
 		diaryList[i].HasLiked = liked
 	}
 	return diaryList, nil
 }
 
-func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64, ipAddress string) (*entity.DBTablePost, error) {
-	diary, err := repository.GetDiaryByID(ctx, db, id)
+func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTablePost, error) {
+	diary, err := repository.GetDiaryByID(ctx, database, id)
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, db, diary.ID)
-	liked, _ := repository.HasLiked(ctx, db, diary.ID, ipAddress)
+	count, _ := repository.CountLikesByPostID(ctx, database, diary.ID)
+	liked, _ := repository.HasLiked(ctx, database, diary.ID, ipAddress)
 	diary.LikesCount = count
 	diary.HasLiked = liked
 	return diary, nil
 }
 
-func CreateDiary(ctx context.Context, db *gorm.DB, req entity.CreateDiaryRequest) (entity.CreateDiaryResponse, error) {
+func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.CreateDiaryResponse, error) {
 	status := req.Status
 	if status == "" {
 		status = "draft"
@@ -54,7 +53,7 @@ func CreateDiary(ctx context.Context, db *gorm.DB, req entity.CreateDiaryRequest
 		Content: req.Content,
 		Status:  status,
 	}
-	if err := repository.CreateDiary(ctx, db, &diary); err != nil {
+	if err := repository.CreateDiary(ctx, database, &diary); err != nil {
 		return entity.CreateDiaryResponse{}, err
 	}
 	contentCache.Delete("diary:list:false", "diary:list:true")
@@ -68,8 +67,8 @@ func CreateDiary(ctx context.Context, db *gorm.DB, req entity.CreateDiaryRequest
 	}, nil
 }
 
-func UpdateDiary(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateDiaryRequest) (entity.UpdateDiaryResponse, error) {
-	diary, err := repository.GetDiaryByID(ctx, db, id)
+func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (entity.UpdateDiaryResponse, error) {
+	diary, err := repository.GetDiaryByID(ctx, database, id)
 	if err != nil {
 		return entity.UpdateDiaryResponse{}, err
 	}
@@ -80,7 +79,7 @@ func UpdateDiary(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateDi
 		diary.Status = req.Status
 	}
 
-	if err := repository.UpdateDiary(ctx, db, diary); err != nil {
+	if err := repository.UpdateDiary(ctx, database, diary); err != nil {
 		return entity.UpdateDiaryResponse{}, err
 	}
 	contentCache.Delete("diary:list:false", "diary:list:true")
@@ -95,8 +94,8 @@ func UpdateDiary(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateDi
 	}, nil
 }
 
-func DeleteDiary(ctx context.Context, db *gorm.DB, id int64) error {
-	if err := repository.DeleteDiary(ctx, db, id); err != nil {
+func DeleteDiary(ctx context.Context, id int64) error {
+	if err := repository.DeleteDiary(ctx, database, id); err != nil {
 		return err
 	}
 	contentCache.Delete("diary:list:false", "diary:list:true")
