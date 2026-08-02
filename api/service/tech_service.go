@@ -14,11 +14,8 @@ func ListTechs(ctx context.Context, all bool, ipAddress string) ([]entity.DBTabl
 	if err != nil {
 		return nil, err
 	}
-	for i := range techList {
-		count, _ := repository.CountLikesByPostID(ctx, database, techList[i].ID)
-		liked, _ := repository.HasLiked(ctx, database, techList[i].ID, ipAddress)
-		techList[i].LikesCount = count
-		techList[i].HasLiked = liked
+	if err := repository.EnrichPostEngagements(ctx, database, techList, ipAddress); err != nil {
+		return nil, err
 	}
 	return techList, nil
 }
@@ -29,10 +26,11 @@ func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTab
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, database, tech.ID)
-	liked, _ := repository.HasLiked(ctx, database, tech.ID, ipAddress)
-	tech.LikesCount = count
-	tech.HasLiked = liked
+	posts := []entity.DBTablePost{*tech}
+	if err := repository.EnrichPostEngagements(ctx, database, posts, ipAddress); err != nil {
+		return nil, err
+	}
+	*tech = posts[0]
 	return tech, nil
 }
 

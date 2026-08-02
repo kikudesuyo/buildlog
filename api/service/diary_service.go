@@ -14,13 +14,8 @@ func ListDiaries(ctx context.Context, all bool, offset int, limit int, ipAddress
 	if err != nil {
 		return nil, err
 	}
-	for i := range diaryList {
-		count, _ := repository.CountLikesByPostID(ctx, database, diaryList[i].ID)
-		commentsCount, _ := repository.CountCommentsByPostID(ctx, database, diaryList[i].ID)
-		liked, _ := repository.HasLiked(ctx, database, diaryList[i].ID, ipAddress)
-		diaryList[i].LikesCount = count
-		diaryList[i].CommentsCount = commentsCount
-		diaryList[i].HasLiked = liked
+	if err := repository.EnrichPostEngagements(ctx, database, diaryList, ipAddress); err != nil {
+		return nil, err
 	}
 	return diaryList, nil
 }
@@ -31,12 +26,11 @@ func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTa
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, database, diary.ID)
-	commentsCount, _ := repository.CountCommentsByPostID(ctx, database, diary.ID)
-	liked, _ := repository.HasLiked(ctx, database, diary.ID, ipAddress)
-	diary.LikesCount = count
-	diary.CommentsCount = commentsCount
-	diary.HasLiked = liked
+	posts := []entity.DBTablePost{*diary}
+	if err := repository.EnrichPostEngagements(ctx, database, posts, ipAddress); err != nil {
+		return nil, err
+	}
+	*diary = posts[0]
 	return diary, nil
 }
 
