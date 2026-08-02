@@ -206,3 +206,11 @@
 	vertical-align: middle;
 }
 
+
+@media (max-width: 640px) {
+	.font-display-lg, .text-display-lg { font-size: 36px; }
+	.font-headline-lg, .text-headline-lg { font-size: 28px; }
+	.font-headline-md, .text-headline-md { font-size: 22px; }
+	.font-body-lg, .text-body-lg { font-size: 18px; line-height: 1.6; }
+	.font-body-md, .text-body-md { font-size: 16px; line-height: 1.55; }
+}
