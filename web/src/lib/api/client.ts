@@ -250,22 +250,18 @@ export type ApiLikeStatus = {
 type ApiComment = {
 	id: number;
 	post_id: number;
-	parent_id: number | null;
 	content: string;
 	created_at: string;
 	updated_at: string;
-	replies?: ApiComment[];
 };
 
 function mapComment(comment: ApiComment): CommentEntry {
 	return {
 		id: comment.id,
 		postId: comment.post_id,
-		parentId: comment.parent_id,
 		content: comment.content,
 		createdAt: comment.created_at,
-		updatedAt: comment.updated_at,
-		replies: (comment.replies || []).map(mapComment)
+		updatedAt: comment.updated_at
 	};
 }
 
@@ -276,12 +272,9 @@ export async function fetchComments(fetchFn: ApiFetch, postId: number): Promise<
 
 export async function createComment(
 	postId: number,
-	req: { parentId: number | null; content: string }
+	content: string
 ): Promise<CommentEntry> {
-	const response = await sendRequest<ApiObjectResponse<ApiComment>>('POST', `/posts/${postId}/comments`, {
-		parent_id: req.parentId,
-		content: req.content
-	});
+	const response = await sendRequest<ApiObjectResponse<ApiComment>>('POST', `/posts/${postId}/comments`, { content });
 	return mapComment(response.data);
 }
 

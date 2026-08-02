@@ -17,12 +17,6 @@ func ListCommentsByPostID(ctx context.Context, db *gorm.DB, postID int64) ([]ent
 	return commentList, err
 }
 
-func GetCommentByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTableComment, error) {
-	var comment entity.DBTableComment
-	err := db.WithContext(ctx).First(&comment, id).Error
-	return &comment, err
-}
-
 func CreateComment(ctx context.Context, db *gorm.DB, comment *entity.DBTableComment) error {
 	return db.WithContext(ctx).Create(comment).Error
 }

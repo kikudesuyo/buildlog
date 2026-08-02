@@ -101,9 +101,7 @@ export interface HistoryItem {
 export interface CommentEntry {
 	id: number;
 	postId: number;
-	parentId: number | null;
 	content: string;
 	createdAt: string;
 	updatedAt: string;
-	replies: CommentEntry[];
 }
