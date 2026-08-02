@@ -6,6 +6,7 @@ export interface DiaryEntry {
 	createdAt: string;
 	updatedAt: string;
 	likesCount: number;
+	commentsCount: number;
 	hasLiked?: boolean;
 }
 
@@ -104,4 +105,18 @@ export interface CommentEntry {
 	content: string;
 	createdAt: string;
 	updatedAt: string;
+}
+
+export interface Goal {
+	id: number;
+	title: string;
+	targetValue: number;
+	progressValue: number;
+}
+
+export interface GoalPeriod {
+	periodType: 'monthly';
+	startsAt: string;
+	endsAt: string;
+	goals: Goal[];
 }
