@@ -5,15 +5,80 @@ on:
     branches:
       - main
 
-# OIDC認証のためにIDトークンの発行権限を追加
 permissions:
   contents: read
   id-token: write
 
 jobs:
+  test-api:
+    name: Test and Build Go API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+          cache-dependency-path: api/go.sum
+
+      - name: Build Go API
+        run: |
+          cd api
+          go build -o ./app .
+
+  test-web:
+    name: Build and Typecheck SvelteKit Web
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: |
+          cd web
+          pnpm install --frozen-lockfile
+
+      - name: Build and Typecheck Web
+        run: |
+          cd web
+          pnpm run build
+
+  migration:
+    name: Apply Database Migrations (Atlas)
+    runs-on: ubuntu-latest
+    needs: [test-api, test-web]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Atlas CLI
+        uses: ariga/setup-atlas@v0
+
+      - name: Apply migrations
+        run: |
+          atlas migrate apply \
+            --dir "file://sql/migrations" \
+            --url "${{ secrets.DATABASE_URL }}"
+
   deploy-api:
     name: Deploy Go API to Cloud Run
     runs-on: ubuntu-latest
+    needs: migration
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -31,4 +96,3 @@ jobs:
         run: |
           cd api
           make deploy-prod
-
