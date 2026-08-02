@@ -9,7 +9,8 @@ import type {
 	ProfileData,
 	AnalyticsData,
 	HistoryItem,
-	CommentEntry
+	CommentEntry,
+	GoalPeriod
 } from '$lib/api/types';
 
 type ApiFetch = LoadEvent['fetch'];
@@ -50,6 +51,7 @@ export type ApiPost = {
 	created_at: string;
 	updated_at: string;
 	likes_count: number;
+	comments_count: number;
 	has_liked: boolean;
 };
 
@@ -64,6 +66,7 @@ export async function fetchDiaryEntries(fetchFn: ApiFetch, all = false): Promise
 		createdAt: post.created_at,
 		updatedAt: post.updated_at,
 		likesCount: post.likes_count,
+		commentsCount: post.comments_count,
 		hasLiked: post.has_liked
 	}));
 }
@@ -130,6 +133,7 @@ export async function createDiary(title: string, content: string, status?: 'draf
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }
@@ -144,6 +148,7 @@ export async function updateDiary(id: number, title: string, content: string, st
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }
@@ -222,6 +227,7 @@ export async function fetchDiary(fetchFn: ApiFetch, id: number): Promise<DiaryEn
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }
@@ -313,6 +319,51 @@ export async function fetchTrashEntries(fetchFn: ApiFetch): Promise<TrashEntry[]
 
 export async function restoreEntry(id: number): Promise<void> {
 	await sendRequest<void>('PUT', `/trash/${id}/restore`);
+}
+
+type ApiGoal = {
+	id: number;
+	title: string;
+	target_value: number;
+	progress_value: number;
+};
+
+type ApiGoalPeriod = {
+	period_type: 'monthly';
+	starts_at: string;
+	ends_at: string;
+	goals: ApiGoal[];
+};
+
+function mapGoalPeriod(period: ApiGoalPeriod): GoalPeriod {
+	return {
+		periodType: period.period_type,
+		startsAt: period.starts_at,
+		endsAt: period.ends_at,
+		goals: period.goals.map((goal) => ({
+			id: goal.id,
+			title: goal.title,
+			targetValue: goal.target_value,
+			progressValue: goal.progress_value
+		}))
+	};
+}
+
+export async function fetchCurrentGoals(fetchFn: ApiFetch): Promise<GoalPeriod> {
+	const response = await get<ApiObjectResponse<ApiGoalPeriod>>(fetchFn, '/goals/current');
+	return mapGoalPeriod(response.data);
+}
+
+export async function saveCurrentGoals(goals: Array<{ title: string; targetValue: number; progressValue: number }>): Promise<GoalPeriod> {
+	const response = await sendRequest<ApiObjectResponse<ApiGoalPeriod>>('PUT', '/goals/current', {
+		period_type: 'monthly',
+		goals: goals.map((goal) => ({
+			title: goal.title,
+			target_value: goal.targetValue,
+			progress_value: goal.progressValue
+		}))
+	});
+	return mapGoalPeriod(response.data);
 }
 export type ApiApp = {
 	id: number;

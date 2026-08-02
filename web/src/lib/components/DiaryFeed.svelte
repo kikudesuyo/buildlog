@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DiaryEntry } from '$lib/api/types';
 	import { resolve } from '$app/paths';
+	import { tick } from 'svelte';
 	import LikeButton from './LikeButton.svelte';
 
 	type Props = {
@@ -14,6 +15,9 @@
 	let entries = $state(initialEntries);
 	let visibleCount = $state(3);
 	let displayEntries = $derived(entries.slice(0, visibleCount));
+	let actionRefs = $state<Record<number, HTMLButtonElement | undefined>>({});
+	let headingRef: HTMLHeadingElement;
+	let notification = $state<{ message: string; kind: 'success' | 'error' } | null>(null);
 
 	function formatDate(dateStr: string) {
 		if (!dateStr) return '';
@@ -21,8 +25,20 @@
 		return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 	}
 
-	async function deleteEntry(id: number) {
-		if ((await onDelete?.(id)) !== false) entries = entries.filter((entry) => entry.id !== id);
+	async function deleteEntry(entry: DiaryEntry) {
+		if (!confirm(`「${entry.title}」を削除しますか？`)) return;
+
+		const entryIndex = displayEntries.findIndex((displayEntry) => displayEntry.id === entry.id);
+		const nextFocusId = displayEntries[entryIndex + 1]?.id ?? displayEntries[entryIndex - 1]?.id;
+		if ((await onDelete?.(entry.id)) === false) {
+			notification = { message: `「${entry.title}」の削除に失敗しました。`, kind: 'error' };
+			return;
+		}
+
+		entries = entries.filter((currentEntry) => currentEntry.id !== entry.id);
+		notification = { message: `「${entry.title}」を削除しました。`, kind: 'success' };
+		await tick();
+		(actionRefs[nextFocusId ?? -1] ?? headingRef)?.focus();
 	}
 </script>
 
@@ -32,8 +48,8 @@
 			{#if isAdmin}
 				<p class="font-label-sm text-label-sm mb-stack-sm tracking-[0.2em] text-outline uppercase">Content Manager / Diary</p>
 			{/if}
-			<h1 class="font-display-lg text-display-lg text-primary">{isAdmin ? 'つぶやき管理' : '日々のつぶやき'}</h1>
-		</div>
+			<h1 bind:this={headingRef} tabindex="-1" class="font-display-lg text-display-lg text-primary">{isAdmin ? 'つぶやき管理' : '日々のつぶやき'}</h1>
+	</div>
 		{#if isAdmin}
 			<a
 				href={resolve(isAdmin ? '/admin/diary/new' : '/diary/new')}
@@ -57,10 +73,10 @@
 					</div>
 					{#if isAdmin}
 						<div class="flex gap-2">
-							<button type="button" onclick={() => onEdit?.(entry.id)} class="p-1 text-outline opacity-60 transition-all duration-200 hover:text-primary hover:opacity-100" title="編集">
+							<button type="button" onclick={() => onEdit?.(entry.id)} class="min-h-11 min-w-11 rounded-lg p-1 text-outline opacity-60 transition-all duration-200 hover:text-primary hover:opacity-100" title={`編集: ${entry.title}`} aria-label={`編集: ${entry.title}`}>
 								<span class="material-symbols-outlined text-[18px]">edit</span>
 							</button>
-							<button type="button" onclick={() => deleteEntry(entry.id)} class="p-1 text-outline opacity-60 transition-all duration-200 hover:text-error hover:opacity-100" title="削除">
+							<button bind:this={actionRefs[entry.id]} type="button" onclick={() => deleteEntry(entry)} class="min-h-11 min-w-11 rounded-lg p-1 text-outline opacity-60 transition-all duration-200 hover:text-error hover:opacity-100" title={`削除: ${entry.title}`} aria-label={`削除: ${entry.title}`}>
 								<span class="material-symbols-outlined text-[18px]">delete</span>
 							</button>
 						</div>
@@ -74,11 +90,21 @@
 					{/if}
 				</a>
 				<div class="flex items-center justify-between">
-					<LikeButton postId={entry.id} initialLikesCount={entry.likesCount} initialHasLiked={entry.hasLiked} />
+					<div class="flex items-center gap-4">
+						<LikeButton postId={entry.id} initialLikesCount={entry.likesCount} initialHasLiked={entry.hasLiked} />
+						<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant" aria-label={`コメント${entry.commentsCount}件`}>
+							<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>
+							{entry.commentsCount}
+						</span>
+					</div>
 				</div>
 			</article>
 		{/each}
 	</div>
+
+	{#if notification}
+		<p class="sr-only" role={notification.kind === 'error' ? 'alert' : 'status'} aria-live="polite">{notification.message}</p>
+	{/if}
 
 	{#if visibleCount < entries.length}
 		<div class="flex justify-center">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
 	import { resolve } from '$app/paths';
 	import { techCategories } from '$lib/tech/categories';
@@ -18,6 +19,9 @@
 	let deletedIds = $state<number[]>([]);
 	let selectedCategory = $state<string | null>(null);
 	const categories = ['All', ...techCategories];
+	let categoryScroller = $state<HTMLDivElement | null>(null);
+	let canScrollLeft = $state(false);
+	let canScrollRight = $state(false);
 	let articles = $derived(
 		(featuredArticle?.title ? [featuredArticle, ...techArticles] : techArticles).filter(
 			(article) => !deletedIds.includes(article.id)
@@ -37,6 +41,31 @@
 	async function deleteArticle(id: number) {
 		if ((await onDelete?.(id)) !== false) deletedIds = [...deletedIds, id];
 	}
+
+	function updateCategoryOverflow() {
+		const scroller = categoryScroller;
+		if (!scroller) return;
+		canScrollLeft = scroller.scrollLeft > 0;
+		canScrollRight = scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 1;
+	}
+
+	function selectCategory(category: string) {
+		selectedCategory = category === 'All' ? null : category;
+		requestAnimationFrame(() => {
+			categoryScroller?.querySelector<HTMLElement>(`[data-category="${category}"]`)?.scrollIntoView({
+				behavior: 'smooth',
+				block: 'nearest',
+				inline: 'center'
+			});
+			updateCategoryOverflow();
+		});
+	}
+
+	onMount(() => {
+		updateCategoryOverflow();
+		window.addEventListener('resize', updateCategoryOverflow);
+		return () => window.removeEventListener('resize', updateCategoryOverflow);
+	});
 </script>
 
 <div class="editorial-container mx-auto flex flex-col gap-8 px-gutter">
@@ -53,10 +82,28 @@
 		{/if}
 	</section>
 
-	<div class="flex flex-wrap gap-2">
-		{#each categories as category (category)}
-			<button type="button" onclick={() => (selectedCategory = category === 'All' ? null : category)} class="font-label-sm text-label-sm cursor-pointer rounded-full px-3 py-1 transition-all {selectedCategory === category || (category === 'All' && !selectedCategory) ? 'bg-primary font-semibold text-on-primary' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}">{category}</button>
-		{/each}
+	<div class="relative" aria-label="技術記事カテゴリ">
+		<div
+			bind:this={categoryScroller}
+			class="category-scroller flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-contain px-1 py-1"
+			tabindex="0"
+			onscroll={updateCategoryOverflow}
+		>
+			{#each categories as category (category)}
+				<button
+					type="button"
+					data-category={category}
+					aria-pressed={selectedCategory === category || (category === 'All' && !selectedCategory)}
+					onclick={() => selectCategory(category)}
+					class="font-label-sm text-label-sm min-h-11 shrink-0 snap-start cursor-pointer rounded-full px-4 py-2 transition-all {selectedCategory === category || (category === 'All' && !selectedCategory) ? 'bg-primary font-semibold text-on-primary' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}"
+				>
+					{category}
+				</button>
+			{/each}
+		</div>
+		{#if canScrollLeft}<span class="pointer-events-none absolute inset-y-0 left-0 flex items-center bg-gradient-to-r from-surface to-transparent pr-3 pl-1 text-primary" aria-hidden="true">‹</span>{/if}
+		{#if canScrollRight}<span class="pointer-events-none absolute inset-y-0 right-0 flex items-center bg-gradient-to-l from-surface to-transparent pl-3 pr-1 text-primary" aria-hidden="true">›</span>{/if}
+		<p class="sr-only" aria-live="polite">{selectedCategory ?? 'All'}カテゴリを選択中</p>
 	</div>
 
 	{#if loadError}
@@ -124,4 +171,14 @@
 			</article>
 		{/each}
 	</div>
+
+	<style>
+		.category-scroller {
+			scrollbar-width: none;
+		}
+
+		.category-scroller::-webkit-scrollbar {
+			display: none;
+		}
+	</style>
 </div>
