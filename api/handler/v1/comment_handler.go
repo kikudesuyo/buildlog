@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -25,6 +26,21 @@ func HandleGetCommentList(r *http.Request, requestData map[string]interface{}) (
 		return nil, err
 	}
 	return entity.NewListResponse(commentList), nil
+}
+
+// HandleDeleteComment は管理者によるコメント削除を処理します。
+func HandleDeleteComment(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if os.Getenv("ADMIN_API_TOKEN") == "" || r.Header.Get("X-Admin-Token") != os.Getenv("ADMIN_API_TOKEN") {
+		return nil, xerror.AuthGeneralErr(errors.New("comment management authorization failed"))
+	}
+	commentID, err := strconv.ParseInt(chi.URLParam(r, "commentID"), 10, 64)
+	if err != nil || commentID <= 0 {
+		return nil, xerror.ClientValidationErr(errors.New("invalid comment id"))
+	}
+	if err := service.DeleteComment(r.Context(), commentID); err != nil {
+		return nil, err
+	}
+	return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil
 }
 
 // HandleCreateComment はHTTPリクエストを受け取り、対応する処理結果を返します。

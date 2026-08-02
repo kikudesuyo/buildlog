@@ -29,3 +29,11 @@ func CreateComment(ctx context.Context, postID int64, req entity.CreateCommentRe
 
 	return comment, nil
 }
+
+// DeleteComment は管理者によるコメント削除を実行します。
+func DeleteComment(ctx context.Context, commentID int64) error {
+	if err := repository.DeleteComment(ctx, database, commentID); err != nil {
+		return xerror.UnknownServerErr(err)
+	}
+	return nil
+}

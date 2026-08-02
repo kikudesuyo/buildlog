@@ -46,6 +46,7 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Put("/profile", handleFunc(v1.HandleUpdateProfile))
 		r.Get("/posts/{id}/comments", handleFunc(v1.HandleGetCommentList))
 		r.Post("/posts/{id}/comments", handleFunc(v1.HandleCreateComment))
+		r.Delete("/comments/{commentID}", handleFunc(v1.HandleDeleteComment))
 		r.Get("/posts/history", handleFunc(v1.HandleGetPostHistory(db)))
 		r.Get("/admin/analytics", handleFunc(v1.HandleGetAnalytics))
 		r.Get("/goals/current", handleFunc(v1.HandleGetCurrentGoals))

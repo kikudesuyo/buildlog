@@ -23,6 +23,11 @@ func CreateComment(ctx context.Context, db *gorm.DB, comment *entity.DBTableComm
 	return db.WithContext(ctx).Create(comment).Error
 }
 
+// DeleteComment は指定されたコメントを削除します。
+func DeleteComment(ctx context.Context, db *gorm.DB, commentID int64) error {
+	return db.WithContext(ctx).Delete(&entity.DBTableComment{}, commentID).Error
+}
+
 // CountCommentsByPostID は件数を取得します。
 func CountCommentsByPostID(ctx context.Context, db *gorm.DB, postID int64) (int64, error) {
 	var count int64

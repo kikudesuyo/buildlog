@@ -289,6 +289,10 @@ export async function createComment(
 	return mapComment(response.data);
 }
 
+export async function deleteComment(commentId: number): Promise<void> {
+	await sendRequest<void>('DELETE', `/comments/${commentId}`);
+}
+
 export async function likePost(id: number): Promise<ApiLikeStatus> {
 	const response = await sendRequest<ApiObjectResponse<ApiLikeStatus>>('POST', `/posts/${id}/like`);
 	return response.data;

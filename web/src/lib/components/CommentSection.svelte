@@ -65,6 +65,7 @@
 					</div>
 
 					<p class="whitespace-pre-wrap text-body-md leading-relaxed text-on-surface-variant">{comment.content}</p>
+					<a class="mt-3 inline-block text-label-sm text-outline hover:text-primary hover:underline" href={`mailto:admin@buildlog.dev?subject=${encodeURIComponent(`不適切なコメントの報告（${postId}）`)}&body=${encodeURIComponent(comment.content)}`}>不適切なコメントを報告</a>
 				</article>
 			{/each}
 		{/if}
