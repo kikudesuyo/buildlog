@@ -116,6 +116,15 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false): Promise<{
 	};
 }
 
+export async function searchPosts(fetchFn: ApiFetch, query: string): Promise<ApiPost[]> {
+	const encodedQuery = encodeURIComponent(query.trim());
+	const [diaries, techs] = await Promise.all([
+		get<ApiListResponse<ApiPost>>(fetchFn, `/diaries?q=${encodedQuery}`),
+		get<ApiListResponse<ApiPost>>(fetchFn, `/techs?q=${encodedQuery}`)
+	]);
+	return [...diaries.data_list, ...techs.data_list].sort((a, b) => b.created_at.localeCompare(a.created_at));
+}
+
 async function sendRequest<T>(method: string, path: string, body?: unknown): Promise<T> {
 	const response = await fetch(`${apiBaseUrl}${path}`, {
 		method,

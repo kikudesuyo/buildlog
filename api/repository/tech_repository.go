@@ -8,11 +8,15 @@ import (
 )
 
 // ListTechs は一覧を取得します。
-func ListTechs(ctx context.Context, db *gorm.DB, all bool) ([]entity.DBTablePost, error) {
+func ListTechs(ctx context.Context, db *gorm.DB, all bool, queryText string) ([]entity.DBTablePost, error) {
 	techList := make([]entity.DBTablePost, 0)
 	query := db.WithContext(ctx).Where("type = ?", "tech")
 	if !all {
 		query = query.Where("status = ?", "published")
+	}
+	if queryText != "" {
+		pattern := "%" + queryText + "%"
+		query = query.Where("title ILIKE ? OR content ILIKE ?", pattern, pattern)
 	}
 	err := query.
 		Order("created_at DESC").

@@ -21,7 +21,7 @@ func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (ht
 	if limit < 0 {
 		limit = 0
 	}
-	diaryList, err := service.ListDiaries(r.Context(), all, offset, limit, getClientIP(r))
+	diaryList, err := service.ListDiaries(r.Context(), all, offset, limit, r.URL.Query().Get("q"), getClientIP(r))
 	if err != nil {
 		return nil, err
 	}

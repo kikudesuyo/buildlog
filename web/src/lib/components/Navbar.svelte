@@ -2,6 +2,7 @@
 import { onMount } from 'svelte';
 import { page } from '$app/state';
 import { resolve } from '$app/paths';
+import { searchPosts, type ApiFetch, type ApiPost } from '$lib/api/client';
 
 	let isSearchOpen = $state(false);
 	let isMenuOpen = $state(false);
@@ -12,6 +13,9 @@ import { resolve } from '$app/paths';
 	let searchInput = $state<HTMLInputElement | null>(null);
 	let previouslyFocused: HTMLElement | null = null;
 	let searchHistoryEntry = false;
+	let searchResults = $state<ApiPost[]>([]);
+	let searchPending = $state(false);
+	let searchError = $state(false);
 
 	onMount(() => {
 		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -48,6 +52,21 @@ import { resolve } from '$app/paths';
 			searchHistoryEntry = false;
 		}
 		requestAnimationFrame(() => previouslyFocused?.focus());
+	}
+
+	async function updateSearch() {
+		const query = searchQuery.trim();
+		searchResults = [];
+		searchError = false;
+		if (!query) return;
+		searchPending = true;
+		try {
+			searchResults = await searchPosts(window.fetch.bind(window) as ApiFetch, query);
+		} catch {
+			searchError = true;
+		} finally {
+			searchPending = false;
+		}
 	}
 
 	function toggleTheme() {
@@ -235,6 +254,7 @@ import { resolve } from '$app/paths';
 					bind:this={searchInput}
 					type="text"
 					bind:value={searchQuery}
+					oninput={updateSearch}
 					aria-label="記事やキーワード"
 					placeholder="記事やキーワードを検索..."
 					class="w-full bg-transparent text-primary outline-none font-body-md placeholder:text-outline"
@@ -249,8 +269,20 @@ import { resolve } from '$app/paths';
 				</button>
 			</div>
 			<div class="mt-4 text-label-sm text-on-surface-variant">
-				{#if searchQuery.trim()}
-					<p class="py-2">「{searchQuery}」の検索結果（デモ機能）</p>
+				{#if searchPending}
+					<p class="py-2">検索中…</p>
+				{:else if searchError}
+					<p class="py-2 text-error" role="alert">検索に失敗しました。</p>
+				{:else if searchQuery.trim()}
+					{#if searchResults.length > 0}
+						<ul class="divide-y divide-outline-variant/20">
+							{#each searchResults as result (`${result.type}-${result.id}`)}
+								<li><a href={resolve(`/${result.type === 'diary' ? 'diary' : 'tech'}/${result.id}`)} onclick={() => closeSearch()} class="block py-3 text-primary hover:underline">{result.title}<span class="ml-2 text-outline">{result.type === 'diary' ? '日記' : 'Tech'}</span></a></li>
+							{/each}
+						</ul>
+					{:else}
+						<p class="py-2">「{searchQuery}」に一致する記事はありません。</p>
+					{/if}
 				{:else}
 					<p class="py-2 text-outline">キーワードを入力してください</p>
 				{/if}

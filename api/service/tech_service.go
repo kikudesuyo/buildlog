@@ -9,8 +9,8 @@ import (
 )
 
 // ListTechs は一覧を取得します。
-func ListTechs(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	techList, err := repository.ListTechs(ctx, database, all)
+func ListTechs(ctx context.Context, all bool, queryText, ipAddress string) ([]entity.DBTablePost, error) {
+	techList, err := repository.ListTechs(ctx, database, all, queryText)
 	if err != nil {
 		return nil, err
 	}

@@ -12,7 +12,7 @@ import (
 
 // HandleGetTechList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	techList, err := service.ListTechs(r.Context(), r.URL.Query().Get("all") == "true", getClientIP(r))
+	techList, err := service.ListTechs(r.Context(), r.URL.Query().Get("all") == "true", r.URL.Query().Get("q"), getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
