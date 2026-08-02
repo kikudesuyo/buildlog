@@ -106,3 +106,17 @@ export interface CommentEntry {
 	createdAt: string;
 	updatedAt: string;
 }
+
+export interface Goal {
+	id: number;
+	title: string;
+	targetValue: number;
+	progressValue: number;
+}
+
+export interface GoalPeriod {
+	periodType: 'monthly';
+	startsAt: string;
+	endsAt: string;
+	goals: Goal[];
+}
