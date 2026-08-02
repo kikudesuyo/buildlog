@@ -1,0 +1,54 @@
+name: Migrate Production Database
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "sql/atlas.hcl"
+      - "sql/migrations/**"
+      - ".github/workflows/migrate.yml"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Preview pending migrations without applying them
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-database-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Apply Atlas migrations
+    runs-on: ubuntu-latest
+    env:
+      PROD_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Atlas CLI
+        uses: ariga/setup-atlas@v0
+
+      - name: Check production database secret
+        run: test -n "$PROD_DATABASE_URL"
+
+      - name: Check migration directory
+        working-directory: sql
+        run: atlas migrate validate --dir "file://migrations"
+
+      - name: Preview pending migrations
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        working-directory: sql
+        run: atlas migrate apply --env prod --dry-run
+
+      - name: Apply pending migrations
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.dry_run }}
+        working-directory: sql
+        run: atlas migrate apply --env prod
