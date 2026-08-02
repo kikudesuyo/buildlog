@@ -10,6 +10,7 @@ type DBTableComment struct {
 	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
 }
 
+// TableName はエンティティに対応するデータベーステーブル名を返します。
 func (DBTableComment) TableName() string {
 	return "comments"
 }

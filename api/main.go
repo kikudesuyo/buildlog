@@ -12,6 +12,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/route"
 )
 
+// main はアプリケーションを起動します。
 func main() {
 	portFlag := flag.String("port", "8081", "port to run HTTP server on")
 	flag.Parse()

@@ -10,6 +10,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
+// HandleGetDiaryList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	diaryList, err := service.ListDiaries(r.Context(), r.URL.Query().Get("all") == "true", getClientIP(r))
 	if err != nil {
@@ -18,6 +19,7 @@ func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (ht
 	return entity.NewListResponse(diaryList), nil
 }
 
+// HandleGetDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -30,6 +32,7 @@ func HandleGetDiary(r *http.Request, requestData map[string]interface{}) (http.H
 	return entity.NewObjectResponse(diary), nil
 }
 
+// HandleCreateDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleCreateDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	var req entity.CreateDiaryRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -45,6 +48,7 @@ func HandleCreateDiary(r *http.Request, requestData map[string]interface{}) (htt
 	return entity.NewObjectResponse(resp), nil
 }
 
+// HandleUpdateDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -64,6 +68,7 @@ func HandleUpdateDiary(r *http.Request, requestData map[string]interface{}) (htt
 	return entity.NewObjectResponse(resp), nil
 }
 
+// HandleDeleteDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleDeleteDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
+// HandleGetAppList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetAppList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	appList, err := service.ListApps(r.Context())
 	if err != nil {
@@ -18,6 +19,7 @@ func HandleGetAppList(r *http.Request, requestData map[string]interface{}) (http
 	return entity.NewListResponse(appList), nil
 }
 
+// HandleGetApp はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetApp(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -30,6 +32,7 @@ func HandleGetApp(r *http.Request, requestData map[string]interface{}) (http.Han
 	return entity.NewObjectResponse(app), nil
 }
 
+// HandleCreateApp はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleCreateApp(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	var req entity.CreateAppRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -45,6 +48,7 @@ func HandleCreateApp(r *http.Request, requestData map[string]interface{}) (http.
 	return entity.NewObjectResponse(resp), nil
 }
 
+// HandleUpdateApp はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateApp(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -64,6 +68,7 @@ func HandleUpdateApp(r *http.Request, requestData map[string]interface{}) (http.
 	return entity.NewObjectResponse(resp), nil
 }
 
+// HandleDeleteApp はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleDeleteApp(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {

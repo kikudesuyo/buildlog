@@ -8,6 +8,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
+// ListCommentsByPostID は一覧を取得します。
 func ListCommentsByPostID(ctx context.Context, postID int64) ([]entity.DBTableComment, error) {
 	commentList, err := repository.ListCommentsByPostID(ctx, database, postID)
 	if err != nil {
@@ -16,6 +17,7 @@ func ListCommentsByPostID(ctx context.Context, postID int64) ([]entity.DBTableCo
 	return commentList, nil
 }
 
+// CreateComment はデータを作成します。
 func CreateComment(ctx context.Context, postID int64, req entity.CreateCommentRequest) (*entity.DBTableComment, error) {
 	comment := &entity.DBTableComment{
 		PostID:  postID,

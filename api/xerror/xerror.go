@@ -13,11 +13,13 @@ const (
 	ServerError failure.StringCode = "E-0-00001"
 )
 
+// IsCustomError は条件を判定します。
 func IsCustomError(err error) bool {
 	_, ok := failure.CodeOf(err)
 	return ok
 }
 
+// GetHTTPErrorCode はデータを取得します。
 func GetHTTPErrorCode(err error) int {
 	code, ok := failure.CodeOf(err)
 	if !ok {
@@ -37,6 +39,7 @@ func GetHTTPErrorCode(err error) int {
 	}
 }
 
+// GetStringCode はデータを取得します。
 func GetStringCode(err error) string {
 	code, ok := failure.CodeOf(err)
 	if !ok {
@@ -46,6 +49,7 @@ func GetStringCode(err error) string {
 	return code.ErrorCode()
 }
 
+// GetErrorMessage はデータを取得します。
 func GetErrorMessage(err error) string {
 	if err == nil {
 		return ""
@@ -58,6 +62,7 @@ func GetErrorMessage(err error) string {
 	return msg
 }
 
+// UnknownServerErr は対応するエラーを生成します。
 func UnknownServerErr(err error) error {
 	if err == nil {
 		return nil
@@ -68,6 +73,7 @@ func UnknownServerErr(err error) error {
 	)
 }
 
+// GetErrMetaData はデータを取得します。
 func GetErrMetaData(err error) (map[string]string, bool) {
 	m := make(map[string]string)
 	if err == nil {
@@ -84,6 +90,7 @@ func GetErrMetaData(err error) (map[string]string, bool) {
 	return m, len(m) != 0
 }
 
+// AddMetaData はこの処理に必要な内部処理を実行します。
 func AddMetaData(err error, meta ...map[string]string) error {
 	list := make([]failure.Wrapper, len(meta))
 	for i, v := range meta {
@@ -92,6 +99,7 @@ func AddMetaData(err error, meta ...map[string]string) error {
 	return failure.Custom(err, list...)
 }
 
+// mergeMetaData はこの処理に必要な内部処理を実行します。
 func mergeMetaData(c1, c2 map[string]string) failure.Context {
 	vv := failure.Context{}
 	for k, v := range c1 {
@@ -103,6 +111,7 @@ func mergeMetaData(c1, c2 map[string]string) failure.Context {
 	return vv
 }
 
+// getDefaultMetaData はこの処理に必要な内部処理を実行します。
 func getDefaultMetaData(err error, meta map[string]string) failure.Context {
 	c := failure.Context{
 		"logging": "1",
@@ -111,10 +120,12 @@ func getDefaultMetaData(err error, meta map[string]string) failure.Context {
 	return mergeMetaData(c, meta)
 }
 
+// generateErr は対応するエラーを生成します。
 func generateErr(err error, text string, code failure.StringCode, meta ...map[string]string) error {
 	return generateErrWithStackDepth(err, text, code, 1, meta...)
 }
 
+// generateErrWithStackDepth は対応するエラーを生成します。
 func generateErrWithStackDepth(err error, text string, code failure.StringCode, stackDepth int, meta ...map[string]string) error {
 	if err == nil {
 		return nil
@@ -143,6 +154,7 @@ func generateErrWithStackDepth(err error, text string, code failure.StringCode, 
 	)
 }
 
+// generateErrFromText は対応するエラーを生成します。
 func generateErrFromText(text string, code failure.StringCode, meta ...map[string]string) error {
 	err := errors.New(text)
 	return generateErrWithStackDepth(err, text, code, 1, meta...)

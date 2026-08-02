@@ -9,6 +9,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
+// HandleGetDeletedPosts はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetDeletedPosts(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	posts, err := service.ListDeletedPosts(r.Context())
 	if err != nil {
@@ -17,6 +18,7 @@ func HandleGetDeletedPosts(r *http.Request, requestData map[string]interface{}) 
 	return entity.NewListResponse(posts), nil
 }
 
+// HandleRestorePost はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleRestorePost(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {

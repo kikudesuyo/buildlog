@@ -10,6 +10,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
+// HandleGetTechList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	techList, err := service.ListTechs(r.Context(), r.URL.Query().Get("all") == "true", getClientIP(r))
 	if err != nil {
@@ -18,6 +19,7 @@ func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (htt
 	return entity.NewListResponse(techList), nil
 }
 
+// HandleGetTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -30,6 +32,7 @@ func HandleGetTech(r *http.Request, requestData map[string]interface{}) (http.Ha
 	return entity.NewObjectResponse(tech), nil
 }
 
+// HandleCreateTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleCreateTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	var req entity.CreateTechRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -45,6 +48,7 @@ func HandleCreateTech(r *http.Request, requestData map[string]interface{}) (http
 	return entity.NewObjectResponse(resp), nil
 }
 
+// HandleUpdateTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -64,6 +68,7 @@ func HandleUpdateTech(r *http.Request, requestData map[string]interface{}) (http
 	return entity.NewObjectResponse(resp), nil
 }
 
+// HandleDeleteTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleDeleteTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {

@@ -14,6 +14,7 @@ type PostLikeCount struct {
 	Count  int64 `gorm:"column:count"`
 }
 
+// GetAnalytics はデータを取得します。
 func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
 	var posts []entity.DBTablePost
 	if err := database.WithContext(ctx).Where("deleted_at IS NULL").Find(&posts).Error; err != nil {

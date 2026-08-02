@@ -2,6 +2,7 @@ package entity
 
 import "testing"
 
+// TestIsValidTechCategory はこの処理に必要な内部処理を実行します。
 func TestIsValidTechCategory(t *testing.T) {
 	validCategories := []string{
 		TechCategoryFrontend,
