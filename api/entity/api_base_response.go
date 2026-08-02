@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
 type BaseResponse struct {
@@ -33,10 +35,27 @@ func NewListResponse(data any) BaseResponse {
 	return BaseResponse{Meta: ResponseMeta{StatusCode: http.StatusOK, Success: true}, DataType: "list", DataList: data}
 }
 
+func NewErrorResponse(err error) BaseResponse {
+	return BaseResponse{
+		Meta: ResponseMeta{
+			StatusCode: xerror.GetHTTPErrorCode(err),
+		},
+		Err: &ResponseError{
+			Code:    xerror.GetStringCode(err),
+			Message: xerror.GetErrorMessage(err),
+		},
+		DataType: "error",
+	}
+}
+
 func (r BaseResponse) Render(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(r.Meta.StatusCode)
 	_, _ = fmt.Fprint(w, r.GetBody())
+}
+
+func (r BaseResponse) ServeHTTP(w http.ResponseWriter, _ *http.Request) {
+	r.Render(w)
 }
 
 func (r BaseResponse) GetStatusCode() int {
