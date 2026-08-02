@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { updateProfile } from '$lib/api/client';
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
