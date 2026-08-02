@@ -14,11 +14,13 @@ import (
 
 func HandleGetDiaryList(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		diaries, err := service.ListDiaries(r.Context(), db)
+		all := r.URL.Query().Get("all") == "true"
+		ipAddress := getClientIP(r)
+		diaryList, err := service.ListDiaries(r.Context(), db, all, ipAddress)
 		if err != nil {
 			return nil, err
 		}
-		return entity.NewListResponse(diaries), nil
+		return entity.NewListResponse(diaryList), nil
 	}
 }
 
@@ -29,7 +31,8 @@ func HandleGetDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, err
 		}
 
-		diary, err := service.GetDiaryByID(r.Context(), db, id)
+		ipAddress := getClientIP(r)
+		diary, err := service.GetDiaryByID(r.Context(), db, id, ipAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +51,7 @@ func HandleCreateDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.CreateDiary(r.Context(), db, req.Title, req.Content)
+		resp, err := service.CreateDiary(r.Context(), db, req)
 		if err != nil {
 			return nil, err
 		}
@@ -74,7 +77,7 @@ func HandleUpdateDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, http.ErrBodyNotAllowed
 		}
 
-		resp, err := service.UpdateDiary(r.Context(), db, id, req.Title, req.Content)
+		resp, err := service.UpdateDiary(r.Context(), db, id, req)
 		if err != nil {
 			return nil, err
 		}

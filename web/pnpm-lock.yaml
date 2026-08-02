@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      marked:
+        specifier: ^18.0.7
+        version: 18.0.7
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.4
