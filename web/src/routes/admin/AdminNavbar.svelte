@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 
@@ -12,6 +13,18 @@
 	] as const;
 
 	let isOpen = $state(false);
+	let isDarkMode = $state(false);
+
+	onMount(() => {
+		isDarkMode = document.documentElement.classList.contains('dark');
+	});
+
+	function toggleTheme() {
+		isDarkMode = !isDarkMode;
+		document.documentElement.classList.toggle('dark', isDarkMode);
+		document.documentElement.classList.toggle('light', !isDarkMode);
+		localStorage.setItem('theme', isDarkMode ? "dark" : "light");
+	}
 	let menuButton: HTMLButtonElement | null = null;
 	let closeButton = $state<HTMLButtonElement | null>(null);
 	let previouslyFocused: HTMLElement | null = null;
@@ -125,4 +138,7 @@
 		<a href={resolve('/admin')} class="font-headline-md text-headline-md font-bold tracking-tight text-primary">Buildlog <span class="font-label-sm text-label-sm ml-2 text-outline">Admin</span></a>
 	</div>
 	<a href={resolve('/')} class="material-symbols-outlined rounded-lg p-2 text-on-surface-variant hover:bg-surface-container">visibility</a>
+	<button type="button" aria-label="テーマを切り替える" onclick={toggleTheme} class="material-symbols-outlined min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container" title={isDarkMode ? "ライトモードに切り替え" : "ダークモードに切り替え"}>
+		{isDarkMode ? 'light_mode' : 'dark_mode'}
+	</button>
 </header>
