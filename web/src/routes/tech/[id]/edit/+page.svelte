@@ -9,6 +9,7 @@
 
 	let title = $state(data.tech.title);
 	const MAX_TITLE_LENGTH = 100;
+	let contentElement = $state<HTMLTextAreaElement | null>(null);
 	let content = $state(data.tech.content || '');
 	let category = $state(data.tech.category);
 	let views = $state(data.tech.views || '');
@@ -26,6 +27,10 @@
 
 	// ダミーのUIステート (image.pngの再現用)
 	let tags = $state(['技術', 'プログラミング']);
+	let isTagInputOpen = $state(false);
+	let tagInput = $state('');
+	let tagError = $state('');
+	let tagInputElement = $state<HTMLInputElement | null>(null);
 
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
@@ -69,12 +74,60 @@
 		tags = tags.filter(t => t !== tagToRemove);
 	}
 
+	function openTagInput() {
+		isTagInputOpen = true;
+		tagError = '';
+		requestAnimationFrame(() => tagInputElement?.focus());
+	}
+
+	function closeTagInput() {
+		isTagInputOpen = false;
+		tagInput = '';
+		tagError = '';
+	}
+
 	function addTag() {
-		const newTag = prompt('タグ名を入力してください：');
-		if (newTag && newTag.trim()) {
-			tags = [...tags, newTag.trim()];
+		const newTag = tagInput.trim();
+		if (!newTag) {
+			tagError = 'タグ名を入力してください。';
+			return;
+		}
+		if (newTag.length > 30) {
+			tagError = 'タグは30文字以内で入力してください。';
+			return;
+		}
+		if (tags.includes(newTag)) {
+			tagError = '同じタグは追加できません。';
+			return;
+		}
+		tags = [...tags, newTag];
+		closeTagInput();
+	}
+
+	function handleTagKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			addTag();
+		} else if (event.key === 'Escape') {
+			closeTagInput();
 		}
 	}
+	function applyMarkdown(prefix: string, suffix = prefix) {
+		if (!contentElement) return;
+		const start = contentElement.selectionStart;
+		const end = contentElement.selectionEnd;
+		content = `${content.slice(0, start)}${prefix}${content.slice(start, end)}${suffix}${content.slice(end)}`;
+		requestAnimationFrame(() => {
+			contentElement?.focus();
+			contentElement?.setSelectionRange(start + prefix.length, end + prefix.length);
+		});
+	}
+
+	function insertLink() {
+		const url = window.prompt('リンクURLを入力してください：');
+		if (url?.trim()) applyMarkdown('[', `](${url.trim()})`);
+	}
+
 </script>
 
 <UnsavedChangesGuard {isDirty} {isSubmitting} />
@@ -134,17 +187,21 @@
 	
 	<!-- 左フローティングツールバー (絶対配置) -->
 	<aside class="absolute -left-12 top-24 hidden md:flex flex-col items-center gap-1.5 bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-1.5 shadow-xs w-11">
-		<button type="button" class="w-8 h-8 flex items-center justify-center font-bold text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="太字">B</button>
-		<button type="button" class="w-8 h-8 flex items-center justify-center italic text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="斜体">I</button>
-		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="リスト">
+		<button type="button" class="w-8 h-8 flex items-center justify-center font-bold text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" onclick={() => applyMarkdown('**')} title="太字">B</button>
+		<button type="button" class="w-8 h-8 flex items-center justify-center italic text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" onclick={() => applyMarkdown('*')} title="斜体">I</button>
+		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" onclick={() => applyMarkdown('- ' , '')} title="リスト">
 			<span class="material-symbols-outlined text-[18px]">format_list_bulleted</span>
 		</button>
-		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" title="リンク">
+		<button type="button" class="w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors rounded hover:bg-surface-container" onclick={insertLink} title="リンク">
 			<span class="material-symbols-outlined text-[18px]">link</span>
 		</button>
 	</aside>
 
 	<main class="flex flex-col gap-6">
+		<nav class="sticky top-20 z-10 flex gap-2 rounded-lg border border-outline-variant/20 bg-surface-container-lowest/95 p-2 backdrop-blur md:hidden" aria-label="編集セクション">
+			<a href="#editor-body" class="min-h-11 flex-1 rounded px-3 py-2 text-center font-label-md text-label-md text-primary">本文</a>
+			<a href="#editor-settings" class="min-h-11 flex-1 rounded px-3 py-2 text-center font-label-md text-label-md text-primary">設定</a>
+		</nav>
 		<!-- タイトル -->
 		<div class="border-b border-outline-variant/10 pb-4 mb-4">
 			<input
@@ -162,18 +219,21 @@
 		<!-- 本文 -->
 		<div class="flex flex-col gap-1.5">
 			<label for="tech-content" class="font-label-md text-label-md font-bold text-on-surface">本文 *</label>
-			<textarea
+		<div id="editor-body">
+		<textarea
 				id="tech-content"
 				use:autogrow
+				bind:this={contentElement}
 				bind:value={content}
 				placeholder="本文を書き始めましょう..."
 				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
 				disabled={isSubmitting}
-			></textarea>
+		></textarea>
+		</div>
 		</div>
 
 		<!-- 下部設定セクション -->
-		<footer class="border-t border-outline-variant/10 pt-8 mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+		<footer id="editor-settings" class="border-t border-outline-variant/10 pt-8 mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
 			<!-- 左カラム: タグ・カテゴリ設定 -->
 			<div class="flex flex-col gap-5">
 				<!-- カテゴリ選択 -->
@@ -201,13 +261,18 @@
 								<button type="button" onclick={() => removeTag(tag)} class="hover:text-error transition-colors cursor-pointer font-bold text-[10px]">×</button>
 							</span>
 						{/each}
-						<button
-							type="button"
-							onclick={addTag}
-							class="border border-dashed border-outline-variant/60 hover:border-primary px-3 py-1 rounded text-body-sm text-outline hover:text-primary transition-all cursor-pointer"
-						>
-							+ タグを追加
-						</button>
+		{#if isTagInputOpen}
+			<div class="flex w-full flex-col gap-1 sm:w-auto">
+				<div class="flex items-center gap-2">
+					<input bind:this={tagInputElement} bind:value={tagInput} onkeydown={handleTagKeydown} maxlength="30" aria-label="タグ名" placeholder="タグ名" class="min-h-11 w-40 rounded border border-outline-variant bg-surface-container-high px-3 py-1 text-body-sm text-on-surface focus:border-primary focus:outline-none" />
+					<button type="button" onclick={addTag} class="min-h-11 rounded bg-primary px-3 py-1 text-body-sm text-on-primary">追加</button>
+					<button type="button" onclick={closeTagInput} class="min-h-11 rounded border border-outline-variant/60 px-3 py-1 text-body-sm text-outline">キャンセル</button>
+				</div>
+				{#if tagError}<span class="text-body-sm text-error" role="alert">{tagError}</span>{/if}
+			</div>
+		{:else}
+			<button type="button" onclick={openTagInput} class="min-h-11 rounded border border-dashed border-outline-variant/60 px-3 py-1 text-body-sm text-outline transition-all hover:border-primary hover:text-primary">+ タグを追加</button>
+		{/if}
 					</div>
 				</div>
 			</div>
