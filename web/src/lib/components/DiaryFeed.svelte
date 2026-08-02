@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { DiaryEntry } from '$lib/api/types';
+	import { fetchDiaryEntries, type ApiFetch } from '$lib/api/client';
 	import { resolve } from '$app/paths';
 	import { tick } from 'svelte';
 	import LikeButton from './LikeButton.svelte';
@@ -13,8 +15,13 @@
 
 	let { entries: initialEntries, isAdmin = false, onEdit, onDelete }: Props = $props();
 	let entries = $state(initialEntries);
-	let visibleCount = $state(3);
-	let displayEntries = $derived(entries.slice(0, visibleCount));
+	const pageSize = 3;
+	let isLoading = $state(false);
+	let loadError = $state(false);
+	let hasMore = $state(!isAdmin && initialEntries.length === pageSize);
+	const storageKey = `diary-feed-count:${isAdmin ? 'admin' : 'public'}`;
+	let restoreTarget = 0;
+	let displayEntries = $derived(entries);
 	let actionRefs = $state<Record<number, HTMLButtonElement | undefined>>({});
 	let headingRef: HTMLHeadingElement;
 	let notification = $state<{ message: string; kind: 'success' | 'error' } | null>(null);
@@ -40,6 +47,30 @@
 		await tick();
 		(actionRefs[nextFocusId ?? -1] ?? headingRef)?.focus();
 	}
+
+	async function loadMore() {
+		if (isLoading || !hasMore) return;
+		isLoading = true;
+		loadError = false;
+		try {
+			const nextEntries = await fetchDiaryEntries(fetch as ApiFetch, isAdmin, entries.length, pageSize);
+			entries = [...entries, ...nextEntries];
+			hasMore = nextEntries.length === pageSize;
+			sessionStorage.setItem(storageKey, String(entries.length));
+		} catch {
+			loadError = true;
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	onMount(async () => {
+		const savedCount = Number(sessionStorage.getItem(storageKey));
+		if (savedCount > entries.length) {
+			restoreTarget = savedCount;
+			while (entries.length < restoreTarget && hasMore && !loadError) await loadMore();
+		}
+	});
 </script>
 
 <div class="editorial-container mx-auto px-gutter relative flex flex-col gap-8">
@@ -106,11 +137,23 @@
 		<p class="sr-only" role={notification.kind === 'error' ? 'alert' : 'status'} aria-live="polite">{notification.message}</p>
 	{/if}
 
-	{#if visibleCount < entries.length}
+	{#if loadError}
+		<div class="flex flex-col items-center gap-3" role="alert">
+			<p class="font-body-sm text-body-sm text-error">過去の記録を読み込めませんでした。</p>
+			<button type="button" onclick={loadMore} class="font-label-md text-label-md cursor-pointer rounded-lg border border-error px-6 py-2 text-error transition-colors hover:bg-error hover:text-on-error">再試行</button>
+		</div>
+	{:else if isLoading}
+		<div class="flex items-center justify-center gap-2" role="status" aria-live="polite">
+			<span class="material-symbols-outlined animate-spin text-primary" aria-hidden="true">progress_activity</span>
+			<span class="font-body-sm text-body-sm text-on-surface-variant">読み込み中…</span>
+		</div>
+	{:else if hasMore}
 		<div class="flex justify-center">
-			<button type="button" onclick={() => (visibleCount += 2)} class="font-label-md text-label-md cursor-pointer rounded-lg border border-primary px-8 py-3 text-primary transition-all hover:bg-primary hover:text-on-primary active:scale-95">
+			<button type="button" onclick={loadMore} class="font-label-md text-label-md cursor-pointer rounded-lg border border-primary px-8 py-3 text-primary transition-all hover:bg-primary hover:text-on-primary active:scale-95">
 				過去の記録を見る
 			</button>
 		</div>
+	{:else if !isAdmin}
+		<p class="font-body-sm text-body-sm text-center text-outline" role="status">すべての記録を表示しました。</p>
 	{/if}
 </div>

@@ -8,9 +8,9 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
-// ListDiaries は一覧を取得します。
-func ListDiaries(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	diaryList, err := repository.ListDiaries(ctx, database, all)
+// ListDiaries は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
+func ListDiaries(ctx context.Context, all bool, offset int, limit int, ipAddress string) ([]entity.DBTablePost, error) {
+	diaryList, err := repository.ListDiaries(ctx, database, all, offset, limit)
 	if err != nil {
 		return nil, err
 	}
