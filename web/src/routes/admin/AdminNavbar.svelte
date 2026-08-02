@@ -4,12 +4,12 @@
 	import { resolve } from '$app/paths';
 
 	const navItems = [
-		{ href: '/admin/analytics', label: 'Analytics', description: 'アクセス統計・分析', icon: 'analytics' },
 		{ href: '/admin', label: 'Diary', description: 'つぶやきを管理', icon: 'edit_note' },
 		{ href: '/admin/tech', label: 'Tech', description: '技術記事を管理', icon: 'article' },
-		{ href: '/admin/trash', label: 'Trash', description: 'ゴミ箱', icon: 'delete_outline' },
+		{ href: '/admin/profile', label: 'Profile', description: '自己紹介を管理', icon: 'person' },
 		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' },
-		{ href: '/admin/profile', label: 'Profile', description: '自己紹介を管理', icon: 'person' }
+		{ href: '/admin/analytics', label: 'Analytics', description: 'アクセス統計・分析', icon: 'analytics' },
+		{ href: '/admin/trash', label: 'Trash', description: 'ゴミ箱', icon: 'delete_outline' }
 	] as const;
 
 	let isOpen = $state(false);
