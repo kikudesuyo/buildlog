@@ -14,12 +14,21 @@ import { resolve } from '$app/paths';
 	let searchHistoryEntry = false;
 
 	onMount(() => {
-		isDarkMode = document.documentElement.classList.contains('dark');
+		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+		const syncTheme = () => {
+			const savedTheme = localStorage.getItem('theme');
+			isDarkMode = savedTheme ? savedTheme === 'dark' : mediaQuery.matches;
+		};
+		syncTheme();
+		mediaQuery.addEventListener('change', syncTheme);
 		const handlePopState = () => {
 			if (isSearchOpen) closeSearch(true);
 		};
 		window.addEventListener('popstate', handlePopState);
-		return () => window.removeEventListener('popstate', handlePopState);
+		return () => {
+			mediaQuery.removeEventListener('change', syncTheme);
+			window.removeEventListener('popstate', handlePopState);
+		};
 	});
 
 	function openSearch() {
@@ -46,10 +55,12 @@ import { resolve } from '$app/paths';
 		if (isDarkMode) {
 			document.documentElement.classList.add('dark');
 			document.documentElement.classList.remove('light');
+			document.documentElement.dataset.theme = 'dark';
 			localStorage.setItem('theme', 'dark');
 		} else {
 			document.documentElement.classList.add('light');
 			document.documentElement.classList.remove('dark');
+			document.documentElement.dataset.theme = 'light';
 			localStorage.setItem('theme', 'light');
 		}
 	}
@@ -142,7 +153,8 @@ import { resolve } from '$app/paths';
 			</button>
 			<button
 				type="button"
-				aria-label="テーマを切り替える"
+				aria-pressed={isDarkMode}
+				aria-label={isDarkMode ? '現在はダークモード。ライトモードに切り替える' : '現在はライトモード。ダークモードに切り替える'}
 				onclick={toggleTheme}
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
 				title={isDarkMode ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
