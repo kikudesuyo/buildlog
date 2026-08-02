@@ -12,7 +12,7 @@ import type {
 	CommentEntry
 } from '$lib/api/types';
 
-type ApiFetch = LoadEvent['fetch'];
+export type ApiFetch = LoadEvent['fetch'];
 
 type ApiListResponse<T> = {
 	data_list: T[];
@@ -53,8 +53,13 @@ export type ApiPost = {
 	has_liked: boolean;
 };
 
-export async function fetchDiaryEntries(fetchFn: ApiFetch, all = false): Promise<DiaryEntry[]> {
-	const url = all ? '/diaries?all=true' : '/diaries';
+export async function fetchDiaryEntries(fetchFn: ApiFetch, all = false, offset = 0, limit = 0): Promise<DiaryEntry[]> {
+	const params = new URLSearchParams();
+	if (all) params.set('all', 'true');
+	if (!all && offset > 0) params.set('offset', String(offset));
+	if (!all && limit > 0) params.set('limit', String(limit));
+	const query = params.toString();
+	const url = query ? `/diaries?${query}` : '/diaries';
 	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);
 	return response.data_list.map((post) => ({
 		id: post.id,

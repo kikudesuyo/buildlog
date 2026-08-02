@@ -8,8 +8,8 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
-func ListDiaries(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	diaryList, err := repository.ListDiaries(ctx, database, all)
+func ListDiaries(ctx context.Context, all bool, offset int, limit int, ipAddress string) ([]entity.DBTablePost, error) {
+	diaryList, err := repository.ListDiaries(ctx, database, all, offset, limit)
 	if err != nil {
 		return nil, err
 	}

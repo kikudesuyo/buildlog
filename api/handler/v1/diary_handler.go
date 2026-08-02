@@ -11,7 +11,16 @@ import (
 )
 
 func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	diaryList, err := service.ListDiaries(r.Context(), r.URL.Query().Get("all") == "true", getClientIP(r))
+	all := r.URL.Query().Get("all") == "true"
+	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	if offset < 0 {
+		offset = 0
+	}
+	if limit < 0 {
+		limit = 0
+	}
+	diaryList, err := service.ListDiaries(r.Context(), all, offset, limit, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
