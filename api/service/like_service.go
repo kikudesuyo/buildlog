@@ -12,17 +12,17 @@ type LikeStatus struct {
 }
 
 func LikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
-	alreadyLiked, err := repository.HasLiked(ctx, DB, postID, ipAddress)
+	alreadyLiked, err := repository.HasLiked(ctx, database, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}
 	if !alreadyLiked {
-		if err := repository.CreateLike(ctx, DB, postID, ipAddress); err != nil {
+		if err := repository.CreateLike(ctx, database, postID, ipAddress); err != nil {
 			return LikeStatus{}, err
 		}
 	}
 
-	count, err := repository.CountLikesByPostID(ctx, DB, postID)
+	count, err := repository.CountLikesByPostID(ctx, database, postID)
 	if err != nil {
 		return LikeStatus{}, err
 	}
@@ -34,11 +34,11 @@ func LikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, 
 }
 
 func UnlikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
-	if err := repository.DeleteLike(ctx, DB, postID, ipAddress); err != nil {
+	if err := repository.DeleteLike(ctx, database, postID, ipAddress); err != nil {
 		return LikeStatus{}, err
 	}
 
-	count, err := repository.CountLikesByPostID(ctx, DB, postID)
+	count, err := repository.CountLikesByPostID(ctx, database, postID)
 	if err != nil {
 		return LikeStatus{}, err
 	}
@@ -50,12 +50,12 @@ func UnlikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus
 }
 
 func GetLikeStatus(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
-	count, err := repository.CountLikesByPostID(ctx, DB, postID)
+	count, err := repository.CountLikesByPostID(ctx, database, postID)
 	if err != nil {
 		return LikeStatus{}, err
 	}
 
-	hasLiked, err := repository.HasLiked(ctx, DB, postID, ipAddress)
+	hasLiked, err := repository.HasLiked(ctx, database, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}

@@ -30,7 +30,7 @@ func mapToAppResponse(dbApp *entity.DBTableApp) (*entity.AppResponse, error) {
 }
 
 func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
-	dbApps, err := repository.ListApps(ctx, DB)
+	dbApps, err := repository.ListApps(ctx, database)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
 }
 
 func GetAppByID(ctx context.Context, id int64) (*entity.AppResponse, error) {
-	dbApp, err := repository.GetAppByID(ctx, DB, id)
+	dbApp, err := repository.GetAppByID(ctx, database, id)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func CreateApp(ctx context.Context, req entity.CreateAppRequest) (*entity.AppRes
 		CodeURL:     req.CodeURL,
 	}
 
-	if err := repository.CreateApp(ctx, DB, &app); err != nil {
+	if err := repository.CreateApp(ctx, database, &app); err != nil {
 		return nil, err
 	}
 
@@ -81,7 +81,7 @@ func CreateApp(ctx context.Context, req entity.CreateAppRequest) (*entity.AppRes
 }
 
 func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*entity.AppResponse, error) {
-	app, err := repository.GetAppByID(ctx, DB, id)
+	app, err := repository.GetAppByID(ctx, database, id)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*ent
 	app.DemoURL = req.DemoURL
 	app.CodeURL = req.CodeURL
 
-	if err := repository.UpdateApp(ctx, DB, app); err != nil {
+	if err := repository.UpdateApp(ctx, database, app); err != nil {
 		return nil, err
 	}
 
@@ -109,5 +109,5 @@ func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*ent
 }
 
 func DeleteApp(ctx context.Context, id int64) error {
-	return repository.DeleteApp(ctx, DB, id)
+	return repository.DeleteApp(ctx, database, id)
 }

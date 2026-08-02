@@ -9,7 +9,7 @@ import (
 )
 
 func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
-	dbProfile, err := repository.GetProfile(ctx, DB)
+	dbProfile, err := repository.GetProfile(ctx, database)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entit
 		FinalQuote:   req.FinalQuote,
 	}
 
-	if err := repository.UpdateProfile(ctx, DB, &dbProfile); err != nil {
+	if err := repository.UpdateProfile(ctx, database, &dbProfile); err != nil {
 		return nil, err
 	}
 

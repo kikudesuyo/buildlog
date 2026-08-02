@@ -7,96 +7,70 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/kikudesuyo/buildlog/api/entity"
-	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
-func HandleGetDiaryList() handler.ProcessFunc {
-	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		all := r.URL.Query().Get("all") == "true"
-		ipAddress := getClientIP(r)
-		diaries, err := service.ListDiaries(r.Context(), all, ipAddress)
-		if err != nil {
-			return nil, err
-		}
-		return entity.NewListResponse(diaries), nil
+func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	diaryList, err := service.ListDiaries(r.Context(), r.URL.Query().Get("all") == "true", getClientIP(r))
+	if err != nil {
+		return nil, err
 	}
+	return entity.NewListResponse(diaryList), nil
 }
 
-func HandleGetDiary() handler.ProcessFunc {
-	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-		if err != nil {
-			return nil, err
-		}
-
-		ipAddress := getClientIP(r)
-		diary, err := service.GetDiaryByID(r.Context(), id, ipAddress)
-		if err != nil {
-			return nil, err
-		}
-		return entity.NewObjectResponse(diary), nil
+func HandleGetDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		return nil, err
 	}
+	diary, err := service.GetDiaryByID(r.Context(), id, getClientIP(r))
+	if err != nil {
+		return nil, err
+	}
+	return entity.NewObjectResponse(diary), nil
 }
 
-func HandleCreateDiary() handler.ProcessFunc {
-	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		var req entity.CreateDiaryRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			return nil, err
-		}
-
-		if req.Title == "" || req.Content == "" {
-			return nil, http.ErrBodyNotAllowed
-		}
-
-		resp, err := service.CreateDiary(r.Context(), req)
-		if err != nil {
-			return nil, err
-		}
-
-		return entity.NewObjectResponse(resp), nil
+func HandleCreateDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	var req entity.CreateDiaryRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
 	}
+	if req.Title == "" || req.Content == "" {
+		return nil, http.ErrBodyNotAllowed
+	}
+	resp, err := service.CreateDiary(r.Context(), req)
+	if err != nil {
+		return nil, err
+	}
+	return entity.NewObjectResponse(resp), nil
 }
 
-func HandleUpdateDiary() handler.ProcessFunc {
-	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		idStr := chi.URLParam(r, "id")
-		id, err := strconv.ParseInt(idStr, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-
-		var req entity.UpdateDiaryRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			return nil, err
-		}
-
-		if req.Title == "" || req.Content == "" {
-			return nil, http.ErrBodyNotAllowed
-		}
-
-		resp, err := service.UpdateDiary(r.Context(), id, req)
-		if err != nil {
-			return nil, err
-		}
-
-		return entity.NewObjectResponse(resp), nil
+func HandleUpdateDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		return nil, err
 	}
+	var req entity.UpdateDiaryRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	if req.Title == "" || req.Content == "" {
+		return nil, http.ErrBodyNotAllowed
+	}
+	resp, err := service.UpdateDiary(r.Context(), id, req)
+	if err != nil {
+		return nil, err
+	}
+	return entity.NewObjectResponse(resp), nil
 }
 
-func HandleDeleteDiary() handler.ProcessFunc {
-	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		idStr := chi.URLParam(r, "id")
-		id, err := strconv.ParseInt(idStr, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := service.DeleteDiary(r.Context(), id); err != nil {
-			return nil, err
-		}
-
-		return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil
+func HandleDeleteDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		return nil, err
 	}
+	if err := service.DeleteDiary(r.Context(), id); err != nil {
+		return nil, err
+	}
+	return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil
 }

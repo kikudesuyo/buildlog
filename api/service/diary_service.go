@@ -9,26 +9,26 @@ import (
 )
 
 func ListDiaries(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	diaries, err := repository.ListDiaries(ctx, DB, all)
+	diaryList, err := repository.ListDiaries(ctx, database, all)
 	if err != nil {
 		return nil, err
 	}
-	for i := range diaries {
-		count, _ := repository.CountLikesByPostID(ctx, DB, diaries[i].ID)
-		liked, _ := repository.HasLiked(ctx, DB, diaries[i].ID, ipAddress)
-		diaries[i].LikesCount = count
-		diaries[i].HasLiked = liked
+	for i := range diaryList {
+		count, _ := repository.CountLikesByPostID(ctx, database, diaryList[i].ID)
+		liked, _ := repository.HasLiked(ctx, database, diaryList[i].ID, ipAddress)
+		diaryList[i].LikesCount = count
+		diaryList[i].HasLiked = liked
 	}
-	return diaries, nil
+	return diaryList, nil
 }
 
 func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTablePost, error) {
-	diary, err := repository.GetDiaryByID(ctx, DB, id)
+	diary, err := repository.GetDiaryByID(ctx, database, id)
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, DB, diary.ID)
-	liked, _ := repository.HasLiked(ctx, DB, diary.ID, ipAddress)
+	count, _ := repository.CountLikesByPostID(ctx, database, diary.ID)
+	liked, _ := repository.HasLiked(ctx, database, diary.ID, ipAddress)
 	diary.LikesCount = count
 	diary.HasLiked = liked
 	return diary, nil
@@ -44,7 +44,7 @@ func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.Cre
 		Content: req.Content,
 		Status:  status,
 	}
-	if err := repository.CreateDiary(ctx, DB, &diary); err != nil {
+	if err := repository.CreateDiary(ctx, database, &diary); err != nil {
 		return entity.CreateDiaryResponse{}, err
 	}
 	return entity.CreateDiaryResponse{
@@ -58,7 +58,7 @@ func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.Cre
 }
 
 func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (entity.UpdateDiaryResponse, error) {
-	diary, err := repository.GetDiaryByID(ctx, DB, id)
+	diary, err := repository.GetDiaryByID(ctx, database, id)
 	if err != nil {
 		return entity.UpdateDiaryResponse{}, err
 	}
@@ -69,7 +69,7 @@ func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (
 		diary.Status = req.Status
 	}
 
-	if err := repository.UpdateDiary(ctx, DB, diary); err != nil {
+	if err := repository.UpdateDiary(ctx, database, diary); err != nil {
 		return entity.UpdateDiaryResponse{}, err
 	}
 
@@ -84,5 +84,5 @@ func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (
 }
 
 func DeleteDiary(ctx context.Context, id int64) error {
-	return repository.DeleteDiary(ctx, DB, id)
+	return repository.DeleteDiary(ctx, database, id)
 }

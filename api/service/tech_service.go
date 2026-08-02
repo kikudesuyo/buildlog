@@ -9,26 +9,26 @@ import (
 )
 
 func ListTechs(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	techs, err := repository.ListTechs(ctx, DB, all)
+	techList, err := repository.ListTechs(ctx, database, all)
 	if err != nil {
 		return nil, err
 	}
-	for i := range techs {
-		count, _ := repository.CountLikesByPostID(ctx, DB, techs[i].ID)
-		liked, _ := repository.HasLiked(ctx, DB, techs[i].ID, ipAddress)
-		techs[i].LikesCount = count
-		techs[i].HasLiked = liked
+	for i := range techList {
+		count, _ := repository.CountLikesByPostID(ctx, database, techList[i].ID)
+		liked, _ := repository.HasLiked(ctx, database, techList[i].ID, ipAddress)
+		techList[i].LikesCount = count
+		techList[i].HasLiked = liked
 	}
-	return techs, nil
+	return techList, nil
 }
 
 func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTablePost, error) {
-	tech, err := repository.GetTechByID(ctx, DB, id)
+	tech, err := repository.GetTechByID(ctx, database, id)
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, DB, tech.ID)
-	liked, _ := repository.HasLiked(ctx, DB, tech.ID, ipAddress)
+	count, _ := repository.CountLikesByPostID(ctx, database, tech.ID)
+	liked, _ := repository.HasLiked(ctx, database, tech.ID, ipAddress)
 	tech.LikesCount = count
 	tech.HasLiked = liked
 	return tech, nil
@@ -46,7 +46,7 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 		Views:    req.Views,
 		Status:   status,
 	}
-	if err := repository.CreateTech(ctx, DB, &tech); err != nil {
+	if err := repository.CreateTech(ctx, database, &tech); err != nil {
 		return entity.CreateTechResponse{}, err
 	}
 	return entity.CreateTechResponse{
@@ -62,7 +62,7 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 }
 
 func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (entity.UpdateTechResponse, error) {
-	tech, err := repository.GetTechByID(ctx, DB, id)
+	tech, err := repository.GetTechByID(ctx, database, id)
 	if err != nil {
 		return entity.UpdateTechResponse{}, err
 	}
@@ -75,7 +75,7 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 		tech.Status = req.Status
 	}
 
-	if err := repository.UpdateTech(ctx, DB, tech); err != nil {
+	if err := repository.UpdateTech(ctx, database, tech); err != nil {
 		return entity.UpdateTechResponse{}, err
 	}
 
@@ -92,5 +92,5 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 }
 
 func DeleteTech(ctx context.Context, id int64) error {
-	return repository.DeleteTech(ctx, DB, id)
+	return repository.DeleteTech(ctx, database, id)
 }

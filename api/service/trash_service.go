@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
-	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
 func ListDeletedPosts(ctx context.Context) ([]entity.DBTablePost, error) {
-	return repository.ListDeletedPosts(ctx, DB)
+	var posts []entity.DBTablePost
+	err := database.WithContext(ctx).Unscoped().Where("deleted_at IS NOT NULL").Order("deleted_at DESC").Find(&posts).Error
+	return posts, err
 }
 
 func RestorePost(ctx context.Context, id int64) error {
-	return repository.RestorePost(ctx, DB, id)
+	return database.WithContext(ctx).Unscoped().Model(&entity.DBTablePost{}).Where("id = ?", id).Update("deleted_at", nil).Error
 }
