@@ -6,11 +6,9 @@
 	let { data } = $props();
 
 	async function handleDelete(id: number) {
-		if (!confirm('この記事を削除してもよろしいですか？')) return;
 		try {
 			await deleteDiary(id);
 		} catch {
-			alert('削除に失敗しました。');
 			return false;
 		}
 		return true;
