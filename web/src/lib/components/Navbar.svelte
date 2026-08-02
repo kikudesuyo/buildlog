@@ -9,11 +9,37 @@ import { resolve } from '$app/paths';
 	let isDarkMode = $state(false);
 	let menuButton: HTMLButtonElement | null = null;
 	let closeButton = $state<HTMLButtonElement | null>(null);
+	let searchInput = $state<HTMLInputElement | null>(null);
 	let previouslyFocused: HTMLElement | null = null;
+	let searchHistoryEntry = false;
 
 	onMount(() => {
 		isDarkMode = document.documentElement.classList.contains('dark');
+		const handlePopState = () => {
+			if (isSearchOpen) closeSearch(true);
+		};
+		window.addEventListener('popstate', handlePopState);
+		return () => window.removeEventListener('popstate', handlePopState);
 	});
+
+	function openSearch() {
+		previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+		isSearchOpen = true;
+		window.history.pushState({ searchModal: true }, '');
+		searchHistoryEntry = true;
+	}
+
+	function closeSearch(fromHistory = false) {
+		if (!isSearchOpen) return;
+		isSearchOpen = false;
+		if (!fromHistory && searchHistoryEntry) {
+			searchHistoryEntry = false;
+			window.history.back();
+		} else {
+			searchHistoryEntry = false;
+		}
+		requestAnimationFrame(() => previouslyFocused?.focus());
+	}
 
 	function toggleTheme() {
 		isDarkMode = !isDarkMode;
@@ -47,7 +73,14 @@ import { resolve } from '$app/paths';
 		if (event.key === 'Escape' && isMenuOpen) {
 			closeMenu();
 		}
+		if (event.key === 'Escape' && isSearchOpen) {
+			closeSearch();
+		}
 	}
+
+	$effect(() => {
+		if (isSearchOpen) requestAnimationFrame(() => searchInput?.focus());
+	});
 
 	$effect(() => {
 		if (isMenuOpen) {
@@ -102,7 +135,7 @@ import { resolve } from '$app/paths';
 			<button
 				type="button"
 				aria-label="検索を開く"
-				onclick={() => (isSearchOpen = !isSearchOpen)}
+				onclick={() => (isSearchOpen ? closeSearch() : openSearch())}
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
 			>
 				search
@@ -172,34 +205,35 @@ import { resolve } from '$app/paths';
 <!-- Search Modal (Minimalist) -->
 {#if isSearchOpen}
 	<div
-		role="button"
-		tabindex="0"
-		class="fixed inset-0 z-50 bg-primary/20 backdrop-blur-xs flex items-start justify-center pt-28 px-4"
-		onclick={() => (isSearchOpen = false)}
-		onkeydown={(e) => e.key === 'Escape' && (isSearchOpen = false)}
+		class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-primary/20 px-4 pt-[max(7rem,calc(env(safe-area-inset-top)+5rem))] pb-8 backdrop-blur-xs"
+		onclick={(event) => event.target === event.currentTarget && closeSearch()}
 	>
 		<div
 			role="dialog"
 			aria-modal="true"
+			aria-labelledby="search-modal-title"
 			tabindex="-1"
-			class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-6 w-full max-w-[540px] shadow-xl"
+			class="max-h-[calc(100dvh-8rem)] w-full max-w-[540px] overflow-y-auto rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xl"
 			onclick={(e) => e.stopPropagation()}
-			onkeydown={(e) => e.key === 'Escape' && (isSearchOpen = false)}
 		>
 			<div class="flex items-center gap-3 border-b border-outline-variant/20 pb-3">
 				<span class="material-symbols-outlined text-on-surface-variant">search</span>
+				<h2 id="search-modal-title" class="sr-only">記事を検索</h2>
 				<input
+					bind:this={searchInput}
 					type="text"
 					bind:value={searchQuery}
+					aria-label="記事やキーワード"
 					placeholder="記事やキーワードを検索..."
 					class="w-full bg-transparent text-primary outline-none font-body-md placeholder:text-outline"
 				/>
 				<button
 					type="button"
-					onclick={() => (isSearchOpen = false)}
-					class="text-label-sm text-outline hover:text-primary"
+					aria-label="検索を閉じる"
+					onclick={() => closeSearch()}
+					class="min-h-11 min-w-11 rounded-lg px-2 text-label-sm text-outline hover:bg-surface-container-low hover:text-primary"
 				>
-					ESC
+					閉じる
 				</button>
 			</div>
 			<div class="mt-4 text-label-sm text-on-surface-variant">
