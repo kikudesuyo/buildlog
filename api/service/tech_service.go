@@ -8,6 +8,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
+// ListTechs は一覧を取得します。
 func ListTechs(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
 	techList, err := repository.ListTechs(ctx, database, all)
 	if err != nil {
@@ -22,6 +23,7 @@ func ListTechs(ctx context.Context, all bool, ipAddress string) ([]entity.DBTabl
 	return techList, nil
 }
 
+// GetTechByID はデータを取得します。
 func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTablePost, error) {
 	tech, err := repository.GetTechByID(ctx, database, id)
 	if err != nil {
@@ -34,6 +36,7 @@ func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTab
 	return tech, nil
 }
 
+// CreateTech はデータを作成します。
 func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.CreateTechResponse, error) {
 	status := req.Status
 	if status == "" {
@@ -61,6 +64,7 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 	}, nil
 }
 
+// UpdateTech はデータを更新します。
 func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (entity.UpdateTechResponse, error) {
 	tech, err := repository.GetTechByID(ctx, database, id)
 	if err != nil {
@@ -91,6 +95,7 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 	}, nil
 }
 
+// DeleteTech はデータを削除します。
 func DeleteTech(ctx context.Context, id int64) error {
 	return repository.DeleteTech(ctx, database, id)
 }

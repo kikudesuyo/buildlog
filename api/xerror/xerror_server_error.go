@@ -106,10 +106,12 @@ func UnknownLibraryErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "unknown app component error", CodeAppLib, meta...)
 }
 
+// UnknownPanicError は対応するエラーを生成します。
 func UnknownPanicError(meta ...map[string]string) error {
 	return generateErrFromText("unknown system error", CodeAppPanic, meta...)
 }
 
+// AppDebug はこの処理に必要な内部処理を実行します。
 func AppDebug(meta ...map[string]string) error {
 	return generateErrFromText("technical error", CodeAppDebug, meta...)
 }
@@ -145,6 +147,7 @@ func UnknownDBInRepositoryErr(err error, meta ...map[string]string) error {
 	return generateErrWithStackDepth(err, "unknown database error", CodeDBInRepository, 1, meta...)
 }
 
+// UnknownDBErr は対応するエラーを生成します。
 func UnknownDBErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -152,6 +155,7 @@ func UnknownDBErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "unknown database error", CodeDB, meta...)
 }
 
+// DBInitErr は対応するエラーを生成します。
 func DBInitErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -159,10 +163,12 @@ func DBInitErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "unknown database init error", CodeDBInit, meta...)
 }
 
+// DBPrimaryKey はこの処理に必要な内部処理を実行します。
 func DBPrimaryKey(meta ...map[string]string) error {
 	return generateErr(errors.New("primary key must be null on creation"), "unknown database error", CodeDBPrimaryKey, meta...)
 }
 
+// DBCommitErr は対応するエラーを生成します。
 func DBCommitErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -170,6 +176,7 @@ func DBCommitErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "unknown database commit error", CodeDBCommit, meta...)
 }
 
+// DBDuplicateEntryErr は対応するエラーを生成します。
 func DBDuplicateEntryErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -177,6 +184,7 @@ func DBDuplicateEntryErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "the data already exists", CodeDBDuplicateEntry, meta...)
 }
 
+// DBSchemaColumnErr は対応するエラーを生成します。
 func DBSchemaColumnErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -184,6 +192,7 @@ func DBSchemaColumnErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "database schema column error (e.g. default value)", CodeDBSchemaColumn, meta...)
 }
 
+// UnknownPinpointErr は対応するエラーを生成します。
 func UnknownPinpointErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -191,6 +200,7 @@ func UnknownPinpointErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "unknown email error", CodePinpoint, meta...)
 }
 
+// UnknownEmailTemplateErr は対応するエラーを生成します。
 func UnknownEmailTemplateErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -198,6 +208,7 @@ func UnknownEmailTemplateErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "unknown email error", CodeEmailTemplate, meta...)
 }
 
+// UnknownEmailSendErr は対応するエラーを生成します。
 func UnknownEmailSendErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -205,6 +216,7 @@ func UnknownEmailSendErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "unknown email error", CodeEmailSend, meta...)
 }
 
+// CacheGetErr は対応するエラーを生成します。
 func CacheGetErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -212,6 +224,7 @@ func CacheGetErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "cache get error", CodeCacheGet, meta...)
 }
 
+// CacheSetErr は対応するエラーを生成します。
 func CacheSetErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)
@@ -219,6 +232,7 @@ func CacheSetErr(err error, meta ...map[string]string) error {
 	return generateErr(err, "cache set error", CodeCacheSet, meta...)
 }
 
+// CacheInvalidTypeErr は対応するエラーを生成します。
 func CacheInvalidTypeErr(err error, meta ...map[string]string) error {
 	if IsCustomError(err) {
 		return AddMetaData(err, meta...)

@@ -9,6 +9,7 @@ type DBTableLike struct {
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
 }
 
+// TableName はエンティティに対応するデータベーステーブル名を返します。
 func (DBTableLike) TableName() string {
 	return "likes"
 }

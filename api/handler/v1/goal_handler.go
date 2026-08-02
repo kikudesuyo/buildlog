@@ -9,6 +9,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
+// HandleGetCurrentGoals はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetCurrentGoals(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	goals, err := service.GetCurrentGoals(r.Context())
 	if err != nil {
@@ -17,6 +18,7 @@ func HandleGetCurrentGoals(r *http.Request, requestData map[string]interface{}) 
 	return entity.NewObjectResponse(goals), nil
 }
 
+// HandleSaveCurrentGoals はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleSaveCurrentGoals(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	var req entity.SaveGoalsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

@@ -19,6 +19,7 @@ type DBTableProfile struct {
 	UpdatedAt    time.Time `gorm:"column:updated_at"`
 }
 
+// TableName はエンティティに対応するデータベーステーブル名を返します。
 func (DBTableProfile) TableName() string {
 	return "profiles"
 }

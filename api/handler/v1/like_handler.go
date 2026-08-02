@@ -10,6 +10,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
+// getClientIP はこの処理に必要な内部処理を実行します。
 func getClientIP(r *http.Request) string {
 	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
 		return xff
@@ -24,6 +25,7 @@ func getClientIP(r *http.Request) string {
 	return host
 }
 
+// HandlePostLike はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandlePostLike(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	postID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -36,6 +38,7 @@ func HandlePostLike(r *http.Request, requestData map[string]interface{}) (http.H
 	return entity.NewObjectResponse(resp), nil
 }
 
+// HandleDeleteLike はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleDeleteLike(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	postID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -48,6 +51,7 @@ func HandleDeleteLike(r *http.Request, requestData map[string]interface{}) (http
 	return entity.NewObjectResponse(resp), nil
 }
 
+// HandleGetLikeStatus はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetLikeStatus(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	postID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {

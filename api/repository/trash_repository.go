@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// ListDeletedPosts は一覧を取得します。
 func ListDeletedPosts(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
 	var posts []entity.DBTablePost
 	err := db.WithContext(ctx).
@@ -17,6 +18,7 @@ func ListDeletedPosts(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, e
 	return posts, err
 }
 
+// RestorePost は削除済みデータを復元します。
 func RestorePost(ctx context.Context, db *gorm.DB, id int64) error {
 	return db.WithContext(ctx).
 		Unscoped().

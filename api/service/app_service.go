@@ -8,6 +8,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
+// mapToAppResponse はこの処理に必要な内部処理を実行します。
 func mapToAppResponse(dbApp *entity.DBTableApp) (*entity.AppResponse, error) {
 	var tags []string
 	if dbApp.Tags != "" {
@@ -29,6 +30,7 @@ func mapToAppResponse(dbApp *entity.DBTableApp) (*entity.AppResponse, error) {
 	}, nil
 }
 
+// ListApps は一覧を取得します。
 func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
 	dbApps, err := repository.ListApps(ctx, database)
 	if err != nil {
@@ -47,6 +49,7 @@ func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
 	return appList, nil
 }
 
+// GetAppByID はデータを取得します。
 func GetAppByID(ctx context.Context, id int64) (*entity.AppResponse, error) {
 	dbApp, err := repository.GetAppByID(ctx, database, id)
 	if err != nil {
@@ -55,6 +58,7 @@ func GetAppByID(ctx context.Context, id int64) (*entity.AppResponse, error) {
 	return mapToAppResponse(dbApp)
 }
 
+// CreateApp はデータを作成します。
 func CreateApp(ctx context.Context, req entity.CreateAppRequest) (*entity.AppResponse, error) {
 	tagsJSON, err := json.Marshal(req.Tags)
 	if err != nil {
@@ -80,6 +84,7 @@ func CreateApp(ctx context.Context, req entity.CreateAppRequest) (*entity.AppRes
 	return mapToAppResponse(&app)
 }
 
+// UpdateApp はデータを更新します。
 func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*entity.AppResponse, error) {
 	app, err := repository.GetAppByID(ctx, database, id)
 	if err != nil {
@@ -108,6 +113,7 @@ func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*ent
 	return mapToAppResponse(app)
 }
 
+// DeleteApp はデータを削除します。
 func DeleteApp(ctx context.Context, id int64) error {
 	return repository.DeleteApp(ctx, database, id)
 }

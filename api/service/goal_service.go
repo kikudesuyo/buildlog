@@ -14,6 +14,7 @@ import (
 
 const monthlyGoalPeriod = "monthly"
 
+// GetCurrentGoals はデータを取得します。
 func GetCurrentGoals(ctx context.Context) (*entity.GoalPeriodResponse, error) {
 	startsAt := currentMonthStart()
 	period, err := repository.GetGoalPeriod(ctx, database, monthlyGoalPeriod, startsAt)
@@ -26,6 +27,7 @@ func GetCurrentGoals(ctx context.Context) (*entity.GoalPeriodResponse, error) {
 	return newGoalPeriodResponse(period.PeriodType, period.StartsAt, period.EndsAt, period.Goals), nil
 }
 
+// SaveCurrentGoals はデータを保存します。
 func SaveCurrentGoals(ctx context.Context, req entity.SaveGoalsRequest) (*entity.GoalPeriodResponse, error) {
 	if req.PeriodType != "" && req.PeriodType != monthlyGoalPeriod {
 		return nil, xerror.ClientValidationErr(errors.New("unsupported goal period"))
@@ -59,11 +61,13 @@ func SaveCurrentGoals(ctx context.Context, req entity.SaveGoalsRequest) (*entity
 	return newGoalPeriodResponse(period.PeriodType, period.StartsAt, period.EndsAt, period.Goals), nil
 }
 
+// currentMonthStart はこの処理に必要な内部処理を実行します。
 func currentMonthStart() time.Time {
 	now := time.Now().UTC()
 	return time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.UTC)
 }
 
+// newGoalPeriodResponse はこの処理に必要な内部処理を実行します。
 func newGoalPeriodResponse(periodType string, startsAt, endsAt time.Time, goalList []entity.DBTableGoal) *entity.GoalPeriodResponse {
 	goals := make([]entity.GoalResponse, 0, len(goalList))
 	for _, goal := range goalList {

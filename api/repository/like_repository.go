@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// CreateLike はデータを作成します。
 func CreateLike(ctx context.Context, db *gorm.DB, postID int64, ipAddress string) error {
 	like := entity.DBTableLike{
 		PostID:    postID,
@@ -15,12 +16,14 @@ func CreateLike(ctx context.Context, db *gorm.DB, postID int64, ipAddress string
 	return db.WithContext(ctx).Create(&like).Error
 }
 
+// DeleteLike はデータを削除します。
 func DeleteLike(ctx context.Context, db *gorm.DB, postID int64, ipAddress string) error {
 	return db.WithContext(ctx).
 		Where("post_id = ? AND ip_address = ?", postID, ipAddress).
 		Delete(&entity.DBTableLike{}).Error
 }
 
+// CountLikesByPostID は件数を取得します。
 func CountLikesByPostID(ctx context.Context, db *gorm.DB, postID int64) (int64, error) {
 	var count int64
 	err := db.WithContext(ctx).
@@ -30,6 +33,7 @@ func CountLikesByPostID(ctx context.Context, db *gorm.DB, postID int64) (int64, 
 	return count, err
 }
 
+// HasLiked は状態を判定します。
 func HasLiked(ctx context.Context, db *gorm.DB, postID int64, ipAddress string) (bool, error) {
 	var count int64
 	err := db.WithContext(ctx).

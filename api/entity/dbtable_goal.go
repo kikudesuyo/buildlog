@@ -10,6 +10,7 @@ type DBTableGoalPeriod struct {
 	Goals      []DBTableGoal `gorm:"foreignKey:PeriodID"`
 }
 
+// TableName はエンティティに対応するデータベーステーブル名を返します。
 func (DBTableGoalPeriod) TableName() string { return "goal_periods" }
 
 type DBTableGoal struct {
@@ -22,4 +23,5 @@ type DBTableGoal struct {
 	UpdatedAt     time.Time `gorm:"column:updated_at" json:"updated_at"`
 }
 
+// TableName はエンティティに対応するデータベーステーブル名を返します。
 func (DBTableGoal) TableName() string { return "goals" }

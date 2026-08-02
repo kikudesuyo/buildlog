@@ -17,6 +17,7 @@ type DBTableApp struct {
 	UpdatedAt   time.Time `gorm:"column:updated_at"`
 }
 
+// TableName はエンティティに対応するデータベーステーブル名を返します。
 func (DBTableApp) TableName() string {
 	return "apps"
 }

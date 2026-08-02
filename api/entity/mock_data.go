@@ -11,6 +11,7 @@ type DiaryEntry struct {
 	CategoryColorClass string `json:"category_color_class,omitempty"`
 }
 
+
 type TechArticle struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
@@ -31,4 +32,3 @@ type TechFeed struct {
 	FeaturedArticle FeaturedTechArticle `json:"featured_article"`
 	Articles        []TechArticle       `json:"articles"`
 }
-

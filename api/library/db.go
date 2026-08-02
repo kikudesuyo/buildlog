@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// OpenDatabase はこの処理に必要な内部処理を実行します。
 func OpenDatabase(ctx context.Context) (*gorm.DB, error) {
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {

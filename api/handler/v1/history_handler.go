@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// HandleGetPostHistory はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetPostHistory(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 		itemList := make([]entity.HistoryItem, 0)
