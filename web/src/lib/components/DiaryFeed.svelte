@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DiaryEntry } from '$lib/api/types';
 	import { resolve } from '$app/paths';
+	import LikeButton from './LikeButton.svelte';
 
 	type Props = {
 		entries: DiaryEntry[];
@@ -46,9 +47,14 @@
 
 	<div class="flex flex-col gap-6">
 		{#each displayEntries as entry (entry.id)}
-			<article class="group relative -mx-4 rounded-xl border border-transparent p-4">
+			<article class="group relative rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20">
 				<div class="mb-stack-sm flex items-center justify-between">
-					<span class="font-label-sm text-label-sm text-outline">{formatDate(entry.createdAt)}</span>
+					<div class="flex items-center gap-3">
+						<span class="font-label-sm text-label-sm text-outline">{formatDate(entry.createdAt)}</span>
+						{#if entry.status === 'draft'}
+							<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
+						{/if}
+					</div>
 					{#if isAdmin}
 						<div class="flex gap-2">
 							<button type="button" onclick={() => onEdit?.(entry.id)} class="p-1 text-outline opacity-60 transition-all duration-200 hover:text-primary hover:opacity-100" title="編集">
@@ -61,7 +67,10 @@
 					{/if}
 				</div>
 				<h2 class="font-headline-lg text-headline-lg mb-stack-md text-primary transition-colors group-hover:text-primary-container">{entry.title}</h2>
-				<p class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface-variant">{entry.content}</p>
+				<p class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface-variant mb-4">{entry.content}</p>
+				<div class="flex items-center justify-between">
+					<LikeButton postId={entry.id} initialLikesCount={entry.likesCount} initialHasLiked={entry.hasLiked} />
+				</div>
 			</article>
 		{/each}
 	</div>

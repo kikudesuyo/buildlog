@@ -2,21 +2,24 @@
 	import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
 	import { resolve } from '$app/paths';
 	import { techCategories } from '$lib/tech/categories';
+	import LikeButton from './LikeButton.svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	type Props = {
-		featuredArticle: FeaturedTechArticle;
-		techArticles: TechArticle[];
+		featuredArticle?: FeaturedTechArticle | null;
+		techArticles?: TechArticle[];
+		loadError?: boolean;
 		isAdmin?: boolean;
 		onEdit?: (id: number) => void;
 		onDelete?: (id: number) => void | Promise<boolean | void>;
 	};
 
-	let { featuredArticle, techArticles, isAdmin = false, onEdit, onDelete }: Props = $props();
+	let { featuredArticle = null, techArticles = [], loadError = false, isAdmin = false, onEdit, onDelete }: Props = $props();
 	let deletedIds = $state<number[]>([]);
 	let selectedCategory = $state<string | null>(null);
 	const categories = ['All', ...techCategories];
 	let articles = $derived(
-		(featuredArticle.title ? [featuredArticle, ...techArticles] : techArticles).filter(
+		(featuredArticle?.title ? [featuredArticle, ...techArticles] : techArticles).filter(
 			(article) => !deletedIds.includes(article.id)
 		)
 	);
@@ -56,33 +59,66 @@
 		{/each}
 	</div>
 
+	{#if loadError}
+		<section class="rounded-xl border border-error/30 bg-error-container/30 p-8 text-center" role="alert">
+			<h2 class="font-headline-md text-headline-md text-on-surface">記事を読み込めませんでした</h2>
+			<p class="font-body-md text-body-md mt-2 text-on-surface-variant">通信を確認して、もう一度お試しください。</p>
+			<button type="button" onclick={() => invalidateAll()} class="font-label-md text-label-md mt-5 min-h-11 rounded-lg bg-primary px-5 py-2 text-on-primary">再試行</button>
+		</section>
+	{:else if articles.length === 0}
+		<section class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-8 text-center">
+			<h2 class="font-headline-md text-headline-md text-primary">技術記事はまだありません</h2>
+			<p class="font-body-md text-body-md mt-2 text-on-surface-variant">新しい記事が公開されるまでお待ちください。</p>
+		</section>
+	{:else if selectedCategory && filteredArticles.length === 0}
+		<section class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-8 text-center">
+			<h2 class="font-headline-md text-headline-md text-primary">該当する記事がありません</h2>
+			<p class="font-body-md text-body-md mt-2 text-on-surface-variant">「{selectedCategory}」の記事はありません。</p>
+			<button type="button" onclick={() => (selectedCategory = null)} class="font-label-md text-label-md mt-5 min-h-11 rounded-lg border border-outline-variant/50 px-5 py-2 text-primary">Allへ戻る</button>
+		</section>
+	{/if}
+
 	{#if (!selectedCategory || selectedCategory === featured?.category) && featured}
-		<article class="group relative -mx-4 rounded-xl border border-transparent p-4">
+		<article aria-label="Featured article" class="group relative rounded-xl border border-outline-variant/40 bg-surface-container-low p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 			<div class="mb-stack-sm flex flex-wrap items-center gap-stack-sm">
 				<span class="font-label-sm text-label-sm rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container">{featured.category}</span>
 				<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>
+				{#if featured.status === 'draft'}
+					<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
+				{/if}
 				{#if isAdmin}<div class="ml-auto flex gap-2"><button type="button" onclick={() => onEdit?.(featured.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(featured.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}
 			</div>
-			<h2 class="font-display-lg mb-stack-md text-[28px] leading-tight text-primary transition-colors group-hover:text-primary/80">
+			<h2 class="font-display-lg mb-stack-md text-[24px] leading-tight text-primary transition-colors group-hover:text-primary/80 md:text-[28px]">
 				<a href={resolve(`/tech/${featured.id}`)} class="hover:underline">{featured.title}</a>
 			</h2>
-			<p class="font-body-md text-body-md mb-6 text-on-surface-variant line-clamp-3">{featured.content}</p>
+			<p class="font-body-md text-body-md mb-4 text-on-surface-variant line-clamp-2 md:mb-6 md:line-clamp-3">{featured.content}</p>
+			<div class="flex items-center justify-between mb-4">
+				<LikeButton postId={featured.id} initialLikesCount={featured.likesCount} initialHasLiked={featured.hasLiked} />
+			</div>
 			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
 		</article>
 	{/if}
 
-	<div class="space-y-12">
+	<div class="space-y-6 md:space-y-12">
 		{#each filteredArticles as article (article.id)}
-			<article class="group relative flex flex-col gap-3 rounded-xl border border-transparent p-4">
+			<article class="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 				<div class="flex items-center justify-between">
-					<div class="flex items-center gap-stack-sm"><span class="font-label-sm text-label-sm rounded bg-primary-fixed px-2 py-0.5 text-primary">{article.category}</span></div>
+					<div class="flex items-center gap-stack-sm">
+						<span class="font-label-sm text-label-sm rounded bg-primary-fixed px-2 py-0.5 text-primary">{article.category}</span>
+						{#if article.status === 'draft'}
+							<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
+						{/if}
+					</div>
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>{#if isAdmin}<div class="flex gap-2"><button type="button" onclick={() => onEdit?.(article.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(article.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}</div>
 				</div>
-				<h3 class="font-headline-lg text-headline-lg text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline">
+				<h3 class="font-headline-lg text-[22px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-headline-lg">
 					<a href={resolve(`/tech/${article.id}`)}>{article.title}</a>
 				</h3>
 				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
-				{#if article.views}<div class="mt-2 flex items-center gap-4"><span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views}</span></div>{/if}
+				<div class="mt-3 flex items-center gap-4">
+					<LikeButton postId={article.id} initialLikesCount={article.likesCount} initialHasLiked={article.hasLiked} />
+					{#if article.views}<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views}</span>{/if}
+				</div>
 			</article>
 		{/each}
 	</div>

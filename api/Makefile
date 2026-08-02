@@ -30,9 +30,11 @@ docker-build-prod:
 _docker-build:
 	gcloud builds submit --default-buckets-behavior="regional-user-owned-bucket" --region=asia-northeast1 --config=_cloudbuild.all.yaml --project ${project} .
 
+ALLOWED_ORIGINS ?=
+
 # 本番環境 Cloud Runへデプロイ
 deploy-prod:
-	make __deploy project=${GCP_PROJECT_PROD} bucketprefix=prod resourceprefix=prod apidomain=${API_DOMAIN_PROD} is_production=true
+	make __deploy project=${GCP_PROJECT_PROD} bucketprefix=prod resourceprefix=prod apidomain=${API_DOMAIN_PROD} is_production=true allowed_origins="${ALLOWED_ORIGINS}"
 
 __deploy:
 	gcloud builds submit \
@@ -40,7 +42,7 @@ __deploy:
 	  --region=asia-northeast1 \
 	  --config=_cloudbuild.all.yaml \
 	  --project ${project} \
-	  --substitutions=_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production}
+	  --substitutions=_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production},_ALLOWED_ORIGINS="${allowed_origins}"
 
 # チェックサム作成
 migrate_hash:
@@ -50,6 +52,11 @@ migrate_hash:
 migrate_apply:
 	$(LOAD_ENV) ; \
 	cd ../sql && atlas migrate apply --env local
+
+# 本番環境マイグレーション実行
+migrate_apply_prod:
+	@PROD_DATABASE_URL=$$(gcloud secrets versions access latest --secret=DATABASE_URL --project=${GCP_PROJECT_PROD}) ; \
+	cd ../sql && PROD_DATABASE_URL="$$PROD_DATABASE_URL" atlas migrate apply --env prod
 
 # テストデータ注入
 db_seed:

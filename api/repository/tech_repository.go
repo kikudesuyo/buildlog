@@ -7,14 +7,17 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListTechs(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
-	techs := make([]entity.DBTablePost, 0)
-	err := db.WithContext(ctx).
-		Where("type = ?", "tech").
+func ListTechs(ctx context.Context, db *gorm.DB, all bool) ([]entity.DBTablePost, error) {
+	techList := make([]entity.DBTablePost, 0)
+	query := db.WithContext(ctx).Where("type = ?", "tech")
+	if !all {
+		query = query.Where("status = ?", "published")
+	}
+	err := query.
 		Order("created_at DESC").
 		Order("id DESC").
-		Find(&techs).Error
-	return techs, err
+		Find(&techList).Error
+	return techList, err
 }
 
 func GetTechByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePost, error) {
