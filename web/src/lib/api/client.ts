@@ -26,7 +26,7 @@ type ApiObjectResponse<T> = {
 
 
 const apiBaseUrl = (() => {
-	const rawUrl = env.PUBLIC_API_BASE_URL 
+	const rawUrl = env.PUBLIC_API_BASE_URL || 'http://localhost:8081';
 	return rawUrl.endsWith('/api/v1') ? rawUrl : `${rawUrl}/api/v1`;
 })();
 

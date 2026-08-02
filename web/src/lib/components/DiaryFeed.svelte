@@ -66,8 +66,13 @@
 						</div>
 					{/if}
 				</div>
-				<h2 class="font-headline-lg text-headline-lg mb-stack-md text-primary transition-colors group-hover:text-primary-container">{entry.title}</h2>
-				<p class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface-variant mb-4">{entry.content}</p>
+				<a href={isAdmin ? undefined : resolve(`/diary/${entry.id}`)} class="block">
+					<h2 class="font-headline-lg text-headline-lg mb-stack-md text-primary transition-colors group-hover:text-primary-container">{entry.title}</h2>
+					<p class="font-body-md text-body-md leading-relaxed whitespace-pre-wrap text-on-surface-variant mb-4 line-clamp-3">{entry.content}</p>
+					{#if !isAdmin}
+						<span class="font-label-md text-label-md text-primary group-hover:underline">続きを読む</span>
+					{/if}
+				</a>
 				<div class="flex items-center justify-between">
 					<LikeButton postId={entry.id} initialLikesCount={entry.likesCount} initialHasLiked={entry.hasLiked} />
 				</div>
