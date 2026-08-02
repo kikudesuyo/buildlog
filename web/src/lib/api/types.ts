@@ -90,3 +90,10 @@ export interface AnalyticsData {
 	topLikesArticles: AnalyticsArticleItem[];
 	monthlyActivities: MonthlyActivityItem[];
 }
+
+export interface HistoryItem {
+	id: number;
+	type: 'diary' | 'tech';
+	title: string;
+	createdAt: string;
+}

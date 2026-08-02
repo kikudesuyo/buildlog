@@ -6,50 +6,46 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/kikudesuyo/buildlog/api/handler"
 	v1 "github.com/kikudesuyo/buildlog/api/handler/v1"
+	"github.com/kikudesuyo/buildlog/api/service"
 	"gorm.io/gorm"
 )
 
 func NewRouter(db *gorm.DB) http.Handler {
+	service.SetDatabase(db)
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(corsMiddleware)
 
 	r.Route("/api/v1", func(r chi.Router) {
-		r.Get("/diaries", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetDiaryList(db))
-		})
-		r.Get("/diaries/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetDiary(db))
-		})
-		r.Post("/diaries", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleCreateDiary(db))
-		})
-		r.Put("/diaries/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateDiary(db))
-		})
-		r.Delete("/diaries/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteDiary(db))
-		})
+		r.Get("/diaries", handleFunc(v1.HandleGetDiaryList))
+		r.Get("/diaries/{id}", handleFunc(v1.HandleGetDiary))
+		r.Post("/diaries", handleFunc(v1.HandleCreateDiary))
+		r.Put("/diaries/{id}", handleFunc(v1.HandleUpdateDiary))
+		r.Delete("/diaries/{id}", handleFunc(v1.HandleDeleteDiary))
 
-		r.Get("/techs", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetTechList(db))
-		})
-		r.Get("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleGetTech(db))
-		})
-		r.Post("/techs", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleCreateTech(db))
-		})
-		r.Put("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateTech(db))
-		})
-		r.Delete("/techs/{id}", func(w http.ResponseWriter, req *http.Request) {
-			handler.HandleRequestAndResponse(req, w, v1.HandleDeleteTech(db))
-		})
+		r.Get("/techs", handleFunc(v1.HandleGetTechList))
+		r.Get("/techs/{id}", handleFunc(v1.HandleGetTech))
+		r.Post("/techs", handleFunc(v1.HandleCreateTech))
+		r.Put("/techs/{id}", handleFunc(v1.HandleUpdateTech))
+		r.Delete("/techs/{id}", handleFunc(v1.HandleDeleteTech))
 
+<<<<<<< HEAD
+		r.Post("/posts/{id}/like", handleFunc(v1.HandlePostLike))
+		r.Delete("/posts/{id}/like", handleFunc(v1.HandleDeleteLike))
+		r.Get("/posts/{id}/like", handleFunc(v1.HandleGetLikeStatus))
+		r.Get("/trash", handleFunc(v1.HandleGetDeletedPosts))
+		r.Put("/trash/{id}/restore", handleFunc(v1.HandleRestorePost))
+		r.Get("/apps", handleFunc(v1.HandleGetAppList))
+		r.Get("/apps/{id}", handleFunc(v1.HandleGetApp))
+		r.Post("/apps", handleFunc(v1.HandleCreateApp))
+		r.Put("/apps/{id}", handleFunc(v1.HandleUpdateApp))
+		r.Delete("/apps/{id}", handleFunc(v1.HandleDeleteApp))
+		r.Get("/profile", handleFunc(v1.HandleGetProfile))
+		r.Put("/profile", handleFunc(v1.HandleUpdateProfile))
+		r.Get("/admin/analytics", handleFunc(v1.HandleGetAnalytics))
+=======
 		r.Post("/posts/{id}/like", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandlePostLike(db))
 		})
@@ -86,9 +82,13 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Put("/profile", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleUpdateProfile(db))
 		})
+		r.Get("/posts/history", func(w http.ResponseWriter, req *http.Request) {
+			handler.HandleRequestAndResponse(req, w, v1.HandleGetPostHistory(db))
+		})
 		r.Get("/admin/analytics", func(w http.ResponseWriter, req *http.Request) {
 			handler.HandleRequestAndResponse(req, w, v1.HandleGetAnalytics(db))
 		})
+>>>>>>> dd572d718214095f25371740a9f3d14f37de939b
 	})
 
 	return r

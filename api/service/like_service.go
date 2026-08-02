@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/kikudesuyo/buildlog/api/repository"
-	"gorm.io/gorm"
 )
 
 type LikeStatus struct {
@@ -12,18 +11,18 @@ type LikeStatus struct {
 	HasLiked   bool  `json:"has_liked"`
 }
 
-func LikePost(ctx context.Context, db *gorm.DB, postID int64, ipAddress string) (LikeStatus, error) {
-	alreadyLiked, err := repository.HasLiked(ctx, db, postID, ipAddress)
+func LikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
+	alreadyLiked, err := repository.HasLiked(ctx, database, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}
 	if !alreadyLiked {
-		if err := repository.CreateLike(ctx, db, postID, ipAddress); err != nil {
+		if err := repository.CreateLike(ctx, database, postID, ipAddress); err != nil {
 			return LikeStatus{}, err
 		}
 	}
 
-	count, err := repository.CountLikesByPostID(ctx, db, postID)
+	count, err := repository.CountLikesByPostID(ctx, database, postID)
 	if err != nil {
 		return LikeStatus{}, err
 	}
@@ -34,12 +33,12 @@ func LikePost(ctx context.Context, db *gorm.DB, postID int64, ipAddress string) 
 	}, nil
 }
 
-func UnlikePost(ctx context.Context, db *gorm.DB, postID int64, ipAddress string) (LikeStatus, error) {
-	if err := repository.DeleteLike(ctx, db, postID, ipAddress); err != nil {
+func UnlikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
+	if err := repository.DeleteLike(ctx, database, postID, ipAddress); err != nil {
 		return LikeStatus{}, err
 	}
 
-	count, err := repository.CountLikesByPostID(ctx, db, postID)
+	count, err := repository.CountLikesByPostID(ctx, database, postID)
 	if err != nil {
 		return LikeStatus{}, err
 	}
@@ -50,13 +49,13 @@ func UnlikePost(ctx context.Context, db *gorm.DB, postID int64, ipAddress string
 	}, nil
 }
 
-func GetLikeStatus(ctx context.Context, db *gorm.DB, postID int64, ipAddress string) (LikeStatus, error) {
-	count, err := repository.CountLikesByPostID(ctx, db, postID)
+func GetLikeStatus(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
+	count, err := repository.CountLikesByPostID(ctx, database, postID)
 	if err != nil {
 		return LikeStatus{}, err
 	}
 
-	hasLiked, err := repository.HasLiked(ctx, db, postID, ipAddress)
+	hasLiked, err := repository.HasLiked(ctx, database, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}
