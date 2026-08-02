@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import { restoreEntry } from '$lib/api/client';
 
 	let { data } = $props();
