@@ -29,8 +29,14 @@ const apiBaseUrl = (() => {
 	return rawUrl.endsWith('/api/v1') ? rawUrl : `${rawUrl}/api/v1`;
 })();
 
+const adminToken = env.PUBLIC_ADMIN_TOKEN || '';
+
 async function get<T>(fetchFn: ApiFetch, path: string): Promise<T> {
-	const response = await fetchFn(`${apiBaseUrl}${path}`);
+	const headers: Record<string, string> = {};
+	if (adminToken) {
+		headers.Authorization = `Bearer ${adminToken}`;
+	}
+	const response = await fetchFn(`${apiBaseUrl}${path}`, { headers });
 	if (!response.ok) {
 		throw new Error(`API request failed: ${response.status} ${response.statusText}`);
 	}
@@ -108,9 +114,17 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false): Promise<{
 }
 
 async function sendRequest<T>(method: string, path: string, body?: unknown): Promise<T> {
+	const headers: Record<string, string> = {};
+	if (adminToken) {
+		headers.Authorization = `Bearer ${adminToken}`;
+	}
+	if (body) {
+		headers['Content-Type'] = 'application/json';
+	}
+
 	const response = await fetch(`${apiBaseUrl}${path}`, {
 		method,
-		headers: body ? { 'Content-Type': 'application/json' } : undefined,
+		headers,
 		body: body ? JSON.stringify(body) : undefined
 	});
 	if (!response.ok) {

@@ -9,9 +9,9 @@ import (
 )
 
 func HandleGetPostHistory(db *gorm.DB) handler.ProcessFunc {
-	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
+	return func(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 		var items []entity.HistoryItem
-		
+
 		err := db.Model(&entity.DBTablePost{}).
 			Select("id, type, title, created_at").
 			Where("deleted_at IS NULL").
