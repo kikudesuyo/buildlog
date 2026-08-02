@@ -5,6 +5,7 @@
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
 	let title = $state('');
+	const MAX_TITLE_LENGTH = 100;
 	let contentElement = $state<HTMLTextAreaElement | null>(null);
 	let content = $state('');
 	let isSubmitting = $state(false);
@@ -47,7 +48,6 @@
 		}
 	}
 
-	}
 	function applyMarkdown(prefix: string, suffix = prefix) {
 		if (!contentElement) return;
 		const start = contentElement.selectionStart;
@@ -143,10 +143,13 @@
 			<input
 				type="text"
 				bind:value={title}
+				maxlength={MAX_TITLE_LENGTH}
+				aria-describedby="title-count"
 				placeholder="タイトルを入力..."
-				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-[36px] font-bold tracking-tight border-none placeholder:text-outline-variant/50"
+				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-[clamp(2rem,8vw,2.25rem)] md:text-[36px] font-bold tracking-tight border-none placeholder:text-outline-variant/50"
 				disabled={isSubmitting}
 			/>
+			<p id="title-count" class="text-right text-body-sm text-outline">{title.length}/{MAX_TITLE_LENGTH}</p>
 		</div>
 
 		<!-- 本文 -->
@@ -178,8 +181,9 @@
 						>
 							<div class="w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 {isPublicLimited ? 'translate-x-4' : 'translate-x-0'}"></div>
 						</button>
+						</div>
 					</div>
-			</div>
+				</div>
 		</footer>
 	</main>
 </div>
