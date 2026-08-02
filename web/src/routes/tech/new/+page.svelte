@@ -4,11 +4,15 @@
 	import { createTech } from '$lib/api/client';
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 	import { defaultTechCategory, techCategories } from '$lib/tech/categories';
+	import { marked } from 'marked';
 
 	let title = $state('');
 	let content = $state('');
 	let category = $state(defaultTechCategory);
 	let views = $state('');
+
+	let previewMode = $state<'edit' | 'preview'>('edit');
+	let parsedContent = $derived(marked.parse(content) as string);
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
@@ -38,7 +42,7 @@
 		};
 	}
 
-	async function handleSave(status: 'draft' | 'published') {
+	async function handleSave() {
 		if (!title.trim() || !content.trim() || !category) {
 			errorMessage = '必須項目（タイトル、本文、カテゴリ）を入力してください。';
 			return;
@@ -51,8 +55,7 @@
 				title,
 				content,
 				category,
-				views,
-				status
+				views
 			});
 			goto(resolve('/admin/tech'));
 		} catch {
@@ -95,7 +98,7 @@
 		{/if}
 		<button
 			type="button"
-			onclick={() => handleSave('draft')}
+			onclick={handleSave}
 			disabled={isSubmitting}
 			class="text-outline font-label-md text-label-md hover:text-primary transition-colors cursor-pointer"
 		>
@@ -103,7 +106,7 @@
 		</button>
 		<button
 			type="button"
-			onclick={() => handleSave('published')}
+			onclick={handleSave}
 			disabled={isSubmitting}
 			class="bg-primary text-on-primary font-label-md text-label-md px-5 py-2 rounded-lg font-medium hover:bg-primary/95 transition-colors cursor-pointer disabled:opacity-50"
 		>
@@ -144,17 +147,56 @@
 			/>
 		</div>
 
-		<!-- 本文 -->
-		<div class="flex flex-col gap-1.5">
-			<label for="tech-content" class="font-label-md text-label-md font-bold text-on-surface">本文 *</label>
-			<textarea
-				id="tech-content"
-				use:autogrow
-				bind:value={content}
-				placeholder="本文を書き始めましょう..."
-				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
-				disabled={isSubmitting}
-			></textarea>
+		<!-- GitHub風の編集・プレビュー切替 -->
+		<div class="overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-container-lowest">
+			<div class="flex items-center border-b border-outline-variant/20 bg-surface-container-high px-2" role="tablist" aria-label="本文表示モード">
+				<button
+				type="button"
+				role="tab"
+				aria-selected={previewMode === 'edit'}
+				aria-controls="tech-editor-panel"
+				onclick={() => (previewMode = 'edit')}
+				class="border-b-2 px-4 py-2.5 text-label-md font-label-md transition-colors cursor-pointer {previewMode === 'edit' ? 'border-primary bg-surface-container-lowest text-primary font-bold' : 'border-transparent text-on-surface-variant hover:bg-surface-container-highest'}"
+			>
+				編集
+				</button>
+				<button
+				type="button"
+				role="tab"
+				aria-selected={previewMode === 'preview'}
+				aria-controls="tech-preview-panel"
+				onclick={() => (previewMode = 'preview')}
+				class="border-b-2 px-4 py-2.5 text-label-md font-label-md transition-colors cursor-pointer {previewMode === 'preview' ? 'border-primary bg-surface-container-lowest text-primary font-bold' : 'border-transparent text-on-surface-variant hover:bg-surface-container-highest'}"
+			>
+				プレビュー
+				</button>
+			</div>
+
+		<!-- 編集とプレビューは同じパネル内で切り替えて表示 -->
+		<div class="p-4">
+			{#if previewMode === 'edit'}
+				<div id="tech-editor-panel" role="tabpanel" aria-label="本文を編集" class="flex flex-col gap-1.5">
+					<label for="tech-content" class="font-label-md text-label-md font-bold text-on-surface border-b border-outline-variant/10 pb-2 mb-2">本文 *</label>
+					<textarea
+						id="tech-content"
+						use:autogrow
+						bind:value={content}
+						placeholder="本文を書き始めましょう..."
+						class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
+						disabled={isSubmitting}
+					></textarea>
+				</div>
+			{/if}
+
+			{#if previewMode === 'preview'}
+				<div id="tech-preview-panel" role="tabpanel" aria-label="本文プレビュー" class="flex flex-col gap-1.5 min-h-[300px]">
+					<span class="font-label-md text-label-md font-bold text-primary border-b border-outline-variant/10 pb-2 mb-2">リアルタイムプレビュー</span>
+					<div class="prose max-w-none text-on-surface min-h-[300px] text-body-lg leading-relaxed">
+						{@html parsedContent}
+					</div>
+				</div>
+			{/if}
+		</div>
 		</div>
 
 		<!-- 下部設定セクション -->

@@ -1,13 +1,19 @@
 <script lang="ts">
+	import PostCalendar from '$lib/components/PostCalendar.svelte';
 	let { data } = $props();
 	let copied = $state(false);
+	let avatarFailed = $state(false);
 
 	function copyEmail() {
-		navigator.clipboard.writeText(data.profileData.contactEmail);
+		navigator.clipboard?.writeText(data.profileData.contactEmail);
 		copied = true;
 		setTimeout(() => {
 			copied = false;
 		}, 2000);
+	}
+
+	function handleAvatarError() {
+		avatarFailed = true;
 	}
 </script>
 
@@ -16,15 +22,27 @@
 </svelte:head>
 
 <div class="mx-auto max-w-container-max px-gutter">
+	<nav aria-label="プロフィール内目次" class="mb-8 flex flex-wrap gap-2 border-y border-outline-variant/20 py-3">
+		<a href="#biography" class="rounded-lg px-3 py-2 text-label-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary">経歴</a>
+		<a href="#highlights" class="rounded-lg px-3 py-2 text-label-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary">実績</a>
+		<a href="#expertise" class="rounded-lg px-3 py-2 text-label-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary">専門領域</a>
+		<a href="#contact" class="rounded-lg px-3 py-2 text-label-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary">連絡先</a>
+	</nav>
 	<!-- Hero Section -->
 	<section class="mb-section-gap flex flex-col gap-stack-lg">
 		<div class="flex items-center gap-stack-md">
 			<div class="h-16 w-16 shrink-0 overflow-hidden rounded-full border border-outline-variant/30">
-				<img
-					class="h-full w-full object-cover grayscale transition-all duration-300 hover:grayscale-0"
-					alt={data.profileData.name}
-					src={data.profileData.avatarUrl}
-				/>
+				{#if avatarFailed}
+					<span class="flex h-full w-full items-center justify-center bg-surface-container-low text-headline-md text-outline" aria-label="プロフィール画像なし">{data.profileData.name.slice(0, 1)}</span>
+				{:else}
+					<img
+						class="aspect-square h-full w-full object-cover grayscale transition-all duration-300 hover:grayscale-0"
+						alt={data.profileData.name}
+						src={data.profileData.avatarUrl}
+						onerror={handleAvatarError}
+						loading="lazy"
+					/>
+				{/if}
 			</div>
 			<div class="h-px flex-grow bg-outline-variant/30"></div>
 		</div>
@@ -47,7 +65,7 @@
 	</section>
 
 	<!-- Bio Section -->
-	<section class="mb-section-gap border-l border-outline-variant/30 pl-stack-lg">
+	<section id="biography" class="mb-section-gap scroll-mt-24 border-l border-outline-variant/30 pl-stack-lg">
 		<h2 class="font-label-md text-label-md mb-stack-md tracking-widest text-outline uppercase">
 			経歴と哲学 / Biography
 		</h2>
@@ -61,10 +79,12 @@
 	</section>
 
 	<!-- Career Highlights -->
-	<section class="mb-section-gap">
+	<section id="highlights" class="mb-section-gap scroll-mt-24">
 		<h2 class="font-label-md text-label-md mb-stack-lg tracking-widest text-outline uppercase">
 			主要な実績 / Highlights
 		</h2>
+		<details open class="group">
+			<summary class="mb-4 cursor-pointer text-label-sm text-outline md:hidden">実績を表示</summary>
 		<div class="grid grid-cols-1 gap-stack-lg">
 			{#each data.profileData.highlights as item (item.title)}
 				<div class="group border-b border-outline-variant/20 pb-stack-md">
@@ -88,13 +108,16 @@
 				</div>
 			{/if}
 		</div>
+		</details>
 	</section>
 
 	<!-- Skills & Expertise -->
-	<section class="mb-section-gap">
+	<section id="expertise" class="mb-section-gap scroll-mt-24">
 		<h2 class="font-label-md text-label-md mb-stack-md tracking-widest text-outline uppercase">
 			専門領域 / Expertise
 		</h2>
+		<details open class="group">
+			<summary class="mb-4 cursor-pointer text-label-sm text-outline md:hidden">専門領域を表示</summary>
 		<div class="flex flex-wrap gap-x-12 gap-y-stack-sm">
 			{#each data.profileData.expertise as skill (skill)}
 				<span
@@ -104,31 +127,35 @@
 				</span>
 			{/each}
 		</div>
+		</details>
 	</section>
 
 	<!-- Contact & SNS Section -->
-	<section class="mb-section-gap border-t border-outline-variant/30 pt-stack-lg">
+	<section id="contact" class="mb-section-gap scroll-mt-24 border-t border-outline-variant/30 pt-stack-lg">
 		<h2 class="font-label-md text-label-md mb-stack-md tracking-widest text-outline uppercase">
 			連絡先と繋がり / Contact & Socials
 		</h2>
-		<div class="flex flex-col gap-6 md:flex-row md:items-center md:gap-12 mt-6">
-			<!-- Email Link -->
-			<button
-				type="button"
-				onclick={copyEmail}
-				class="flex items-center gap-3 font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors duration-200 cursor-pointer bg-transparent border-none p-0 text-left"
-				title="メールアドレスをコピー"
-			>
-				<span class="material-symbols-outlined text-[20px]">
-					{copied ? 'check' : 'mail'}
-				</span>
-				<span class="flex items-center gap-2">
-					{data.profileData.contactEmail}
-					{#if copied}
-						<span class="text-primary font-label-sm text-label-sm tracking-wider">(コピーしました)</span>
-					{/if}
-				</span>
-			</button>
+		<div class="mt-6 flex flex-col gap-4 md:flex-row md:items-center md:gap-6">
+			<!-- Email actions -->
+			<div class="flex flex-wrap items-center gap-3">
+				<a
+					href={`mailto:${data.profileData.contactEmail}`}
+					class="flex min-h-11 items-center gap-2 rounded-lg border border-outline-variant/30 px-3 py-2 font-body-md text-on-surface-variant transition-colors duration-200 hover:border-primary hover:text-primary"
+					aria-label={`メールを作成: ${data.profileData.contactEmail}`}
+				>
+					<span class="material-symbols-outlined text-[20px]">mail</span>
+					<span>{data.profileData.contactEmail}</span>
+				</a>
+				<button
+					type="button"
+					onclick={copyEmail}
+					class="flex min-h-11 items-center gap-2 rounded-lg border border-outline-variant/30 px-3 py-2 font-label-md text-on-surface-variant transition-colors duration-200 hover:border-primary hover:text-primary"
+					aria-label="メールアドレスをコピー"
+				>
+					<span class="material-symbols-outlined text-[20px]">{copied ? 'check' : 'content_copy'}</span>
+					{copied ? 'コピーしました' : 'コピー'}
+				</button>
+			</div>
 
 			<!-- Social Links -->
 			<div class="flex items-center gap-6">
@@ -165,5 +192,5 @@
 		</div>
 	</section>
 
+	<PostCalendar history={data.postHistory} />
 </div>
-

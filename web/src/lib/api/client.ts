@@ -7,7 +7,8 @@ import type {
 	TrashEntry,
 	AppProject,
 	ProfileData,
-	AnalyticsData
+	AnalyticsData,
+	HistoryItem
 } from '$lib/api/types';
 
 type ApiFetch = LoadEvent['fetch'];
@@ -532,4 +533,20 @@ export async function fetchAnalytics(fetchFn?: ApiFetch): Promise<AnalyticsData>
 			count: item.count
 		}))
 	};
+}
+
+export async function fetchPostHistory(fetchFn?: ApiFetch): Promise<HistoryItem[]> {
+	const response = await get<ApiListResponse<{
+		id: number;
+		type: string;
+		title: string;
+		created_at: string;
+	}>>(fetchFn || fetch, '/posts/history');
+
+	return response.data_list.map((item) => ({
+		id: item.id,
+		type: item.type as 'diary' | 'tech',
+		title: item.title,
+		createdAt: item.created_at
+	}));
 }

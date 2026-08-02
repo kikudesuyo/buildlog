@@ -1,9 +1,24 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
+
 	let { data } = $props();
 	let failedImages = $state<Record<string, boolean>>({});
+	let loadingImages = $state<Record<string, boolean>>({});
+	let retrying = $state(false);
 
 	function onImageError(id: string) {
 		failedImages[id] = true;
+		loadingImages[id] = false;
+	}
+
+	function onImageLoad(id: string) {
+		loadingImages[id] = false;
+	}
+
+	async function retry() {
+		retrying = true;
+		await invalidateAll();
+		retrying = false;
 	}
 </script>
 
@@ -21,7 +36,17 @@
 	</header>
 
 	<!-- Project List -->
-	<div class="flex flex-col gap-16">
+	{#if data.appProjects.length === 0}
+		<section class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-8 text-center" aria-live="polite">
+			<span class="material-symbols-outlined mb-3 text-4xl text-outline">inventory_2</span>
+			<h2 class="font-headline-md text-headline-md text-primary">公開中のアプリはありません</h2>
+			<p class="mt-2 text-body-md text-on-surface-variant">時間をおいて再読み込みしてください。</p>
+			<button type="button" onclick={retry} disabled={retrying} class="mt-6 min-h-11 rounded-lg bg-primary px-4 py-2 font-label-md text-on-primary disabled:opacity-60">
+				{retrying ? '再読み込み中…' : '再読み込み'}
+			</button>
+		</section>
+	{:else}
+	<div class="flex flex-col gap-16" aria-busy={retrying}>
 		{#each data.appProjects as project, index (project.id)}
 			<article class="group flex flex-col items-start gap-8 md:flex-row">
 				<a
@@ -29,12 +54,17 @@
 					target="_blank"
 					rel="noopener noreferrer"
 					class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-outline-variant/30 bg-surface-container-low p-1.5 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-md cursor-pointer"
+					aria-label={`${project.name}の${project.codeUrl ? 'コード' : 'デモ'}を開く（外部サイト）`}
 				>
 					{#if project.iconUrl && !failedImages[project.id]}
 						<img
 							src={project.iconUrl}
 							alt={project.name}
-							class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+							class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105 {loadingImages[project.id] ? 'animate-pulse opacity-50' : ''}"
+							loading="lazy"
+							width="96"
+							height="96"
+							onload={() => onImageLoad(project.id)}
 							onerror={() => onImageError(project.id)}
 						/>
 					{:else}
@@ -58,9 +88,7 @@
 									{project.name}
 								</a>
 							</h2>
-							<p
-								class="font-label-sm text-label-sm mt-1 tracking-widest text-on-surface-variant uppercase"
-							>
+					<p class="font-label-sm text-label-sm mt-1 tracking-widest text-on-surface-variant uppercase">
 								{project.category}
 							</p>
 						</div>
@@ -74,16 +102,29 @@
 							{/each}
 						</div>
 					</div>
-					<p class="font-body-md text-body-md max-w-[560px] text-on-surface-variant">
+					<p class="font-body-md text-body-md line-clamp-3 max-w-[560px] text-on-surface-variant">
 						{project.description}
 					</p>
-					<div class="mt-2 flex gap-stack-md">
+					<div class="mt-2 flex flex-wrap gap-2">
+						{#if project.demoUrl}
+							<a
+								href={project.demoUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-label-md font-label-md flex min-h-11 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-on-primary transition-colors hover:bg-primary-container"
+								aria-label={`${project.name}のデモを開く（外部サイト）`}
+							>
+								<span class="material-symbols-outlined text-[18px]" aria-hidden="true">open_in_new</span>
+								View Demo
+							</a>
+						{/if}
 						{#if project.codeUrl}
 							<a
 								href={project.codeUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								class="text-label-md font-label-md flex items-center gap-1.5 text-on-surface-variant transition-colors hover:text-primary"
+								class="text-label-md font-label-md flex min-h-11 items-center gap-1.5 rounded-lg border border-outline-variant/30 px-3 py-2 text-on-surface-variant transition-colors hover:border-primary hover:text-primary"
+								aria-label={`${project.name}のソースコードを開く（外部サイト）`}
 							>
 								<svg class="h-4 w-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
 									<path
@@ -104,6 +145,6 @@
 			{/if}
 		{/each}
 	</div>
+	{/if}
 
 </div>
-
