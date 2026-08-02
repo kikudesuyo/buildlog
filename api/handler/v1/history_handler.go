@@ -9,18 +9,18 @@ import (
 )
 
 func HandleGetPostHistory(db *gorm.DB) handler.ProcessFunc {
-	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
-		var items []entity.HistoryItem
-		
+	return func(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+		itemList := make([]entity.HistoryItem, 0)
+
 		err := db.Model(&entity.DBTablePost{}).
 			Select("id, type, title, created_at").
 			Where("deleted_at IS NULL").
 			Order("created_at DESC").
-			Scan(&items).Error
+			Scan(&itemList).Error
 		if err != nil {
 			return nil, err
 		}
 
-		return entity.NewListResponse(items), nil
+		return entity.NewListResponse(itemList), nil
 	}
 }
