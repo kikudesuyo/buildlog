@@ -14,12 +14,14 @@ import (
 
 func HandleGetTechList(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
+		all := r.URL.Query().Get("all") == "true"
+		ipAddress := getClientIP(r)
 		tag := r.URL.Query().Get("tag")
-		techs, err := service.ListTechs(r.Context(), db, tag)
+		techList, err := service.ListTechs(r.Context(), db, all, ipAddress, tag)
 		if err != nil {
 			return nil, err
 		}
-		return entity.NewListResponse(techs), nil
+		return entity.NewListResponse(techList), nil
 	}
 }
 
@@ -30,7 +32,8 @@ func HandleGetTech(db *gorm.DB) handler.ProcessFunc {
 			return nil, err
 		}
 
-		tech, err := service.GetTechByID(r.Context(), db, id)
+		ipAddress := getClientIP(r)
+		tech, err := service.GetTechByID(r.Context(), db, id, ipAddress)
 		if err != nil {
 			return nil, err
 		}

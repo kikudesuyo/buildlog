@@ -9,25 +9,44 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListDiaries(ctx context.Context, db *gorm.DB, tag string) ([]entity.DBTablePost, error) {
-	return repository.ListDiaries(ctx, db, tag)
+func ListDiaries(ctx context.Context, db *gorm.DB, all bool, ipAddress string, tag string) ([]entity.DBTablePost, error) {
+	diaryList, err := repository.ListDiaries(ctx, db, all, tag)
+	if err != nil {
+		return nil, err
+	}
+	for i := range diaryList {
+		count, _ := repository.CountLikesByPostID(ctx, db, diaryList[i].ID)
+		liked, _ := repository.HasLiked(ctx, db, diaryList[i].ID, ipAddress)
+		diaryList[i].LikesCount = count
+		diaryList[i].HasLiked = liked
+	}
+	return diaryList, nil
 }
 
-func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePost, error) {
-	return repository.GetDiaryByID(ctx, db, id)
+func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64, ipAddress string) (*entity.DBTablePost, error) {
+	diary, err := repository.GetDiaryByID(ctx, db, id)
+	if err != nil {
+		return nil, err
+	}
+	count, _ := repository.CountLikesByPostID(ctx, db, diary.ID)
+	liked, _ := repository.HasLiked(ctx, db, diary.ID, ipAddress)
+	diary.LikesCount = count
+	diary.HasLiked = liked
+	return diary, nil
 }
 
 func CreateDiary(ctx context.Context, db *gorm.DB, req entity.CreateDiaryRequest) (entity.CreateDiaryResponse, error) {
-	diary := entity.DBTablePost{
-		Title:   req.Title,
-		Content: req.Content,
+	status := req.Status
+	if status == "" {
+		status = "draft"
 	}
+	diary := entity.DBTablePost{Title: req.Title, Content: req.Content, Status: status}
 
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err := db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := repository.CreateDiary(ctx, tx, &diary); err != nil {
 			return err
 		}
-		if err := savePostTags(tx, &diary, req.Tags); err != nil {
+		if err := repository.ReplacePostTags(ctx, tx, diary.ID, req.Tags); err != nil {
 			return err
 		}
 		return tx.Preload("Tags").First(&diary, diary.ID).Error
@@ -40,6 +59,7 @@ func CreateDiary(ctx context.Context, db *gorm.DB, req entity.CreateDiaryRequest
 		ID:        diary.ID,
 		Title:     diary.Title,
 		Content:   diary.Content,
+		Status:    diary.Status,
 		Tags:      mapTagsToStrings(diary.Tags),
 		CreatedAt: diary.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: diary.UpdatedAt.Format(time.RFC3339),
@@ -48,20 +68,21 @@ func CreateDiary(ctx context.Context, db *gorm.DB, req entity.CreateDiaryRequest
 
 func UpdateDiary(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateDiaryRequest) (entity.UpdateDiaryResponse, error) {
 	var diary *entity.DBTablePost
-	err := db.Transaction(func(tx *gorm.DB) error {
+	err := db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var err error
 		diary, err = repository.GetDiaryByID(ctx, tx, id)
 		if err != nil {
 			return err
 		}
-
 		diary.Title = req.Title
 		diary.Content = req.Content
-
+		if req.Status != "" {
+			diary.Status = req.Status
+		}
 		if err := repository.UpdateDiary(ctx, tx, diary); err != nil {
 			return err
 		}
-		if err := savePostTags(tx, diary, req.Tags); err != nil {
+		if err := repository.ReplacePostTags(ctx, tx, diary.ID, req.Tags); err != nil {
 			return err
 		}
 		return tx.Preload("Tags").First(diary, diary.ID).Error
@@ -74,6 +95,7 @@ func UpdateDiary(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateDi
 		ID:        diary.ID,
 		Title:     diary.Title,
 		Content:   diary.Content,
+		Status:    diary.Status,
 		Tags:      mapTagsToStrings(diary.Tags),
 		CreatedAt: diary.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: diary.UpdatedAt.Format(time.RFC3339),
@@ -82,27 +104,4 @@ func UpdateDiary(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateDi
 
 func DeleteDiary(ctx context.Context, db *gorm.DB, id int64) error {
 	return repository.DeleteDiary(ctx, db, id)
-}
-
-func savePostTags(tx *gorm.DB, post *entity.DBTablePost, tagNames []string) error {
-	tags := make([]entity.DBTableTag, 0, len(tagNames))
-	for _, name := range tagNames {
-		if name == "" {
-			continue
-		}
-		var t entity.DBTableTag
-		if err := tx.Where("name = ?", name).FirstOrCreate(&t, entity.DBTableTag{Name: name}).Error; err != nil {
-			return err
-		}
-		tags = append(tags, t)
-	}
-	return tx.Model(post).Association("Tags").Replace(tags)
-}
-
-func mapTagsToStrings(tags []entity.DBTableTag) []string {
-	names := make([]string, len(tags))
-	for i, t := range tags {
-		names[i] = t.Name
-	}
-	return names
 }

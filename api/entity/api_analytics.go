@@ -12,11 +12,11 @@ type AnalyticsResponse struct {
 }
 
 type AnalyticsArticleItem struct {
-	ID        int64  `json:"id"`
-	Type      string `json:"type"`
-	Title     string `json:"title"`
-	Views     int64  `json:"views"`
-	Likes     int64  `json:"likes"`
+	ID    int64  `json:"id"`
+	Type  string `json:"type"`
+	Title string `json:"title"`
+	Views int64  `json:"views"`
+	Likes int64  `json:"likes"`
 }
 
 type MonthlyActivityItem struct {

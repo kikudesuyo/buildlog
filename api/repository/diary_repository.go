@@ -7,16 +7,20 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListDiaries(ctx context.Context, db *gorm.DB, tag string) ([]entity.DBTablePost, error) {
+func ListDiaries(ctx context.Context, db *gorm.DB, all bool, tag string) ([]entity.DBTablePost, error) {
 	diaries := make([]entity.DBTablePost, 0)
 	query := db.WithContext(ctx).
 		Preload("Tags").
 		Where("type = ?", "diary")
+	if !all {
+		query = query.Where("status = ?", "published")
+	}
 
 	if tag != "" {
 		query = query.Joins("JOIN post_tags ON post_tags.post_id = posts.id").
 			Joins("JOIN tags ON tags.id = post_tags.tag_id").
-			Where("tags.name = ?", tag)
+			Where("tags.name = ?", tag).
+			Distinct("posts.*")
 	}
 
 	err := query.Order("created_at DESC").

@@ -2,9 +2,12 @@ export interface DiaryEntry {
 	id: number;
 	title: string;
 	content: string;
-	tags?: string[];
+	tags: string[];
+	status?: 'draft' | 'published';
 	createdAt: string;
 	updatedAt: string;
+	likesCount: number;
+	hasLiked?: boolean;
 }
 
 export interface TechArticle {
@@ -12,16 +15,20 @@ export interface TechArticle {
 	title: string;
 	content: string;
 	category: string;
+	tags: string[];
 	views?: string;
-	tags?: string[];
+	status?: 'draft' | 'published';
 	createdAt: string;
 	updatedAt: string;
+	likesCount: number;
+	hasLiked?: boolean;
 }
 
 export type FeaturedTechArticle = TechArticle;
 
 export interface AppProject {
 	id: string;
+	slug?: string;
 	name: string;
 	category: string;
 	tags: string[];
@@ -47,5 +54,48 @@ export interface ProfileData {
 	award?: string;
 	expertise: string[];
 	contactEmail: string;
+	githubUrl?: string;
+	xUrl?: string;
 	finalQuote: string;
+}
+
+export interface TrashEntry {
+	id: number;
+	type: string;
+	title: string;
+	content: string;
+	category?: string;
+	createdAt: string;
+	deletedAt: string;
+}
+
+export interface AnalyticsArticleItem {
+	id: number;
+	type: string;
+	title: string;
+	views: number;
+	likes: number;
+}
+
+export interface MonthlyActivityItem {
+	month: string;
+	count: number;
+}
+
+export interface AnalyticsData {
+	totalViews: number;
+	totalLikes: number;
+	totalPosts: number;
+	diaryCount: number;
+	techCount: number;
+	topViewsArticles: AnalyticsArticleItem[];
+	topLikesArticles: AnalyticsArticleItem[];
+	monthlyActivities: MonthlyActivityItem[];
+}
+
+export interface HistoryItem {
+	id: number;
+	type: 'diary' | 'tech';
+	title: string;
+	createdAt: string;
 }

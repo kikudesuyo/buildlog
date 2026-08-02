@@ -93,7 +93,7 @@
 		<nav aria-label="管理メニュー" class="flex flex-col gap-1">
 			{#each navItems as item (item.href)}
 				<a
-					href={resolve(item.href as never)}
+					href={resolve(item.href)}
 					onclick={closeMenu}
 					class="flex items-center gap-3 rounded-xl px-3 py-3 transition-colors {isActive(item.href) ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'}"
 				>

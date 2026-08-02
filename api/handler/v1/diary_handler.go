@@ -14,12 +14,14 @@ import (
 
 func HandleGetDiaryList(db *gorm.DB) handler.ProcessFunc {
 	return func(r *http.Request, requestData map[string]interface{}) (handler.Renderer, error) {
+		all := r.URL.Query().Get("all") == "true"
+		ipAddress := getClientIP(r)
 		tag := r.URL.Query().Get("tag")
-		diaries, err := service.ListDiaries(r.Context(), db, tag)
+		diaryList, err := service.ListDiaries(r.Context(), db, all, ipAddress, tag)
 		if err != nil {
 			return nil, err
 		}
-		return entity.NewListResponse(diaries), nil
+		return entity.NewListResponse(diaryList), nil
 	}
 }
 
@@ -30,7 +32,8 @@ func HandleGetDiary(db *gorm.DB) handler.ProcessFunc {
 			return nil, err
 		}
 
-		diary, err := service.GetDiaryByID(r.Context(), db, id)
+		ipAddress := getClientIP(r)
+		diary, err := service.GetDiaryByID(r.Context(), db, id, ipAddress)
 		if err != nil {
 			return nil, err
 		}

@@ -179,6 +179,34 @@ import { resolve } from '$app/paths';
 		min-block-size: 2.75rem;
 		min-inline-size: 2.75rem;
 	}
+
+	@media (max-width: 767px) {
+		.site-nav-inner {
+			gap: 0.5rem;
+			padding-inline: 1rem;
+		}
+
+		.site-logo {
+			font-size: 1.25rem;
+			line-height: 1.5rem;
+			white-space: nowrap;
+		}
+
+		.site-nav-links {
+			display: none;
+		}
+
+		.site-nav-actions {
+			margin-left: auto;
+			gap: 0.25rem;
+		}
+
+		.site-nav-actions button {
+			min-height: 2.75rem;
+			min-width: 2.75rem;
+			padding: 0.625rem;
+		}
+	}
 </style>
 
 <!-- Search Modal (Minimalist) -->
@@ -224,33 +252,3 @@ import { resolve } from '$app/paths';
 		</div>
 </div>
 {/if}
-
-<style>
-	@media (max-width: 767px) {
-		.site-nav-inner {
-			gap: 0.5rem;
-			padding-inline: 1rem;
-		}
-
-		.site-logo {
-			font-size: 1.25rem;
-			line-height: 1.5rem;
-			white-space: nowrap;
-		}
-
-		.site-nav-links {
-			display: none;
-		}
-
-		.site-nav-actions {
-			margin-left: auto;
-			gap: 0.25rem;
-		}
-
-		.site-nav-actions button {
-			min-height: 2.75rem;
-			min-width: 2.75rem;
-			padding: 0.625rem;
-		}
-	}
-</style>

@@ -8,16 +8,11 @@
 
 <div class="mx-auto max-w-container-max px-gutter">
 	{#if data.selectedTag}
-		<div class="mb-6 flex items-center gap-3 bg-surface-container-high px-4 py-2.5 rounded-lg border border-outline-variant/30 w-fit">
+		<div class="mb-6 flex w-fit items-center gap-3 rounded-lg border border-outline-variant/30 bg-surface-container-high px-4 py-2.5">
 			<span class="text-body-sm font-medium text-on-surface-variant">タグフィルタ:</span>
-			<span class="font-label-sm text-label-sm px-2.5 py-1 rounded-full bg-primary text-on-primary font-bold">
-				{data.selectedTag}
-			</span>
-			<a href={resolve('/tech')} class="text-outline hover:text-primary transition-colors text-[18px] font-bold ml-1 cursor-pointer" title="フィルタ解除">
-				×
-			</a>
+			<span class="font-label-sm text-label-sm rounded-full bg-primary px-2.5 py-1 font-bold text-on-primary">{data.selectedTag}</span>
+			<a href={resolve('/tech')} class="ml-1 cursor-pointer text-[18px] font-bold text-outline transition-colors hover:text-primary" title="フィルタ解除">×</a>
 		</div>
 	{/if}
-
 	<TechFeed {...data} />
 </div>
