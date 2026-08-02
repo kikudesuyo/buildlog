@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PostCalendar from '$lib/components/PostCalendar.svelte';
 	let { data } = $props();
 	let copied = $state(false);
 	let avatarFailed = $state(false);
@@ -191,4 +192,5 @@
 		</div>
 	</section>
 
+	<PostCalendar history={data.postHistory} />
 </div>
