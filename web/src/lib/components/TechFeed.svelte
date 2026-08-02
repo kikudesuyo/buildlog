@@ -3,21 +3,23 @@
 	import { resolve } from '$app/paths';
 	import { techCategories } from '$lib/tech/categories';
 	import LikeButton from './LikeButton.svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	type Props = {
-		featuredArticle: FeaturedTechArticle;
-		techArticles: TechArticle[];
+		featuredArticle?: FeaturedTechArticle | null;
+		techArticles?: TechArticle[];
+		loadError?: boolean;
 		isAdmin?: boolean;
 		onEdit?: (id: number) => void;
 		onDelete?: (id: number) => void | Promise<boolean | void>;
 	};
 
-	let { featuredArticle, techArticles, isAdmin = false, onEdit, onDelete }: Props = $props();
+	let { featuredArticle = null, techArticles = [], loadError = false, isAdmin = false, onEdit, onDelete }: Props = $props();
 	let deletedIds = $state<number[]>([]);
 	let selectedCategory = $state<string | null>(null);
 	const categories = ['All', ...techCategories];
 	let articles = $derived(
-		(featuredArticle.title ? [featuredArticle, ...techArticles] : techArticles).filter(
+		(featuredArticle?.title ? [featuredArticle, ...techArticles] : techArticles).filter(
 			(article) => !deletedIds.includes(article.id)
 		)
 	);
@@ -56,6 +58,25 @@
 			<button type="button" onclick={() => (selectedCategory = category === 'All' ? null : category)} class="font-label-sm text-label-sm cursor-pointer rounded-full px-3 py-1 transition-all {selectedCategory === category || (category === 'All' && !selectedCategory) ? 'bg-primary font-semibold text-on-primary' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}">{category}</button>
 		{/each}
 	</div>
+
+	{#if loadError}
+		<section class="rounded-xl border border-error/30 bg-error-container/30 p-8 text-center" role="alert">
+			<h2 class="font-headline-md text-headline-md text-on-surface">記事を読み込めませんでした</h2>
+			<p class="font-body-md text-body-md mt-2 text-on-surface-variant">通信を確認して、もう一度お試しください。</p>
+			<button type="button" onclick={() => invalidateAll()} class="font-label-md text-label-md mt-5 min-h-11 rounded-lg bg-primary px-5 py-2 text-on-primary">再試行</button>
+		</section>
+	{:else if articles.length === 0}
+		<section class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-8 text-center">
+			<h2 class="font-headline-md text-headline-md text-primary">技術記事はまだありません</h2>
+			<p class="font-body-md text-body-md mt-2 text-on-surface-variant">新しい記事が公開されるまでお待ちください。</p>
+		</section>
+	{:else if selectedCategory && filteredArticles.length === 0}
+		<section class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-8 text-center">
+			<h2 class="font-headline-md text-headline-md text-primary">該当する記事がありません</h2>
+			<p class="font-body-md text-body-md mt-2 text-on-surface-variant">「{selectedCategory}」の記事はありません。</p>
+			<button type="button" onclick={() => (selectedCategory = null)} class="font-label-md text-label-md mt-5 min-h-11 rounded-lg border border-outline-variant/50 px-5 py-2 text-primary">Allへ戻る</button>
+		</section>
+	{/if}
 
 	{#if (!selectedCategory || selectedCategory === featured?.category) && featured}
 		<article aria-label="Featured article" class="group relative rounded-xl border border-outline-variant/40 bg-surface-container-low p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">

@@ -101,7 +101,7 @@ import { resolve } from '$app/paths';
 		<div class="site-nav-actions flex items-center gap-stack-md">
 			<button
 				type="button"
-				aria-label="Search"
+				aria-label="検索を開く"
 				onclick={() => (isSearchOpen = !isSearchOpen)}
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
 			>
@@ -109,7 +109,7 @@ import { resolve } from '$app/paths';
 			</button>
 			<button
 				type="button"
-				aria-label="Toggle Theme"
+				aria-label="テーマを切り替える"
 				onclick={toggleTheme}
 				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
 				title={isDarkMode ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
@@ -169,6 +169,17 @@ import { resolve } from '$app/paths';
 		</nav>
 	</div>
 {/if}
+<style>
+	.site-nav {
+		padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+		padding-block-start: env(safe-area-inset-top);
+	}
+
+	.site-nav button {
+		min-block-size: 2.75rem;
+		min-inline-size: 2.75rem;
+	}
+</style>
 
 <!-- Search Modal (Minimalist) -->
 {#if isSearchOpen}
