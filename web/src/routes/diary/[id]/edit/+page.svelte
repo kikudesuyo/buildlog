@@ -7,6 +7,7 @@
 	let { data } = $props();
 
 	let title = $state(data.diary.title);
+	const MAX_TITLE_LENGTH = 100;
 	let contentElement = $state<HTMLTextAreaElement | null>(null);
 	let content = $state(data.diary.content);
 	let status = $state(data.diary.status || 'draft');
@@ -150,10 +151,13 @@
 			<input
 				type="text"
 				bind:value={title}
+				maxlength={MAX_TITLE_LENGTH}
+				aria-describedby="title-count"
 				placeholder="タイトルを入力..."
 				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-[36px] font-bold tracking-tight border-none placeholder:text-outline-variant/50"
 				disabled={isSubmitting}
 			/>
+			<p id="title-count" class="text-right text-body-sm text-outline">{title.length}/{MAX_TITLE_LENGTH}</p>
 		</div>
 
 		<!-- 本文 -->
