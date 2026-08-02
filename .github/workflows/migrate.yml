@@ -1,13 +1,6 @@
 name: Migrate Production Database
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "sql/atlas.hcl"
-      - "sql/migrations/**"
-      - ".github/workflows/migrate.yml"
   workflow_dispatch:
     inputs:
       dry_run:

@@ -1,12 +1,6 @@
 name: Build Web
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "web/**"
-      - ".github/workflows/build-web.yml"
   workflow_dispatch:
 
 concurrency:
