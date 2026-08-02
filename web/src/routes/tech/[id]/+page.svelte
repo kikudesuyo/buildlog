@@ -125,7 +125,7 @@
 			{/if}
 
 			<!-- タイトル -->
-			<h1 class="font-display-lg text-[40px] leading-tight text-primary font-bold tracking-tight">
+			<h1 class="font-display-lg text-[clamp(2rem,8vw,2.5rem)] md:text-[40px] leading-tight text-primary font-bold tracking-tight">
 				{data.tech.title}
 			</h1>
 		</header>
