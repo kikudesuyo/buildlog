@@ -327,7 +327,7 @@
 			{#each selectedPosts as post (post.id)}
 				<li class="flex flex-col gap-1 text-body-md">
 					<a
-						href={post.type === 'tech' ? resolve(`/tech/${post.id}`) : resolve(`/?id=${post.id}`)}
+						href={post.type === 'tech' ? resolve(`/tech/${post.id}`) : resolve(`/diary/${post.id}`)}
 						class="text-on-surface hover:text-primary hover:underline transition-colors font-medium leading-snug"
 						onclick={closePopover}
 					>
