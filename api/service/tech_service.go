@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
@@ -10,17 +9,9 @@ import (
 )
 
 func ListTechs(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	cacheKey := fmt.Sprintf("tech:list:%t", all)
-	var techList []entity.DBTablePost
-	if cached, ok := contentCache.Get(cacheKey); ok {
-		techList = append([]entity.DBTablePost(nil), cached.([]entity.DBTablePost)...)
-	} else {
-		var err error
-		techList, err = repository.ListTechs(ctx, database, all)
-		if err != nil {
-			return nil, err
-		}
-		contentCache.Set(cacheKey, append([]entity.DBTablePost(nil), techList...))
+	techList, err := repository.ListTechs(ctx, database, all)
+	if err != nil {
+		return nil, err
 	}
 	for i := range techList {
 		count, _ := repository.CountLikesByPostID(ctx, database, techList[i].ID)
@@ -58,7 +49,6 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 	if err := repository.CreateTech(ctx, database, &tech); err != nil {
 		return entity.CreateTechResponse{}, err
 	}
-	contentCache.Delete("tech:list:false", "tech:list:true")
 	return entity.CreateTechResponse{
 		ID:        tech.ID,
 		Title:     tech.Title,
@@ -88,8 +78,6 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 	if err := repository.UpdateTech(ctx, database, tech); err != nil {
 		return entity.UpdateTechResponse{}, err
 	}
-	contentCache.Delete("tech:list:false", "tech:list:true")
-
 	return entity.UpdateTechResponse{
 		ID:        tech.ID,
 		Title:     tech.Title,
@@ -106,6 +94,5 @@ func DeleteTech(ctx context.Context, id int64) error {
 	if err := repository.DeleteTech(ctx, database, id); err != nil {
 		return err
 	}
-	contentCache.Delete("tech:list:false", "tech:list:true")
 	return nil
 }

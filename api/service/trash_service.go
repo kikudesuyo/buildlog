@@ -16,6 +16,5 @@ func RestorePost(ctx context.Context, id int64) error {
 	if err := database.WithContext(ctx).Unscoped().Model(&entity.DBTablePost{}).Where("id = ?", id).Update("deleted_at", nil).Error; err != nil {
 		return err
 	}
-	contentCache.Delete("diary:list:false", "diary:list:true", "tech:list:false", "tech:list:true")
 	return nil
 }

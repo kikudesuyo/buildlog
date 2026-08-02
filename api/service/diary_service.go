@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
@@ -10,17 +9,9 @@ import (
 )
 
 func ListDiaries(ctx context.Context, all bool, ipAddress string) ([]entity.DBTablePost, error) {
-	cacheKey := fmt.Sprintf("diary:list:%t", all)
-	var diaryList []entity.DBTablePost
-	if cached, ok := contentCache.Get(cacheKey); ok {
-		diaryList = append([]entity.DBTablePost(nil), cached.([]entity.DBTablePost)...)
-	} else {
-		var err error
-		diaryList, err = repository.ListDiaries(ctx, database, all)
-		if err != nil {
-			return nil, err
-		}
-		contentCache.Set(cacheKey, append([]entity.DBTablePost(nil), diaryList...))
+	diaryList, err := repository.ListDiaries(ctx, database, all)
+	if err != nil {
+		return nil, err
 	}
 	for i := range diaryList {
 		count, _ := repository.CountLikesByPostID(ctx, database, diaryList[i].ID)
@@ -56,7 +47,6 @@ func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.Cre
 	if err := repository.CreateDiary(ctx, database, &diary); err != nil {
 		return entity.CreateDiaryResponse{}, err
 	}
-	contentCache.Delete("diary:list:false", "diary:list:true")
 	return entity.CreateDiaryResponse{
 		ID:        diary.ID,
 		Title:     diary.Title,
@@ -82,8 +72,6 @@ func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (
 	if err := repository.UpdateDiary(ctx, database, diary); err != nil {
 		return entity.UpdateDiaryResponse{}, err
 	}
-	contentCache.Delete("diary:list:false", "diary:list:true")
-
 	return entity.UpdateDiaryResponse{
 		ID:        diary.ID,
 		Title:     diary.Title,
@@ -98,6 +86,5 @@ func DeleteDiary(ctx context.Context, id int64) error {
 	if err := repository.DeleteDiary(ctx, database, id); err != nil {
 		return err
 	}
-	contentCache.Delete("diary:list:false", "diary:list:true")
 	return nil
 }

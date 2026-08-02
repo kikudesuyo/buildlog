@@ -30,10 +30,6 @@ func mapToAppResponse(dbApp *entity.DBTableApp) (*entity.AppResponse, error) {
 }
 
 func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
-	if cached, ok := contentCache.Get("apps:list"); ok {
-		return append([]entity.AppResponse(nil), cached.([]entity.AppResponse)...), nil
-	}
-
 	dbApps, err := repository.ListApps(ctx, database)
 	if err != nil {
 		return nil, err
@@ -48,7 +44,6 @@ func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
 		appList = append(appList, *app)
 	}
 
-	contentCache.Set("apps:list", append([]entity.AppResponse(nil), appList...))
 	return appList, nil
 }
 
@@ -81,8 +76,6 @@ func CreateApp(ctx context.Context, req entity.CreateAppRequest) (*entity.AppRes
 	if err := repository.CreateApp(ctx, database, &app); err != nil {
 		return nil, err
 	}
-	contentCache.Delete("apps:list")
-
 	return mapToAppResponse(&app)
 }
 
@@ -110,8 +103,6 @@ func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*ent
 	if err := repository.UpdateApp(ctx, database, app); err != nil {
 		return nil, err
 	}
-	contentCache.Delete("apps:list")
-
 	return mapToAppResponse(app)
 }
 
@@ -119,6 +110,5 @@ func DeleteApp(ctx context.Context, id int64) error {
 	if err := repository.DeleteApp(ctx, database, id); err != nil {
 		return err
 	}
-	contentCache.Delete("apps:list")
 	return nil
 }
