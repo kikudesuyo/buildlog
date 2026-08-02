@@ -119,14 +119,14 @@
 			</div>
 
 			<!-- タイトル -->
-			<h1 class="font-display-lg text-[clamp(2rem,8vw,2.5rem)] md:text-[40px] leading-tight text-primary font-bold tracking-tight">
+		<h1 class="font-display-lg text-[clamp(2rem,8vw,2.5rem)] leading-tight text-primary font-bold tracking-tight md:text-[40px]">
 				{data.tech.title}
 			</h1>
 		</header>
 
 		<!-- 本文 (Content) -->
 		<section
-			class="font-body-md text-body-md leading-relaxed text-on-surface pt-4 mb-8 prose dark:prose-invert max-w-none"
+			class="font-body-md text-body-md prose dark:prose-invert max-w-none break-words pt-4 mb-8 text-[1.0625rem] leading-8 text-on-surface md:text-body-md md:leading-relaxed"
 			onclick={copyCode}
 			onkeydown={handleProseKeydown}
 			role="group"
@@ -144,7 +144,14 @@
 	</article>
 </div>
 
-<style>
+	<style>
+	:global(.prose pre) {
+		position: relative;
+		max-width: 100%;
+		overflow-x: auto;
+		padding-top: 3.25rem;
+	}
+
 	:global(.markdown-code-block) {
 		margin: 1.5rem 0;
 		overflow: hidden;
@@ -195,5 +202,9 @@
 		padding: 1rem;
 		font-size: 0.875rem;
 		line-height: 1.6;
+	}
+
+	:global(.prose code) {
+		overflow-wrap: anywhere;
 	}
 </style>
