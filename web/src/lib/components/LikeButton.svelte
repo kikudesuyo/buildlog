@@ -23,7 +23,7 @@
 			if (likedIds.includes(postId)) {
 				hasLiked = true;
 			}
-		} catch {
+		} catch (e) {
 			// ignore
 		}
 	});
@@ -47,7 +47,7 @@
 				likedIds = likedIds.filter(id => id !== postId);
 			}
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(likedIds));
-		} catch {
+		} catch (e) {
 			// ignore
 		}
 
@@ -61,7 +61,7 @@
 				likesCount = res.likes_count;
 				hasLiked = res.has_liked;
 			}
-		} catch {
+		} catch (e) {
 			hasLiked = previousHasLiked;
 			likesCount = previousCount;
 		} finally {

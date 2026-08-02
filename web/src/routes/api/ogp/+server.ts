@@ -62,7 +62,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			siteName
 		});
 
-	} catch {
+	} catch (err) {
 		return json({
 			title: targetUrl,
 			description: 'Link preview currently unavailable.',
