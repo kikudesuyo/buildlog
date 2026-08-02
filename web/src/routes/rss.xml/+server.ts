@@ -7,6 +7,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		fetchDiaryEntries(fetch),
 		fetchTechFeed(fetch)
 	]);
+	const featuredArticle = techFeed.featuredArticle;
 
 	// すべての記事を統合
 	const articles = [
@@ -16,11 +17,11 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			createdAt: d.createdAt,
 			link: `/diary/${d.id}`
 		})),
-		...(techFeed.featuredArticle.title ? [{
-			title: techFeed.featuredArticle.title,
-			content: techFeed.featuredArticle.content,
-			createdAt: techFeed.featuredArticle.createdAt,
-			link: `/tech/${techFeed.featuredArticle.id}`
+		...(featuredArticle?.title ? [{
+			title: featuredArticle.title,
+			content: featuredArticle.content,
+			createdAt: featuredArticle.createdAt,
+			link: `/tech/${featuredArticle.id}`
 		}] : []),
 		...techFeed.techArticles.map(t => ({
 			title: t.title,

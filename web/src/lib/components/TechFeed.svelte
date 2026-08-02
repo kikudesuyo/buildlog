@@ -5,17 +5,24 @@
 	import { techCategories } from '$lib/tech/categories';
 	import LikeButton from './LikeButton.svelte';
 	import { invalidateAll } from '$app/navigation';
+	import { fetchTechFeed, type ApiFetch } from '$lib/api/client';
 
 	type Props = {
 		featuredArticle?: FeaturedTechArticle | null;
 		techArticles?: TechArticle[];
+		hasMore?: boolean;
 		loadError?: boolean;
 		isAdmin?: boolean;
 		onEdit?: (id: number) => void;
 		onDelete?: (id: number) => void | Promise<boolean | void>;
 	};
 
-	let { featuredArticle = null, techArticles = [], loadError = false, isAdmin = false, onEdit, onDelete }: Props = $props();
+	let { featuredArticle = null, techArticles = [], hasMore = false, loadError = false, isAdmin = false, onEdit, onDelete }: Props = $props();
+	let loadedTechArticles = $state(techArticles);
+	let loadedFeaturedArticle = $state(featuredArticle);
+	let hasMoreArticles = $state(hasMore);
+	let isLoadingMore = $state(false);
+	let loadMoreError = $state(false);
 	let deletedIds = $state<number[]>([]);
 	let selectedCategory = $state<string | null>(null);
 	const categories = ['All', ...techCategories];
@@ -23,7 +30,7 @@
 	let canScrollLeft = $state(false);
 	let canScrollRight = $state(false);
 	let articles = $derived(
-		(featuredArticle?.title ? [featuredArticle, ...techArticles] : techArticles).filter(
+		(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles).filter(
 			(article) => !deletedIds.includes(article.id)
 		)
 	);
@@ -40,6 +47,22 @@
 
 	async function deleteArticle(id: number) {
 		if ((await onDelete?.(id)) !== false) deletedIds = [...deletedIds, id];
+	}
+
+	async function loadMore() {
+		if (isLoadingMore || !hasMoreArticles) return;
+		isLoadingMore = true;
+		loadMoreError = false;
+		try {
+			const offset = (loadedFeaturedArticle?.title ? 1 : 0) + loadedTechArticles.length;
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, 3);
+			loadedTechArticles = [...loadedTechArticles, ...next.techArticles];
+			hasMoreArticles = next.hasMore;
+		} catch {
+			loadMoreError = true;
+		} finally {
+			isLoadingMore = false;
+		}
 	}
 
 	function updateCategoryOverflow() {
@@ -171,6 +194,15 @@
 			</article>
 		{/each}
 	</div>
+
+	{#if !isAdmin && hasMoreArticles}
+		<div class="flex flex-col items-center gap-3">
+			{#if loadMoreError}<p class="font-body-sm text-body-sm text-error" role="alert">記事を追加で読み込めませんでした。</p>{/if}
+			<button type="button" onclick={loadMore} disabled={isLoadingMore} class="font-label-md text-label-md min-h-11 rounded-lg border border-outline-variant/60 px-6 py-2 text-primary transition-colors hover:bg-surface-container-high disabled:cursor-wait disabled:opacity-60">
+				{isLoadingMore ? '読み込み中…' : 'もっと見る'}
+			</button>
+		</div>
+	{/if}
 
 	<style>
 		.category-scroller {

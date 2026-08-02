@@ -10,9 +10,32 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
+func parsePaginationValue(value string) (int, error) {
+	if value == "" {
+		return 0, nil
+	}
+	n, err := strconv.Atoi(value)
+	if err != nil || n < 0 {
+		return 0, http.ErrBodyNotAllowed
+	}
+	return n, nil
+}
+
 // HandleGetTechList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	techList, err := service.ListTechs(r.Context(), r.URL.Query().Get("all") == "true", getClientIP(r))
+	query := r.URL.Query()
+	offset, err := parsePaginationValue(query.Get("offset"))
+	if err != nil {
+		return nil, err
+	}
+	limit, err := parsePaginationValue(query.Get("limit"))
+	if err != nil {
+		return nil, err
+	}
+	if limit > 0 {
+		limit++
+	}
+	techList, err := service.ListTechs(r.Context(), query.Get("all") == "true", offset, limit, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
