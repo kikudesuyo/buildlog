@@ -29,12 +29,12 @@
 	<article class="flex flex-col gap-6">
 		<header class="flex flex-col gap-4 border-b border-outline-variant/20 pb-8">
 			<span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(data.diary.createdAt)}</span>
-			<h1 class="font-display-lg text-[clamp(2rem,8vw,2.5rem)] leading-tight font-bold tracking-tight text-primary md:text-[40px]">
+			<h1 class="font-display-lg text-[clamp(1.75rem,7vw,2.5rem)] leading-tight font-bold tracking-tight text-primary md:text-[40px]">
 				{data.diary.title}
 			</h1>
 		</header>
 
-		<p class="font-body-md text-body-md whitespace-pre-wrap break-words pt-4 text-[1.0625rem] leading-8 text-on-surface md:text-body-md md:leading-relaxed">
+		<p class="font-body-md text-body-md whitespace-pre-wrap break-words pt-4 text-[1rem] leading-7 text-on-surface md:text-body-md md:leading-relaxed">
 			{data.diary.content}
 		</p>
 

@@ -120,14 +120,14 @@
 			</div>
 
 			<!-- タイトル -->
-		<h1 class="font-display-lg text-[clamp(2rem,8vw,2.5rem)] leading-tight text-primary font-bold tracking-tight md:text-[40px]">
+		<h1 class="font-display-lg text-[clamp(1.75rem,7vw,2.5rem)] leading-tight text-primary font-bold tracking-tight md:text-[40px]">
 				{data.tech.title}
 			</h1>
 		</header>
 
 		<!-- 本文 (Content) -->
 		<section
-			class="font-body-md text-body-md prose dark:prose-invert max-w-none break-words pt-4 mb-8 text-[1.0625rem] leading-8 text-on-surface md:text-body-md md:leading-relaxed"
+			class="font-body-md text-body-md prose dark:prose-invert max-w-none break-words pt-4 mb-8 text-[1rem] leading-7 text-on-surface md:text-body-md md:leading-relaxed"
 			onclick={copyCode}
 			onkeydown={handleProseKeydown}
 			role="group"
