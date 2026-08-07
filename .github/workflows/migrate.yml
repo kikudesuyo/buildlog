@@ -36,11 +36,10 @@ jobs:
 
       - name: Load production database URL from Secret Manager
         run: |
-          echo 'PROD_DATABASE_URL<<EOF' >> "$GITHUB_ENV"
-          gcloud secrets versions access latest \
+          PROD_DATABASE_URL="$(gcloud secrets versions access latest \
             --secret=DATABASE_URL \
-            --project=buildlog-503612 >> "$GITHUB_ENV"
-          echo 'EOF' >> "$GITHUB_ENV"
+            --project=buildlog-503612)"
+          printf 'PROD_DATABASE_URL=%s\n' "$PROD_DATABASE_URL" >> "$GITHUB_ENV"
 
       - name: Set up Atlas CLI
         uses: ariga/setup-atlas@v0
