@@ -2,12 +2,6 @@ name: Migrate Production Database
 
 on:
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: Preview pending migrations without applying them
-        required: true
-        default: true
-        type: boolean
 
 permissions:
   contents: read
@@ -51,12 +45,6 @@ jobs:
         working-directory: sql
         run: atlas migrate validate --dir "file://migrations"
 
-      - name: Preview pending migrations
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
-        working-directory: sql
-        run: atlas migrate apply --env prod --dry-run
-
       - name: Apply pending migrations
-        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.dry_run }}
         working-directory: sql
         run: atlas migrate apply --env prod
