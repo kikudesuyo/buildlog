@@ -21,7 +21,7 @@ func GetGoalPeriod(ctx context.Context, db *gorm.DB, periodType string, startsAt
 // SaveGoalPeriod はデータを保存します。
 func SaveGoalPeriod(ctx context.Context, db *gorm.DB, period *entity.DBTableGoalPeriod) error {
 	return db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("id = ?", period.ID).Delete(&entity.DBTableGoal{}).Error; err != nil {
+		if err := tx.Where("period_id = ?", period.ID).Delete(&entity.DBTableGoal{}).Error; err != nil {
 			return err
 		}
 		if err := tx.Omit("Goals").Save(period).Error; err != nil {
