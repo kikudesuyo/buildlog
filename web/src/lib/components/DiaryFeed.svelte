@@ -123,7 +123,7 @@
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-4">
 						<LikeButton postId={entry.id} initialLikesCount={entry.likesCount} initialHasLiked={entry.hasLiked} />
-						<a href={resolve(`/diary/${entry.id}#comments-heading`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${entry.commentsCount}件を表示`}>
+						<a href={resolve(`/diary/${entry.id}`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${entry.commentsCount}件を表示`}>
 							<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>
 							{entry.commentsCount}
 						</a>
