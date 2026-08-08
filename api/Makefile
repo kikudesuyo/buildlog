@@ -61,7 +61,7 @@ migrate_apply_prod:
 # テストデータ注入
 db_seed:
 	$(LOAD_ENV) ; \
-	cat ../sql/seeds/seed_posts.sql | docker compose -f ../compose.yml exec -T postgres psql -U $${POSTGRES_USER} -d $${POSTGRES_DB}
+	cat ../sql/seeds/seed_posts.sql ../sql/seeds/seed_comments.sql ../sql/seeds/seed_goals.sql | docker compose -f ../compose.yml exec -T postgres psql -U $${POSTGRES_USER} -d $${POSTGRES_DB}
 
 # マイグレーション適用とテストデータ注入を実行
 db_setup: migrate_apply db_seed
