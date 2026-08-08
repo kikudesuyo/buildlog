@@ -11,7 +11,7 @@ import (
 
 // HandleGetDeletedPosts はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetDeletedPosts(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	posts, err := service.ListDeletedPosts(r.Context())
+	posts, err := service.ListDeletedPosts(r.Context(), service.DatabaseFromContext(r.Context()))
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func HandleRestorePost(r *http.Request, requestData map[string]interface{}) (htt
 	if err != nil {
 		return nil, err
 	}
-	if err := service.RestorePost(r.Context(), id); err != nil {
+	if err := service.RestorePost(r.Context(), service.DatabaseFromContext(r.Context()), id); err != nil {
 		return nil, err
 	}
 	return entity.NewObjectResponse(map[string]string{"status": "restored"}), nil

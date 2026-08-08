@@ -15,9 +15,9 @@ import (
 const monthlyGoalPeriod = "monthly"
 
 // GetCurrentGoals はデータを取得します。
-func GetCurrentGoals(ctx context.Context) (*entity.GoalPeriodResponse, error) {
+func GetCurrentGoals(ctx context.Context, db *gorm.DB) (*entity.GoalPeriodResponse, error) {
 	startsAt := currentMonthStart()
-	period, err := repository.GetGoalPeriod(ctx, databaseFromContext(ctx), monthlyGoalPeriod, startsAt)
+	period, err := repository.GetGoalPeriod(ctx, db, monthlyGoalPeriod, startsAt)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return newGoalPeriodResponse(monthlyGoalPeriod, startsAt, startsAt.AddDate(0, 1, -1), nil), nil
 	}
@@ -28,7 +28,7 @@ func GetCurrentGoals(ctx context.Context) (*entity.GoalPeriodResponse, error) {
 }
 
 // SaveCurrentGoals はデータを保存します。
-func SaveCurrentGoals(ctx context.Context, req entity.SaveGoalsRequest) (*entity.GoalPeriodResponse, error) {
+func SaveCurrentGoals(ctx context.Context, db *gorm.DB, req entity.SaveGoalsRequest) (*entity.GoalPeriodResponse, error) {
 	if req.PeriodType != "" && req.PeriodType != monthlyGoalPeriod {
 		return nil, xerror.ClientValidationErr(errors.New("unsupported goal period"))
 	}
@@ -47,7 +47,7 @@ func SaveCurrentGoals(ctx context.Context, req entity.SaveGoalsRequest) (*entity
 		goalList = append(goalList, entity.DBTableGoal{Title: title, TargetValue: goal.TargetValue, ProgressValue: goal.ProgressValue})
 	}
 
-	period, err := repository.GetGoalPeriod(ctx, databaseFromContext(ctx), monthlyGoalPeriod, startsAt)
+	period, err := repository.GetGoalPeriod(ctx, db, monthlyGoalPeriod, startsAt)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		period = &entity.DBTableGoalPeriod{PeriodType: monthlyGoalPeriod, StartsAt: startsAt, EndsAt: endsAt}
 	} else if err != nil {
@@ -55,7 +55,7 @@ func SaveCurrentGoals(ctx context.Context, req entity.SaveGoalsRequest) (*entity
 	}
 	period.EndsAt = endsAt
 	period.Goals = goalList
-	if err := repository.SaveGoalPeriod(ctx, databaseFromContext(ctx), period); err != nil {
+	if err := repository.SaveGoalPeriod(ctx, db, period); err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
 	return newGoalPeriodResponse(period.PeriodType, period.StartsAt, period.EndsAt, period.Goals), nil

@@ -12,7 +12,7 @@ import (
 
 // HandleGetAppList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetAppList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	appList, err := service.ListApps(r.Context())
+	appList, err := service.ListApps(r.Context(), service.DatabaseFromContext(r.Context()))
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func HandleGetApp(r *http.Request, requestData map[string]interface{}) (http.Han
 	if err != nil {
 		return nil, err
 	}
-	app, err := service.GetAppByID(r.Context(), id)
+	app, err := service.GetAppByID(r.Context(), service.DatabaseFromContext(r.Context()), id)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func HandleCreateApp(r *http.Request, requestData map[string]interface{}) (http.
 	if req.Slug == "" || req.Name == "" {
 		return nil, http.ErrBodyNotAllowed
 	}
-	resp, err := service.CreateApp(r.Context(), req)
+	resp, err := service.CreateApp(r.Context(), service.DatabaseFromContext(r.Context()), req)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func HandleUpdateApp(r *http.Request, requestData map[string]interface{}) (http.
 	if req.Slug == "" || req.Name == "" {
 		return nil, http.ErrBodyNotAllowed
 	}
-	resp, err := service.UpdateApp(r.Context(), id, req)
+	resp, err := service.UpdateApp(r.Context(), service.DatabaseFromContext(r.Context()), id, req)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func HandleDeleteApp(r *http.Request, requestData map[string]interface{}) (http.
 	if err != nil {
 		return nil, err
 	}
-	if err := service.DeleteApp(r.Context(), id); err != nil {
+	if err := service.DeleteApp(r.Context(), service.DatabaseFromContext(r.Context()), id); err != nil {
 		return nil, err
 	}
 	return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil

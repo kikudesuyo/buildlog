@@ -31,7 +31,7 @@ func HandlePostLike(r *http.Request, requestData map[string]interface{}) (http.H
 	if err != nil {
 		return nil, err
 	}
-	resp, err := service.LikePost(r.Context(), postID, getClientIP(r))
+	resp, err := service.LikePost(r.Context(), service.DatabaseFromContext(r.Context()), postID, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func HandleDeleteLike(r *http.Request, requestData map[string]interface{}) (http
 	if err != nil {
 		return nil, err
 	}
-	resp, err := service.UnlikePost(r.Context(), postID, getClientIP(r))
+	resp, err := service.UnlikePost(r.Context(), service.DatabaseFromContext(r.Context()), postID, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func HandleGetLikeStatus(r *http.Request, requestData map[string]interface{}) (h
 	if err != nil {
 		return nil, err
 	}
-	resp, err := service.GetLikeStatus(r.Context(), postID, getClientIP(r))
+	resp, err := service.GetLikeStatus(r.Context(), service.DatabaseFromContext(r.Context()), postID, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}

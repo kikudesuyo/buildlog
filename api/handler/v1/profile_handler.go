@@ -10,7 +10,7 @@ import (
 
 // HandleGetProfile はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetProfile(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	profile, err := service.GetProfile(r.Context())
+	profile, err := service.GetProfile(r.Context(), service.DatabaseFromContext(r.Context()))
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func HandleUpdateProfile(r *http.Request, requestData map[string]interface{}) (h
 	if req.Name == "" || req.ContactEmail == "" {
 		return nil, http.ErrBodyNotAllowed
 	}
-	resp, err := service.UpdateProfile(r.Context(), req)
+	resp, err := service.UpdateProfile(r.Context(), service.DatabaseFromContext(r.Context()), req)
 	if err != nil {
 		return nil, err
 	}

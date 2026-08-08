@@ -6,11 +6,12 @@ import (
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/repository"
+	"gorm.io/gorm"
 )
 
 // GetProfile はデータを取得します。
-func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
-	dbProfile, err := repository.GetProfile(ctx, databaseFromContext(ctx))
+func GetProfile(ctx context.Context, db *gorm.DB) (*entity.ProfileResponse, error) {
+	dbProfile, err := repository.GetProfile(ctx, db)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +53,7 @@ func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
 }
 
 // UpdateProfile はデータを更新します。
-func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entity.ProfileResponse, error) {
+func UpdateProfile(ctx context.Context, db *gorm.DB, req entity.UpdateProfileRequest) (*entity.ProfileResponse, error) {
 	bioJSON, err := json.Marshal(req.Bio)
 	if err != nil {
 		return nil, err
@@ -83,7 +84,7 @@ func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entit
 		FinalQuote:   req.FinalQuote,
 	}
 
-	if err := repository.UpdateProfile(ctx, databaseFromContext(ctx), &dbProfile); err != nil {
+	if err := repository.UpdateProfile(ctx, db, &dbProfile); err != nil {
 		return nil, err
 	}
 

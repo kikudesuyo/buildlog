@@ -21,7 +21,7 @@ func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (ht
 	if limit < 0 {
 		limit = 0
 	}
-	diaryList, err := service.ListDiaries(r.Context(), all, offset, limit, getClientIP(r))
+	diaryList, err := service.ListDiaries(r.Context(), service.DatabaseFromContext(r.Context()), all, offset, limit, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func HandleGetDiary(r *http.Request, requestData map[string]interface{}) (http.H
 	if err != nil {
 		return nil, err
 	}
-	diary, err := service.GetDiaryByID(r.Context(), id, getClientIP(r))
+	diary, err := service.GetDiaryByID(r.Context(), service.DatabaseFromContext(r.Context()), id, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func HandleCreateDiary(r *http.Request, requestData map[string]interface{}) (htt
 	if req.Title == "" || req.Content == "" {
 		return nil, http.ErrBodyNotAllowed
 	}
-	resp, err := service.CreateDiary(r.Context(), req)
+	resp, err := service.CreateDiary(r.Context(), service.DatabaseFromContext(r.Context()), req)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func HandleUpdateDiary(r *http.Request, requestData map[string]interface{}) (htt
 	if req.Title == "" || req.Content == "" {
 		return nil, http.ErrBodyNotAllowed
 	}
-	resp, err := service.UpdateDiary(r.Context(), id, req)
+	resp, err := service.UpdateDiary(r.Context(), service.DatabaseFromContext(r.Context()), id, req)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func HandleDeleteDiary(r *http.Request, requestData map[string]interface{}) (htt
 	if err != nil {
 		return nil, err
 	}
-	if err := service.DeleteDiary(r.Context(), id); err != nil {
+	if err := service.DeleteDiary(r.Context(), service.DatabaseFromContext(r.Context()), id); err != nil {
 		return nil, err
 	}
 	return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil

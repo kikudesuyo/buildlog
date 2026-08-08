@@ -20,7 +20,7 @@ func HandleGetCommentList(r *http.Request, requestData map[string]interface{}) (
 		return nil, xerror.ClientValidationErr(err)
 	}
 
-	commentList, err := service.ListCommentsByPostID(r.Context(), postID)
+	commentList, err := service.ListCommentsByPostID(r.Context(), service.DatabaseFromContext(r.Context()), postID)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func HandleCreateComment(r *http.Request, requestData map[string]interface{}) (h
 	}
 	req.Content = strings.TrimSpace(req.Content)
 
-	comment, err := service.CreateComment(r.Context(), postID, req)
+	comment, err := service.CreateComment(r.Context(), service.DatabaseFromContext(r.Context()), postID, req)
 	if err != nil {
 		return nil, err
 	}

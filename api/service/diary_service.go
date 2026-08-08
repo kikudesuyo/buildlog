@@ -6,18 +6,19 @@ import (
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/repository"
+	"gorm.io/gorm"
 )
 
 // ListDiaries は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
-func ListDiaries(ctx context.Context, all bool, offset int, limit int, ipAddress string) ([]entity.DBTablePost, error) {
-	diaryList, err := repository.ListDiaries(ctx, databaseFromContext(ctx), all, offset, limit)
+func ListDiaries(ctx context.Context, db *gorm.DB, all bool, offset int, limit int, ipAddress string) ([]entity.DBTablePost, error) {
+	diaryList, err := repository.ListDiaries(ctx, db, all, offset, limit)
 	if err != nil {
 		return nil, err
 	}
 	for i := range diaryList {
-		count, _ := repository.CountLikesByPostID(ctx, databaseFromContext(ctx), diaryList[i].ID)
-		commentsCount, _ := repository.CountCommentsByPostID(ctx, databaseFromContext(ctx), diaryList[i].ID)
-		liked, _ := repository.HasLiked(ctx, databaseFromContext(ctx), diaryList[i].ID, ipAddress)
+		count, _ := repository.CountLikesByPostID(ctx, db, diaryList[i].ID)
+		commentsCount, _ := repository.CountCommentsByPostID(ctx, db, diaryList[i].ID)
+		liked, _ := repository.HasLiked(ctx, db, diaryList[i].ID, ipAddress)
 		diaryList[i].LikesCount = count
 		diaryList[i].CommentsCount = commentsCount
 		diaryList[i].HasLiked = liked
@@ -26,14 +27,14 @@ func ListDiaries(ctx context.Context, all bool, offset int, limit int, ipAddress
 }
 
 // GetDiaryByID はデータを取得します。
-func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTablePost, error) {
-	diary, err := repository.GetDiaryByID(ctx, databaseFromContext(ctx), id)
+func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64, ipAddress string) (*entity.DBTablePost, error) {
+	diary, err := repository.GetDiaryByID(ctx, db, id)
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, databaseFromContext(ctx), diary.ID)
-	commentsCount, _ := repository.CountCommentsByPostID(ctx, databaseFromContext(ctx), diary.ID)
-	liked, _ := repository.HasLiked(ctx, databaseFromContext(ctx), diary.ID, ipAddress)
+	count, _ := repository.CountLikesByPostID(ctx, db, diary.ID)
+	commentsCount, _ := repository.CountCommentsByPostID(ctx, db, diary.ID)
+	liked, _ := repository.HasLiked(ctx, db, diary.ID, ipAddress)
 	diary.LikesCount = count
 	diary.CommentsCount = commentsCount
 	diary.HasLiked = liked
@@ -41,7 +42,7 @@ func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTa
 }
 
 // CreateDiary はデータを作成します。
-func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.CreateDiaryResponse, error) {
+func CreateDiary(ctx context.Context, db *gorm.DB, req entity.CreateDiaryRequest) (entity.CreateDiaryResponse, error) {
 	status := req.Status
 	if status == "" {
 		status = "draft"
@@ -51,7 +52,7 @@ func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.Cre
 		Content: req.Content,
 		Status:  status,
 	}
-	if err := repository.CreateDiary(ctx, databaseFromContext(ctx), &diary); err != nil {
+	if err := repository.CreateDiary(ctx, db, &diary); err != nil {
 		return entity.CreateDiaryResponse{}, err
 	}
 	return entity.CreateDiaryResponse{
@@ -65,8 +66,8 @@ func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.Cre
 }
 
 // UpdateDiary はデータを更新します。
-func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (entity.UpdateDiaryResponse, error) {
-	diary, err := repository.GetDiaryByID(ctx, databaseFromContext(ctx), id)
+func UpdateDiary(ctx context.Context, db *gorm.DB, id int64, req entity.UpdateDiaryRequest) (entity.UpdateDiaryResponse, error) {
+	diary, err := repository.GetDiaryByID(ctx, db, id)
 	if err != nil {
 		return entity.UpdateDiaryResponse{}, err
 	}
@@ -77,7 +78,7 @@ func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (
 		diary.Status = req.Status
 	}
 
-	if err := repository.UpdateDiary(ctx, databaseFromContext(ctx), diary); err != nil {
+	if err := repository.UpdateDiary(ctx, db, diary); err != nil {
 		return entity.UpdateDiaryResponse{}, err
 	}
 
@@ -92,6 +93,6 @@ func UpdateDiary(ctx context.Context, id int64, req entity.UpdateDiaryRequest) (
 }
 
 // DeleteDiary はデータを削除します。
-func DeleteDiary(ctx context.Context, id int64) error {
-	return repository.DeleteDiary(ctx, databaseFromContext(ctx), id)
+func DeleteDiary(ctx context.Context, db *gorm.DB, id int64) error {
+	return repository.DeleteDiary(ctx, db, id)
 }

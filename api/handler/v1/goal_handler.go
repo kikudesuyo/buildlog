@@ -11,7 +11,7 @@ import (
 
 // HandleGetCurrentGoals はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetCurrentGoals(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	goals, err := service.GetCurrentGoals(r.Context())
+	goals, err := service.GetCurrentGoals(r.Context(), service.DatabaseFromContext(r.Context()))
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func HandleSaveCurrentGoals(r *http.Request, requestData map[string]interface{})
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, xerror.ClientValidationErr(err)
 	}
-	goals, err := service.SaveCurrentGoals(r.Context(), req)
+	goals, err := service.SaveCurrentGoals(r.Context(), service.DatabaseFromContext(r.Context()), req)
 	if err != nil {
 		return nil, err
 	}
