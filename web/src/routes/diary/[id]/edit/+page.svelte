@@ -22,8 +22,10 @@
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
 		function adjust() {
-			node.style.height = 'auto';
+			const scrollY = window.scrollY;
+			node.style.height = '0px';
 			node.style.height = `${node.scrollHeight}px`;
+			window.scrollTo(0, scrollY);
 		}
 		adjust();
 		node.addEventListener('input', adjust);
