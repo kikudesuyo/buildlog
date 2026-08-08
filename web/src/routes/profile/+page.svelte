@@ -22,12 +22,6 @@
 </svelte:head>
 
 <div class="mx-auto max-w-container-max px-gutter">
-	<nav aria-label="プロフィール内目次" class="mb-8 flex flex-wrap gap-2 border-y border-outline-variant/20 py-3">
-		<a href="#biography" class="rounded-lg px-3 py-2 text-label-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary">経歴</a>
-		<a href="#highlights" class="rounded-lg px-3 py-2 text-label-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary">実績</a>
-		<a href="#expertise" class="rounded-lg px-3 py-2 text-label-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary">専門領域</a>
-		<a href="#contact" class="rounded-lg px-3 py-2 text-label-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary">連絡先</a>
-	</nav>
 	<!-- Hero Section -->
 	<section class="mb-section-gap flex flex-col gap-stack-lg">
 		<div class="flex items-center gap-stack-md">
