@@ -101,6 +101,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 		createdAt: post.created_at,
 		updatedAt: post.updated_at,
 		likesCount: post.likes_count,
+		commentsCount: post.comments_count,
 		hasLiked: post.has_liked
 	}));
 
@@ -115,6 +116,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 		createdAt: '',
 		updatedAt: '',
 		likesCount: 0,
+		commentsCount: 0,
 		hasLiked: false
 	};
 	const remaining = featured ? allArticles.slice(1) : allArticles;
@@ -196,6 +198,7 @@ export async function createTech(req: {
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }
@@ -224,6 +227,7 @@ export async function updateTech(id: number, req: {
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }
@@ -259,6 +263,7 @@ export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArti
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }

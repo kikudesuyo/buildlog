@@ -165,6 +165,9 @@
 			<a href={resolve(`/tech/${featured.id}`)} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 			<div class="flex items-center justify-between mb-4">
 				<LikeButton postId={featured.id} initialLikesCount={featured.likesCount} initialHasLiked={featured.hasLiked} />
+				<a href={resolve(`/tech/${featured.id}#comments-heading`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${featured.commentsCount}件を表示`}>
+					<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>{featured.commentsCount}
+				</a>
 			</div>
 			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
 		</article>
@@ -189,6 +192,9 @@
 				<a href={resolve(`/tech/${article.id}`)} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 				<div class="mt-3 flex items-center gap-4">
 					<LikeButton postId={article.id} initialLikesCount={article.likesCount} initialHasLiked={article.hasLiked} />
+					<a href={resolve(`/tech/${article.id}#comments-heading`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${article.commentsCount}件を表示`}>
+						<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>{article.commentsCount}
+					</a>
 					{#if article.views}<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views}</span>{/if}
 				</div>
 			</article>
