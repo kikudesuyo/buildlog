@@ -11,14 +11,13 @@ type DiaryEntry struct {
 	CategoryColorClass string `json:"category_color_class,omitempty"`
 }
 
-
 type TechArticle struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
 	Excerpt  string `json:"excerpt"`
 	Category string `json:"category"`
 	Date     string `json:"date"`
-	Views    string `json:"views,omitempty"`
+	Views    int64  `json:"views,omitempty"`
 }
 
 type FeaturedTechArticle struct {

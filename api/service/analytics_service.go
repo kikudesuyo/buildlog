@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"sort"
-	"strconv"
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
@@ -36,7 +35,7 @@ func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
 	var totalViews, diaryCount, techCount int64
 	items := make([]entity.AnalyticsArticleItem, len(posts))
 	for i, post := range posts {
-		views, _ := strconv.ParseInt(post.Views, 10, 64)
+		views := post.Views
 		totalViews += views
 		if post.Type == "diary" {
 			diaryCount++

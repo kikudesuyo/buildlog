@@ -23,7 +23,7 @@ VALUES
     '静かなるシステムの構築：Rustによるメモリ安全性の再考',
     '現代のソフトウェア開発において、安全性はもはやオプションではありません。所有権モデルがもたらす新しい秩序と、開発者の認知負荷を軽減するための抽象化について考察します。',
     'Backend',
-    '1,024 views',
+    1024,
     CURRENT_TIMESTAMP - INTERVAL '1 day',
     CURRENT_TIMESTAMP - INTERVAL '1 day'
 ),
@@ -32,7 +32,7 @@ VALUES
     'インタフェースの沈黙：ミニマリズムUIの実装戦略',
     '情報を削ぎ落とすことで、ユーザーの集中力を最大化する。CSS Container Queriesを活用した、文脈に応じた適応型レイアウトの設計。',
     'Frontend',
-    '856 views',
+    856,
     CURRENT_TIMESTAMP - INTERVAL '12 hour',
     CURRENT_TIMESTAMP - INTERVAL '12 hour'
 ),
@@ -41,7 +41,7 @@ VALUES
     '今週のライブラリ選定：Headless UIとアクセシビリティの追求',
     'スタイリングを強制しないコンポーネントが、いかにして長期的なメンテナンス性を向上させるか。Radix UIとTailwindの組み合わせ事例を詳解。',
     'Frontend',
-    '542 views',
+    542,
     CURRENT_TIMESTAMP - INTERVAL '2 hour',
     CURRENT_TIMESTAMP - INTERVAL '2 hour'
 );
