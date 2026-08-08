@@ -4,7 +4,7 @@ type CreateTechRequest struct {
 	Title    string `json:"title"`
 	Content  string `json:"content"`
 	Category string `json:"category"`
-	Views    string `json:"views"`
+	Views    int64  `json:"views"`
 	Status   string `json:"status"`
 }
 
@@ -13,7 +13,7 @@ type CreateTechResponse struct {
 	Title     string `json:"title"`
 	Content   string `json:"content"`
 	Category  string `json:"category"`
-	Views     string `json:"views"`
+	Views     int64  `json:"views"`
 	Status    string `json:"status"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
@@ -23,7 +23,7 @@ type UpdateTechRequest struct {
 	Title    string `json:"title"`
 	Content  string `json:"content"`
 	Category string `json:"category"`
-	Views    string `json:"views"`
+	Views    int64  `json:"views"`
 	Status   string `json:"status"`
 }
 
@@ -32,7 +32,7 @@ type UpdateTechResponse struct {
 	Title     string `json:"title"`
 	Content   string `json:"content"`
 	Category  string `json:"category"`
-	Views     string `json:"views"`
+	Views     int64  `json:"views"`
 	Status    string `json:"status"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`

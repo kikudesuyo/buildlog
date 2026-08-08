@@ -9,7 +9,7 @@
 	let title = $state('');
 	let content = $state('');
 	let category = $state(defaultTechCategory);
-	let views = $state('');
+	let views = $state<number | undefined>(undefined);
 
 	let previewMode = $state<'edit' | 'preview'>('edit');
 	let parsedContent = $derived(marked.parse(content) as string);
@@ -20,7 +20,7 @@
 		title.trim().length > 0 ||
 		content.trim().length > 0 ||
 		category !== defaultTechCategory ||
-		views.trim().length > 0
+		views !== undefined
 	);
 
 	// ダミーのUIステート (image.pngの再現用)
@@ -250,9 +250,10 @@
 						<label for="tech-views" class="font-label-xs text-[11px] text-outline">閲覧数（任意）</label>
 						<input
 							id="tech-views"
-							type="text"
-							bind:value={views}
-							placeholder="例: 1,024 views"
+							 type="number"
+							 min="0"
+							 bind:value={views}
+							 placeholder="例: 1024"
 							disabled={isSubmitting}
 							class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md"
 						/>
