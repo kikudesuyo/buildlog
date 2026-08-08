@@ -292,9 +292,13 @@ export async function fetchComments(fetchFn: ApiFetch, postId: number): Promise<
 	return response.data_list.map(mapComment);
 }
 
-export async function fetchAdminComments(): Promise<CommentEntry[]> {
-	const response = await sendAdminRequest<ApiListResponse<ApiComment>>('GET', '/admin/comments');
-	return response.data_list.map(mapComment);
+export async function fetchAdminComments(fetchFn: ApiFetch): Promise<CommentEntry[]> {
+	const response = await fetchFn(`${apiBaseUrl}/admin/comments`, {
+		headers: { Authorization: `Bearer ${adminToken}` }
+	});
+	if (!response.ok) throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+	const data = (await response.json()) as ApiListResponse<ApiComment>;
+	return data.data_list.map(mapComment);
 }
 
 export async function createComment(
