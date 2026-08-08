@@ -9,7 +9,8 @@
 		{ href: '/admin/profile', label: 'Profile', description: '自己紹介を管理', icon: 'person' },
 		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' },
 		{ href: '/admin/analytics', label: 'Analytics', description: 'アクセス統計・分析', icon: 'analytics' },
-		{ href: '/admin/trash', label: 'Trash', description: 'ゴミ箱', icon: 'delete_outline' }
+		{ href: '/admin/trash', label: 'Trash', description: 'ゴミ箱', icon: 'delete_outline' },
+		{ href: '/admin/comments', label: 'Comments', description: 'コメント管理', icon: 'comment' }
 	] as const;
 
 	function resolveAdminPath(path: (typeof navItems)[number]['href']) {
@@ -20,6 +21,8 @@
 				return resolve('/admin/tech');
 			case '/admin/trash':
 				return resolve('/admin/trash');
+			case '/admin/comments':
+				return resolve('/admin/comments');
 			case '/admin/apps':
 				return resolve('/admin/apps');
 			case '/admin/profile':

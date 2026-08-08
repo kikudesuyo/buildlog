@@ -18,6 +18,13 @@ func ListCommentsByPostID(ctx context.Context, db *gorm.DB, postID int64) ([]ent
 	return commentList, err
 }
 
+// ListAllComments は管理画面用にコメントを新しい順で取得します。
+func ListAllComments(ctx context.Context, db *gorm.DB) ([]entity.DBTableComment, error) {
+	commentList := make([]entity.DBTableComment, 0)
+	err := db.WithContext(ctx).Order("created_at DESC").Order("id DESC").Find(&commentList).Error
+	return commentList, err
+}
+
 // CreateComment はデータを作成します。
 func CreateComment(ctx context.Context, db *gorm.DB, comment *entity.DBTableComment) error {
 	return db.WithContext(ctx).Create(comment).Error

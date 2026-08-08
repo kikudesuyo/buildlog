@@ -17,6 +17,15 @@ func ListCommentsByPostID(ctx context.Context, postID int64) ([]entity.DBTableCo
 	return commentList, nil
 }
 
+// ListAllComments は管理画面用にコメントを取得します。
+func ListAllComments(ctx context.Context) ([]entity.DBTableComment, error) {
+	commentList, err := repository.ListAllComments(ctx, database)
+	if err != nil {
+		return nil, xerror.UnknownServerErr(err)
+	}
+	return commentList, nil
+}
+
 // CreateComment はデータを作成します。
 func CreateComment(ctx context.Context, postID int64, req entity.CreateCommentRequest) (*entity.DBTableComment, error) {
 	comment := &entity.DBTableComment{

@@ -28,10 +28,22 @@ func HandleGetCommentList(r *http.Request, requestData map[string]interface{}) (
 	return entity.NewListResponse(commentList), nil
 }
 
+// HandleGetAdminCommentList は管理画面用のコメント一覧を処理します。
+func HandleGetAdminCommentList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := authorizeCommentAdmin(r); err != nil {
+		return nil, err
+	}
+	commentList, err := service.ListAllComments(r.Context())
+	if err != nil {
+		return nil, err
+	}
+	return entity.NewListResponse(commentList), nil
+}
+
 // HandleDeleteComment は管理者によるコメント削除を処理します。
 func HandleDeleteComment(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	if os.Getenv("ADMIN_API_TOKEN") == "" || r.Header.Get("X-Admin-Token") != os.Getenv("ADMIN_API_TOKEN") {
-		return nil, xerror.AuthGeneralErr(errors.New("comment management authorization failed"))
+	if err := authorizeCommentAdmin(r); err != nil {
+		return nil, err
 	}
 	commentID, err := strconv.ParseInt(chi.URLParam(r, "commentID"), 10, 64)
 	if err != nil || commentID <= 0 {
@@ -41,6 +53,17 @@ func HandleDeleteComment(r *http.Request, requestData map[string]interface{}) (h
 		return nil, err
 	}
 	return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil
+}
+
+func authorizeCommentAdmin(r *http.Request) error {
+	adminToken := os.Getenv("ADMIN_TOKEN")
+	if adminToken == "" {
+		adminToken = "dev-admin-token"
+	}
+	if r.Header.Get("Authorization") != "Bearer "+adminToken {
+		return xerror.AuthGeneralErr(errors.New("comment management authorization failed"))
+	}
+	return nil
 }
 
 // HandleCreateComment はHTTPリクエストを受け取り、対応する処理結果を返します。

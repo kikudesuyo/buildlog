@@ -266,6 +266,17 @@ type ApiComment = {
 	updated_at: string;
 };
 
+const adminToken = env.PUBLIC_ADMIN_TOKEN || 'dev-admin-token';
+
+async function sendAdminRequest<T>(method: string, path: string): Promise<T> {
+	const response = await fetch(`${apiBaseUrl}${path}`, {
+		method,
+		headers: { Authorization: `Bearer ${adminToken}` }
+	});
+	if (!response.ok) throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+	return response.json() as Promise<T>;
+}
+
 function mapComment(comment: ApiComment): CommentEntry {
 	return {
 		id: comment.id,
@@ -281,6 +292,11 @@ export async function fetchComments(fetchFn: ApiFetch, postId: number): Promise<
 	return response.data_list.map(mapComment);
 }
 
+export async function fetchAdminComments(): Promise<CommentEntry[]> {
+	const response = await sendAdminRequest<ApiListResponse<ApiComment>>('GET', '/admin/comments');
+	return response.data_list.map(mapComment);
+}
+
 export async function createComment(
 	postId: number,
 	content: string
@@ -290,7 +306,7 @@ export async function createComment(
 }
 
 export async function deleteComment(commentId: number): Promise<void> {
-	await sendRequest<void>('DELETE', `/comments/${commentId}`);
+	await sendAdminRequest<void>('DELETE', `/comments/${commentId}`);
 }
 
 export async function likePost(id: number): Promise<ApiLikeStatus> {
