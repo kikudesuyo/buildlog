@@ -1,9 +1,10 @@
-h1:PLJTYL6LapeO8mBmH3UREQoUgellXkZs409q6NagUhQ=
+h1:W3qxf52tScs0fVVlg5S/vyv3dr/fYatZa2tZqa8+EfU=
 20260720120000_post.sql h1:W6Ug8xDzRjSbgAX3EuUM+xS6N5ODi7g0W8vw1Kp/mso=
 20260727000000_profile.sql h1:Twgzan+Zizx70YPpctzcT3BhE0OhoDW+4E81yOpK4Kc=
 20260727010000_app.sql h1:fnbdrJSmoj+1Qwrfuephc27x7VDW07laYXhtwYY43yA=
 20260727020000_like.sql h1:mkxBHBVIruFZ4mKGiF4ciUepi2f4ZmDagSJdexG+CEw=
 20260727040000_soft_delete.sql h1:+R2KmjMVLPJBKzuFkNdCDsIOqN64FhZxXJ00x/VqjqI=
 20260727140000_add_status_to_posts.sql h1:dgaPBGeVZMKqoGUZ2aQ0emF6du/QHvGHyhwh7XS0F4s=
-20260802000000_comments.sql h1:aqF6o8ja1xcR+ZN8Pk5zNiBAuyRGBa8xsbJoVM8Vtek=
-20260802140000_remove_author_name_from_comments.sql h1:zNEIlmpAFoalIsYdmavUyJz6vBf6kjj0IGWnVK74rQY=
+20260802000000_comments.sql h1:Rlkb55NDyyhEI2a0Ewy4eHnKMcDB3zgimh8JV1UDM/k=
+20260802140000_remove_author_name_from_comments.sql h1:8c9eJ9+71VzKKP2V6Y6SdxVZKplU63mGNZg1gznZgZg=
+20260802150000_goals.sql h1:McVyd3Wt+HE0gjvCcekheg9pBAUJYcGi1KUfcM2+Acg=
