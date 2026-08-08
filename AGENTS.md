@@ -24,3 +24,13 @@
 
 - Issue、Pull Request、description、コメントは日本語で記載する。
 - Markdownの改行を保持するため、本文は`.md`ファイルに書き、GitHub CLIの`--body-file`で登録する。
+
+## PR作成後の検証
+
+- PR作成後の確認で本番データベースへ migration を適用してはいけません。
+- migration を変更した場合は、次の検証コマンドを実行してください。
+  - `cd sql && atlas migrate validate --dir "file://migrations"`
+  - `cd api && GOCACHE=/tmp/buildlog-go-cache go test ./...`
+  - `git diff --check`
+- 実行したコマンドと結果（成功・失敗、既知の警告を含む）を PR description に記載してください。
+- 本番 migration は、承認済みのデプロイ・運用手順またはGitHub Actionsから実行してください。
