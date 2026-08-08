@@ -47,6 +47,8 @@
 
 	function removeGoal(index: number) {
 		if (draftGoals.length === 1) return;
+		const goal = draftGoals[index];
+		if (!confirm(`「${goal.title || `目標${index + 1}`}」を削除しますか？`)) return;
 		draftGoals = draftGoals.filter((_, goalIndex) => goalIndex !== index);
 	}
 
