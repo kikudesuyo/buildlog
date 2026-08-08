@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { HistoryItem } from '$lib/api/types';
-	import { resolve } from '$app/paths';
+import type { HistoryItem } from '$lib/api/types';
+import { resolve } from '$app/paths';
+import { SvelteMap } from 'svelte/reactivity';
 
 	type Props = {
 		history: HistoryItem[];
@@ -10,7 +11,7 @@
 
 	// 履歴データを日付（YYYY-MM-DD）ごとにグループ化するマップ
 	const historyMap = $derived.by(() => {
-		const m = new Map<string, HistoryItem[]>();
+		const m = new SvelteMap<string, HistoryItem[]>();
 		for (const item of history) {
 			if (!item.createdAt) continue;
 			const dateStr = item.createdAt.substring(0, 10); // YYYY-MM-DD
@@ -53,65 +54,7 @@
 		isPopoverOpen = false;
 	}
 
-	// -----------------------------------------------------------------
-	// 1. Contributions Graph (ヒートマップ) のデータ生成
-	// -----------------------------------------------------------------
-	const heatmapData = $derived.by(() => {
-		const today = new Date();
-		const data: { dateStr: string; dayOfWeek: number; count: number }[] = [];
-
-		// 過去365日（今日を含め、52週間分 + 端数）をさかのぼる
-		// 曜日配列が日曜日(0)から始まるように調整
-		const startDate = new Date(today);
-		startDate.setDate(today.getDate() - 365);
-
-		// 開始日を日曜日まで巻き戻して、整然とした週グリッドを作る
-		const startDay = startDate.getDay();
-		startDate.setDate(startDate.getDate() - startDay);
-
-		const tempDate = new Date(startDate);
-		while (tempDate <= today) {
-			const dateStr = tempDate.toISOString().substring(0, 10);
-			const posts = historyMap.get(dateStr) || [];
-			data.push({
-				dateStr,
-				dayOfWeek: tempDate.getDay(),
-				count: posts.length
-			});
-			tempDate.setDate(tempDate.getDate() + 1);
-		}
-		return data;
-	});
-
-	// 週単位の列データに再配置する
-	const heatmapWeeks = $derived.by(() => {
-		const weeks: typeof heatmapData[] = [];
-		let currentWeek: typeof heatmapData = [];
-
-		for (const item of heatmapData) {
-			currentWeek.push(item);
-			if (currentWeek.length === 7) {
-				weeks.push(currentWeek);
-				currentWeek = [];
-			}
-		}
-		if (currentWeek.length > 0) {
-			weeks.push(currentWeek);
-		}
-		return weeks;
-	});
-
-	// 投稿数による色付け設定
-	function getColorClass(count: number): string {
-		if (count === 0) return 'bg-surface-container-high hover:bg-outline-variant/30';
-		if (count === 1) return 'bg-primary/30 hover:bg-primary/40';
-		if (count === 2) return 'bg-primary/60 hover:bg-primary/70';
-		return 'bg-primary hover:bg-primary/90';
-	}
-
-	// -----------------------------------------------------------------
-	// 2. Monthly Calendar (月間カレンダー) のデータ生成
-	// -----------------------------------------------------------------
+	// 月間カレンダーのデータ生成
 	let currentYear = $state(new Date().getFullYear());
 	let currentMonth = $state(new Date().getMonth()); // 0-indexed
 
@@ -189,56 +132,7 @@
 		</p>
 	</header>
 
-	<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-		<!-- ヒートマップ (Contributions Graph) -->
-		<section class="lg:col-span-2 flex flex-col gap-4">
-			<h3 class="font-label-md text-label-md tracking-wider text-outline uppercase">
-				過去365日の履歴 / Activity Map
-			</h3>
-			
-			<div class="w-full overflow-x-auto pb-2 scrollbar-none">
-				<div class="flex gap-[3px] min-w-max">
-					<!-- 曜日のラベル列 -->
-					<div class="grid grid-rows-7 gap-[3px] text-[10px] text-outline font-medium pr-1.5 pt-[14px]">
-						<span class="h-[11px] leading-[11px]">日</span>
-						<span class="h-[11px] leading-[11px]"></span>
-						<span class="h-[11px] leading-[11px]">火</span>
-						<span class="h-[11px] leading-[11px]"></span>
-						<span class="h-[11px] leading-[11px]">木</span>
-						<span class="h-[11px] leading-[11px]"></span>
-						<span class="h-[11px] leading-[11px]">土</span>
-					</div>
-
-					<!-- グリッド (週×日) -->
-					{#each heatmapWeeks as week}
-						<div class="grid grid-rows-7 gap-[3px]">
-							{#each week as item}
-								<!-- svelte-ignore a11y_click_events_have_key_events -->
-								<!-- svelte-ignore a11y_no_static_element_interactions -->
-								<div
-									onclick={(e) => handleDateClick(e, item.dateStr)}
-									class="h-[11px] w-[11px] rounded-[2px] transition-colors duration-150 cursor-pointer {getColorClass(item.count)}"
-									title={`${item.dateStr}: ${item.count} 件の投稿`}
-								></div>
-							{/each}
-						</div>
-					{/each}
-				</div>
-			</div>
-
-			<!-- 凡例 -->
-			<div class="flex items-center justify-end gap-1.5 text-[11px] text-outline mt-1 pr-2">
-				<span>Less</span>
-				<div class="h-2.5 w-2.5 rounded-[1px] bg-surface-container-high"></div>
-				<div class="h-2.5 w-2.5 rounded-[1px] bg-primary/30"></div>
-				<div class="h-2.5 w-2.5 rounded-[1px] bg-primary/60"></div>
-				<div class="h-2.5 w-2.5 rounded-[1px] bg-primary"></div>
-				<span>More</span>
-			</div>
-		</section>
-
-		<!-- 月間カレンダー -->
-		<section class="flex flex-col gap-4 border-t lg:border-t-0 lg:border-l border-outline-variant/20 pt-6 lg:pt-0 lg:pl-6">
+	<section class="flex flex-col gap-4">
 			<header class="flex items-center justify-between">
 				<h3 class="font-label-md text-label-md tracking-wider text-outline uppercase">
 					カレンダー / Calendar
@@ -276,7 +170,7 @@
 				<span class="text-primary py-1 text-[11px]">土</span>
 
 				<!-- 日にちセル -->
-				{#each monthlyDays as day}
+				{#each monthlyDays as day, index (day.dateStr ?? index)}
 					{#if day.dayNum}
 						<!-- svelte-ignore a11y_click_events_have_key_events -->
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -294,8 +188,7 @@
 					{/if}
 				{/each}
 			</div>
-		</section>
-	</div>
+	</section>
 </div>
 
 <!-- 記事リストポップオーバー -->
@@ -345,14 +238,3 @@
 		</ul>
 	</div>
 {/if}
-
-<style>
-	/* スクロールバー非表示用のユーティリティ */
-	.scrollbar-none::-webkit-scrollbar {
-		display: none;
-	}
-	.scrollbar-none {
-		-ms-overflow-style: none;
-		scrollbar-width: none;
-	}
-</style>
