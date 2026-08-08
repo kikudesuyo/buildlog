@@ -4,6 +4,7 @@
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
 	let { data } = $props();
+	let savedProfile = $state(data.profileData);
 
 	let name = $state(data.profileData.name);
 	let title = $state(data.profileData.title);
@@ -30,17 +31,17 @@
 	let successMessage = $state('');
 
 	let isDirty = $derived(
-		name !== data.profileData.name ||
-		title !== data.profileData.title ||
-		subtitle !== data.profileData.subtitle ||
-		avatarUrl !== data.profileData.avatarUrl ||
-		quote !== data.profileData.quote ||
-		bioText !== data.profileData.bio.join('\n\n') ||
-		JSON.stringify(highlights) !== JSON.stringify(data.profileData.highlights) ||
-		award !== (data.profileData.award || '') ||
-		expertiseText !== data.profileData.expertise.join(', ') ||
-		contactEmail !== data.profileData.contactEmail ||
-		finalQuote !== data.profileData.finalQuote
+		name !== savedProfile.name ||
+		title !== savedProfile.title ||
+		subtitle !== savedProfile.subtitle ||
+		avatarUrl !== savedProfile.avatarUrl ||
+		quote !== savedProfile.quote ||
+		bioText !== savedProfile.bio.join('\n\n') ||
+		JSON.stringify(highlights) !== JSON.stringify(savedProfile.highlights) ||
+		award !== (savedProfile.award || '') ||
+		expertiseText !== savedProfile.expertise.join(', ') ||
+		contactEmail !== savedProfile.contactEmail ||
+		finalQuote !== savedProfile.finalQuote
 	);
 
 	function addHighlight() {
@@ -65,7 +66,7 @@
 		const expertise = expertiseText.split(/[,，\n]+/).map(s => s.trim()).filter(s => s.length > 0);
 
 		try {
-			await updateProfile({
+			const updatedProfile = await updateProfile({
 				name,
 				title,
 				subtitle,
@@ -78,6 +79,7 @@
 				contactEmail,
 				finalQuote
 			});
+			savedProfile = updatedProfile;
 			successMessage = 'プロフィールを更新しました。';
 			setTimeout(() => {
 				successMessage = '';
