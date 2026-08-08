@@ -35,6 +35,12 @@
 		isGoalDialogOpen = true;
 	}
 
+	function openGoalDialogWithKeyboard(event: KeyboardEvent) {
+		if (event.key !== 'Enter' && event.key !== ' ') return;
+		event.preventDefault();
+		openGoalDialog();
+	}
+
 	function addGoal() {
 		draftGoals = [...draftGoals, { title: '', targetValue: 1, progressValue: 0 }];
 	}
@@ -79,7 +85,14 @@
 	<div class="grid gap-4 md:grid-cols-2">
 		{#each goals.goals as goal (goal.id)}
 			{@const percentage = Math.round((goal.progressValue / goal.targetValue) * 100)}
-			<div class="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4">
+			<div
+				class="cursor-pointer rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 transition-colors hover:border-primary/50 hover:bg-surface-container-low"
+				role="button"
+				tabindex="0"
+				aria-label={`${goal.title}を編集`}
+				onclick={openGoalDialog}
+				onkeydown={openGoalDialogWithKeyboard}
+			>
 				<div class="mb-2 flex items-center justify-between gap-3">
 					<h2 class="font-label-md text-label-md font-semibold text-primary">{goal.title}</h2>
 					<span class="font-label-sm text-label-sm text-on-surface-variant">{goal.progressValue} / {goal.targetValue} ({percentage}%)</span>
@@ -99,7 +112,7 @@
 		<section role="dialog" aria-modal="true" aria-labelledby="goal-dialog-title" class="w-full max-w-2xl rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xl">
 			<div class="mb-6 flex items-start justify-between gap-4">
 				<div>
-					<h2 id="goal-dialog-title" class="font-headline-lg text-headline-lg text-primary">今月の目標を登録</h2>
+					<h2 id="goal-dialog-title" class="font-headline-lg text-headline-lg text-primary">今月の目標{goals.goals.length > 0 ? 'を編集' : 'を登録'}</h2>
 					<p class="font-body-sm text-body-sm mt-1 text-on-surface-variant">目標値と現在の進捗を入力してください。</p>
 				</div>
 				{#if goals.goals.length > 0}<button type="button" onclick={() => (isGoalDialogOpen = false)} class="min-h-11 min-w-11 rounded-lg text-on-surface-variant hover:bg-surface-container-low" aria-label="目標入力を閉じる">×</button>{/if}
