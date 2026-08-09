@@ -24,7 +24,7 @@
 <!-- Footer -->
 <footer class="bg-surface w-full border-t border-outline-variant/20 py-section-gap">
 	<div class="mx-auto flex max-w-container-max flex-col items-start justify-between gap-stack-md px-gutter md:flex-row md:items-center">
-	<button type="button" onclick={handleBuildlogTap} class="font-label-md text-label-md text-primary font-semibold" aria-label="Buildlog。3回押すと認証ページを開きます">
+	<button type="button" onclick={handleBuildlogTap} class="font-label-md text-label-md text-primary font-semibold">
 			Buildlog
 		</button>
 		<div class="flex flex-wrap items-center gap-2">
