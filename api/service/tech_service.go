@@ -16,13 +16,18 @@ func ListTechs(ctx context.Context, all bool, offset, limit int, ipAddress strin
 	if err != nil {
 		return nil, err
 	}
+	postIDs := make([]int64, len(techList))
 	for i := range techList {
-
-		count, _ := repository.CountLikesByPostID(ctx, db, techList[i].ID)
-
-		liked, _ := repository.HasLiked(ctx, db, techList[i].ID, ipAddress)
-		techList[i].LikesCount = count
-		techList[i].HasLiked = liked
+		postIDs[i] = techList[i].ID
+	}
+	engagements, err := repository.GetPostEngagements(ctx, db, postIDs, ipAddress)
+	if err != nil {
+		return nil, err
+	}
+	for i := range techList {
+		engagement := engagements[techList[i].ID]
+		techList[i].LikesCount = engagement.LikesCount
+		techList[i].HasLiked = engagement.HasLiked
 	}
 	return techList, nil
 }
@@ -34,12 +39,13 @@ func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTab
 	if err != nil {
 		return nil, err
 	}
-
-	count, _ := repository.CountLikesByPostID(ctx, db, tech.ID)
-
-	liked, _ := repository.HasLiked(ctx, db, tech.ID, ipAddress)
-	tech.LikesCount = count
-	tech.HasLiked = liked
+	engagements, err := repository.GetPostEngagements(ctx, db, []int64{tech.ID}, ipAddress)
+	if err != nil {
+		return nil, err
+	}
+	engagement := engagements[tech.ID]
+	tech.LikesCount = engagement.LikesCount
+	tech.HasLiked = engagement.HasLiked
 	return tech, nil
 }
 

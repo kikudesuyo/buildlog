@@ -16,13 +16,19 @@ func ListDiaries(ctx context.Context, all bool, offset int, limit int, ipAddress
 	if err != nil {
 		return nil, err
 	}
+	postIDs := make([]int64, len(diaryList))
 	for i := range diaryList {
-		count, _ := repository.CountLikesByPostID(ctx, db, diaryList[i].ID)
-		commentsCount, _ := repository.CountCommentsByPostID(ctx, db, diaryList[i].ID)
-		liked, _ := repository.HasLiked(ctx, db, diaryList[i].ID, ipAddress)
-		diaryList[i].LikesCount = count
-		diaryList[i].CommentsCount = commentsCount
-		diaryList[i].HasLiked = liked
+		postIDs[i] = diaryList[i].ID
+	}
+	engagements, err := repository.GetPostEngagements(ctx, db, postIDs, ipAddress)
+	if err != nil {
+		return nil, err
+	}
+	for i := range diaryList {
+		engagement := engagements[diaryList[i].ID]
+		diaryList[i].LikesCount = engagement.LikesCount
+		diaryList[i].CommentsCount = engagement.CommentsCount
+		diaryList[i].HasLiked = engagement.HasLiked
 	}
 	return diaryList, nil
 }
@@ -34,12 +40,14 @@ func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTa
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, db, diary.ID)
-	commentsCount, _ := repository.CountCommentsByPostID(ctx, db, diary.ID)
-	liked, _ := repository.HasLiked(ctx, db, diary.ID, ipAddress)
-	diary.LikesCount = count
-	diary.CommentsCount = commentsCount
-	diary.HasLiked = liked
+	engagements, err := repository.GetPostEngagements(ctx, db, []int64{diary.ID}, ipAddress)
+	if err != nil {
+		return nil, err
+	}
+	engagement := engagements[diary.ID]
+	diary.LikesCount = engagement.LikesCount
+	diary.CommentsCount = engagement.CommentsCount
+	diary.HasLiked = engagement.HasLiked
 	return diary, nil
 }
 

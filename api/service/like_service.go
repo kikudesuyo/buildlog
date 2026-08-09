@@ -15,24 +15,18 @@ type LikeStatus struct {
 // LikePost はこの処理に必要な内部処理を実行します。
 func LikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
 	db := library.GetDB(ctx)
-	alreadyLiked, err := repository.HasLiked(ctx, db, postID, ipAddress)
-	if err != nil {
+	if err := repository.CreateLike(ctx, db, postID, ipAddress); err != nil {
 		return LikeStatus{}, err
 	}
-	if !alreadyLiked {
-		if err := repository.CreateLike(ctx, db, postID, ipAddress); err != nil {
-			return LikeStatus{}, err
-		}
-	}
 
-	count, err := repository.CountLikesByPostID(ctx, db, postID)
+	count, hasLiked, err := repository.GetLikeStatus(ctx, db, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}
 
 	return LikeStatus{
 		LikesCount: count,
-		HasLiked:   true,
+		HasLiked:   hasLiked,
 	}, nil
 }
 
@@ -43,26 +37,21 @@ func UnlikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus
 		return LikeStatus{}, err
 	}
 
-	count, err := repository.CountLikesByPostID(ctx, db, postID)
+	count, hasLiked, err := repository.GetLikeStatus(ctx, db, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}
 
 	return LikeStatus{
 		LikesCount: count,
-		HasLiked:   false,
+		HasLiked:   hasLiked,
 	}, nil
 }
 
 // GetLikeStatus はデータを取得します。
 func GetLikeStatus(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
 	db := library.GetDB(ctx)
-	count, err := repository.CountLikesByPostID(ctx, db, postID)
-	if err != nil {
-		return LikeStatus{}, err
-	}
-
-	hasLiked, err := repository.HasLiked(ctx, db, postID, ipAddress)
+	count, hasLiked, err := repository.GetLikeStatus(ctx, db, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}

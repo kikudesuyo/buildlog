@@ -7,6 +7,7 @@ import (
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/library"
+	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
 type PostLikeCount struct {
@@ -17,26 +18,14 @@ type PostLikeCount struct {
 // GetAnalytics はデータを取得します。
 func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
 	db := library.GetDB(ctx)
-	var posts []entity.DBTablePost
-	if err := db.WithContext(ctx).Where("deleted_at IS NULL").Find(&posts).Error; err != nil {
+	data, err := repository.GetAnalyticsData(ctx, db)
+	if err != nil {
 		return entity.AnalyticsResponse{}, err
-	}
-	var totalLikes int64
-	if err := db.WithContext(ctx).Model(&entity.DBTableLike{}).Count(&totalLikes).Error; err != nil {
-		return entity.AnalyticsResponse{}, err
-	}
-	var likeCounts []PostLikeCount
-	if err := db.WithContext(ctx).Model(&entity.DBTableLike{}).Select("post_id, COUNT(*) as count").Group("post_id").Scan(&likeCounts).Error; err != nil {
-		return entity.AnalyticsResponse{}, err
-	}
-	likesMap := make(map[int64]int64)
-	for _, likeCount := range likeCounts {
-		likesMap[likeCount.PostID] = likeCount.Count
 	}
 
 	var totalViews, diaryCount, techCount int64
-	items := make([]entity.AnalyticsArticleItem, len(posts))
-	for i, post := range posts {
+	items := make([]entity.AnalyticsArticleItem, len(data.Posts))
+	for i, post := range data.Posts {
 		views := post.Views
 		totalViews += views
 		if post.Type == "diary" {
@@ -44,7 +33,7 @@ func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
 		} else if post.Type == "tech" {
 			techCount++
 		}
-		items[i] = entity.AnalyticsArticleItem{ID: post.ID, Type: post.Type, Title: post.Title, Views: views, Likes: likesMap[post.ID]}
+		items[i] = entity.AnalyticsArticleItem{ID: post.ID, Type: post.Type, Title: post.Title, Views: views, Likes: data.LikeCounts[post.ID]}
 	}
 	viewsRanking := append([]entity.AnalyticsArticleItem(nil), items...)
 	sort.Slice(viewsRanking, func(i, j int) bool {
@@ -75,7 +64,7 @@ func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
 		months[11-i] = month
 		counts[month] = 0
 	}
-	for _, post := range posts {
+	for _, post := range data.Posts {
 		month := post.CreatedAt.Format("2006-01")
 		if _, ok := counts[month]; ok {
 			counts[month]++
@@ -85,5 +74,5 @@ func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
 	for i, month := range months {
 		activities[i] = entity.MonthlyActivityItem{Month: month, Count: counts[month]}
 	}
-	return entity.AnalyticsResponse{TotalViews: totalViews, TotalLikes: totalLikes, TotalPosts: int64(len(posts)), DiaryCount: diaryCount, TechCount: techCount, TopViewsArticles: viewsRanking, TopLikesArticles: likesRanking, MonthlyActivities: activities}, nil
+	return entity.AnalyticsResponse{TotalViews: totalViews, TotalLikes: data.TotalLikes, TotalPosts: int64(len(data.Posts)), DiaryCount: diaryCount, TechCount: techCount, TopViewsArticles: viewsRanking, TopLikesArticles: likesRanking, MonthlyActivities: activities}, nil
 }
