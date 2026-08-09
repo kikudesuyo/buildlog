@@ -70,7 +70,6 @@
 				name,
 				title,
 				subtitle,
-				avatarUrl: localAvatarUrl,
 				quote,
 				bio,
 				highlights,

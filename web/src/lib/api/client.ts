@@ -512,7 +512,6 @@ export async function fetchProfile(fetchFn: ApiFetch): Promise<ProfileData> {
 		name: string;
 		subtitle: string;
 		title: string;
-		avatar_url: string;
 		quote: string;
 		bio: string[];
 		highlights: { title: string; period: string; description: string }[];
@@ -526,7 +525,6 @@ export async function fetchProfile(fetchFn: ApiFetch): Promise<ProfileData> {
 		name: response.data.name,
 		subtitle: response.data.subtitle,
 		title: response.data.title,
-		avatarUrl: response.data.avatar_url,
 		quote: response.data.quote,
 		bio: response.data.bio,
 		highlights: response.data.highlights,
@@ -543,7 +541,6 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 		name: string;
 		subtitle: string;
 		title: string;
-		avatar_url: string;
 		quote: string;
 		bio: string[];
 		highlights: { title: string; period: string; description: string }[];
@@ -555,7 +552,6 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 		name: profile.name,
 		subtitle: profile.subtitle,
 		title: profile.title,
-		avatar_url: profile.avatarUrl,
 		quote: profile.quote,
 		bio: profile.bio,
 		highlights: profile.highlights,
@@ -569,7 +565,6 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 		name: response.data.name,
 		subtitle: response.data.subtitle,
 		title: response.data.title,
-		avatarUrl: response.data.avatar_url,
 		quote: response.data.quote,
 		bio: response.data.bio,
 		highlights: response.data.highlights,
