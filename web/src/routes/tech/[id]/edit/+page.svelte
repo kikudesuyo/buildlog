@@ -196,6 +196,7 @@
 				<div id="tech-preview-panel" role="tabpanel" aria-label="本文プレビュー" class="flex flex-col gap-1.5 min-h-[300px]">
 					<span class="font-label-md text-label-md font-bold text-primary border-b border-outline-variant/10 pb-2 mb-2">リアルタイムプレビュー</span>
 					<div class="prose max-w-none text-on-surface min-h-[300px] text-body-lg leading-relaxed">
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 						{@html parsedContent}
 					</div>
 				</div>

@@ -57,7 +57,8 @@ func handleRequest(r *http.Request, processFn ProcessFunc) (http.Handler, error)
 	resp, err := processFn(r, data)
 
 	// 後処理実行
-	if err := handleRequestAfter(r, resp); err != nil {
+	if afterErr := handleRequestAfter(r, resp); afterErr != nil {
+		return nil, afterErr
 	}
 
 	return resp, err
@@ -93,11 +94,12 @@ func getParameters(r *http.Request) (map[string]interface{}, error) {
 		contentType == "application/json",
 		strings.HasPrefix(contentType, "application/json;"):
 		bodyData := make(map[string]interface{})
-		buf, _ := io.ReadAll(r.Body)
-		rdr1 := io.NopCloser(bytes.NewBuffer(buf))
-		rdr2 := io.NopCloser(bytes.NewBuffer(buf))
-		r.Body = rdr2 // request.Bodyへストリームデータを書き戻して再利用できるようにする
-		err := json.NewDecoder(rdr1).Decode(&bodyData)
+		buf, err := io.ReadAll(r.Body)
+		if err != nil {
+			return nil, err
+		}
+		r.Body = io.NopCloser(bytes.NewReader(buf)) // request.Bodyへストリームデータを書き戻して再利用できるようにする
+		err = json.NewDecoder(bytes.NewReader(buf)).Decode(&bodyData)
 		if err != nil && err != io.EOF {
 			return nil, err
 		}

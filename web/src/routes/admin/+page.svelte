@@ -70,6 +70,20 @@
 		await persistGoals(nextGoals);
 	}
 
+	function updateGoalProgress(goalId: number, progressValue: number) {
+		goals = {
+			...goals,
+			goals: goals.goals.map((goal) => (goal.id === goalId ? { ...goal, progressValue } : goal))
+		};
+	}
+
+	async function saveGoalProgress(goalId: number, progressValue: number) {
+		const nextGoals = goals.goals.map((goal) =>
+			goal.id === goalId ? { ...goal, progressValue } : goal
+		);
+		await persistGoals(nextGoals);
+	}
+
 	function closeGoalDialog() {
 		if (!isSavingGoals) {
 			isGoalDialogOpen = false;
@@ -110,8 +124,21 @@
 						<button type="button" onclick={() => removeGoal(goal)} class="min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-error/10 hover:text-error" aria-label={`${goal.title}を削除`}><span class="material-symbols-outlined text-[18px]">delete</span></button>
 					</div>
 				</div>
-				<div class="h-3 overflow-hidden rounded-full bg-surface-container-high" role="progressbar" aria-label={`${goal.title}の進捗`} aria-valuemin="0" aria-valuemax={goal.targetValue} aria-valuenow={goal.progressValue}>
-					<div class="h-full rounded-full bg-gradient-to-r from-primary/60 via-primary to-emerald-400 transition-all duration-700" style={`width: ${Math.min(percentage, 100)}%`}></div>
+				<div class="flex flex-col gap-1.5">
+					<input
+						type="range"
+						min="0"
+						max={goal.targetValue}
+						value={goal.progressValue}
+						oninput={(event) => updateGoalProgress(goal.id, Number(event.currentTarget.value))}
+						onchange={(event) => saveGoalProgress(goal.id, Number(event.currentTarget.value))}
+						class="h-3 w-full cursor-pointer accent-primary"
+						aria-label={`${goal.title}の進捗`}
+						aria-valuemin="0"
+						aria-valuemax={goal.targetValue}
+						aria-valuenow={goal.progressValue}
+					/>
+					<p class="font-label-sm text-label-sm text-on-surface-variant">バーを動かして進捗を更新</p>
 				</div>
 				{#if isCompleted}<p class="font-body-sm text-body-sm mt-3 flex items-center gap-1 text-primary"><span class="material-symbols-outlined text-[17px]">celebration</span>目標達成おめでとうございます！</p>{/if}
 			</div>

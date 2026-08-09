@@ -1,11 +1,8 @@
 package v1
 
 import (
-	"encoding/json"
 	"net/http"
-	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
@@ -25,7 +22,7 @@ func HandleGetApp(r *http.Request, requestData map[string]interface{}) (http.Han
 	if err := handler.ValidateRequestWithAuth(r); err != nil {
 		return nil, err
 	}
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +39,7 @@ func HandleCreateApp(r *http.Request, requestData map[string]interface{}) (http.
 		return nil, err
 	}
 	var req entity.CreateAppRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
 	if req.Slug == "" || req.Name == "" {
@@ -60,12 +57,12 @@ func HandleUpdateApp(r *http.Request, requestData map[string]interface{}) (http.
 	if err := handler.ValidateRequestWithAuth(r); err != nil {
 		return nil, err
 	}
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
 	var req entity.UpdateAppRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
 	if req.Slug == "" || req.Name == "" {
@@ -83,12 +80,12 @@ func HandleDeleteApp(r *http.Request, requestData map[string]interface{}) (http.
 	if err := handler.ValidateRequestWithAuth(r); err != nil {
 		return nil, err
 	}
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
 	if err := service.DeleteApp(r.Context(), id); err != nil {
 		return nil, err
 	}
-	return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil
+	return deletedResponse("deleted"), nil
 }
