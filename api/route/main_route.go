@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	v1 "github.com/kikudesuyo/buildlog/api/handler/v1"
+	authmiddleware "github.com/kikudesuyo/buildlog/api/middleware"
 	"github.com/kikudesuyo/buildlog/api/service"
 	"gorm.io/gorm"
 )
@@ -20,36 +21,38 @@ func NewRouter(db *gorm.DB) http.Handler {
 	r.Use(corsMiddleware)
 
 	r.Route("/api/v1", func(r chi.Router) {
-		r.Get("/diaries", handleFunc(v1.HandleGetDiaryList))
+		r.Post("/auth/login", handleFunc(v1.HandleAdminLogin))
+		r.With(authmiddleware.RequireAdmin).Get("/auth/session", handleFunc(v1.HandleAdminSession))
+		r.With(authmiddleware.RequireAdminForAll).Get("/diaries", handleFunc(v1.HandleGetDiaryList))
 		r.Get("/diaries/{id}", handleFunc(v1.HandleGetDiary))
-		r.Post("/diaries", handleFunc(v1.HandleCreateDiary))
-		r.Put("/diaries/{id}", handleFunc(v1.HandleUpdateDiary))
-		r.Delete("/diaries/{id}", handleFunc(v1.HandleDeleteDiary))
+		r.With(authmiddleware.RequireAdmin).Post("/diaries", handleFunc(v1.HandleCreateDiary))
+		r.With(authmiddleware.RequireAdmin).Put("/diaries/{id}", handleFunc(v1.HandleUpdateDiary))
+		r.With(authmiddleware.RequireAdmin).Delete("/diaries/{id}", handleFunc(v1.HandleDeleteDiary))
 
-		r.Get("/techs", handleFunc(v1.HandleGetTechList))
+		r.With(authmiddleware.RequireAdminForAll).Get("/techs", handleFunc(v1.HandleGetTechList))
 		r.Get("/techs/{id}", handleFunc(v1.HandleGetTech))
-		r.Post("/techs", handleFunc(v1.HandleCreateTech))
-		r.Put("/techs/{id}", handleFunc(v1.HandleUpdateTech))
-		r.Delete("/techs/{id}", handleFunc(v1.HandleDeleteTech))
+		r.With(authmiddleware.RequireAdmin).Post("/techs", handleFunc(v1.HandleCreateTech))
+		r.With(authmiddleware.RequireAdmin).Put("/techs/{id}", handleFunc(v1.HandleUpdateTech))
+		r.With(authmiddleware.RequireAdmin).Delete("/techs/{id}", handleFunc(v1.HandleDeleteTech))
 
 		r.Post("/posts/{id}/like", handleFunc(v1.HandlePostLike))
 		r.Delete("/posts/{id}/like", handleFunc(v1.HandleDeleteLike))
 		r.Get("/posts/{id}/like", handleFunc(v1.HandleGetLikeStatus))
-		r.Get("/trash", handleFunc(v1.HandleGetDeletedPosts))
-		r.Put("/trash/{id}/restore", handleFunc(v1.HandleRestorePost))
+		r.With(authmiddleware.RequireAdmin).Get("/trash", handleFunc(v1.HandleGetDeletedPosts))
+		r.With(authmiddleware.RequireAdmin).Put("/trash/{id}/restore", handleFunc(v1.HandleRestorePost))
 		r.Get("/apps", handleFunc(v1.HandleGetAppList))
-		r.Get("/apps/{id}", handleFunc(v1.HandleGetApp))
-		r.Post("/apps", handleFunc(v1.HandleCreateApp))
-		r.Put("/apps/{id}", handleFunc(v1.HandleUpdateApp))
-		r.Delete("/apps/{id}", handleFunc(v1.HandleDeleteApp))
+		r.With(authmiddleware.RequireAdmin).Get("/apps/{id}", handleFunc(v1.HandleGetApp))
+		r.With(authmiddleware.RequireAdmin).Post("/apps", handleFunc(v1.HandleCreateApp))
+		r.With(authmiddleware.RequireAdmin).Put("/apps/{id}", handleFunc(v1.HandleUpdateApp))
+		r.With(authmiddleware.RequireAdmin).Delete("/apps/{id}", handleFunc(v1.HandleDeleteApp))
 		r.Get("/profile", handleFunc(v1.HandleGetProfile))
-		r.Put("/profile", handleFunc(v1.HandleUpdateProfile))
+		r.With(authmiddleware.RequireAdmin).Put("/profile", handleFunc(v1.HandleUpdateProfile))
 		r.Get("/posts/{id}/comments", handleFunc(v1.HandleGetCommentList))
 		r.Post("/posts/{id}/comments", handleFunc(v1.HandleCreateComment))
-		r.Get("/posts/history", handleFunc(v1.HandleGetPostHistory(db)))
-		r.Get("/admin/analytics", handleFunc(v1.HandleGetAnalytics))
-		r.Get("/goals/current", handleFunc(v1.HandleGetCurrentGoals))
-		r.Put("/goals/current", handleFunc(v1.HandleSaveCurrentGoals))
+		r.With(authmiddleware.RequireAdmin).Get("/posts/history", handleFunc(v1.HandleGetPostHistory(db)))
+		r.With(authmiddleware.RequireAdmin).Get("/admin/analytics", handleFunc(v1.HandleGetAnalytics))
+		r.With(authmiddleware.RequireAdmin).Get("/goals/current", handleFunc(v1.HandleGetCurrentGoals))
+		r.With(authmiddleware.RequireAdmin).Put("/goals/current", handleFunc(v1.HandleSaveCurrentGoals))
 	})
 
 	return r
@@ -66,6 +69,9 @@ func corsMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if allowedOrigin != "*" {
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+		}
 
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)

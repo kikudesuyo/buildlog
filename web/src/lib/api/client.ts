@@ -1,4 +1,3 @@
-import * as env from '$env/static/public';
 import type { LoadEvent } from '@sveltejs/kit';
 import type {
 	DiaryEntry,
@@ -26,10 +25,7 @@ type ApiObjectResponse<T> = {
 
 
 
-const apiBaseUrl = (() => {
-	const rawUrl = env.PUBLIC_API_BASE_URL || 'http://localhost:8081';
-	return rawUrl.endsWith('/api/v1') ? rawUrl : `${rawUrl}/api/v1`;
-})();
+const apiBaseUrl = '/api/v1';
 
 async function get<T>(fetchFn: ApiFetch, path: string): Promise<T> {
 	const response = await fetchFn(`${apiBaseUrl}${path}`);

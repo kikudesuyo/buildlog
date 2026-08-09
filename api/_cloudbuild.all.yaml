@@ -45,7 +45,7 @@ steps:
       - 'IS_PRODUCTION=$_IS_PRODUCTION,API_DOMAIN=$_API_DOMAIN,ALLOWED_ORIGINS=$_ALLOWED_ORIGINS'
       # Secret Managerから環境変数へマウント
       - '--set-secrets'
-      - 'DATABASE_URL=DATABASE_URL:latest'
+      - 'DATABASE_URL=DATABASE_URL:latest,ADMIN_PASSWORD=ADMIN_PASSWORD:latest,ADMIN_SESSION_SECRET=ADMIN_SESSION_SECRET:latest'
 
 images:
   - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/buildlog/api-$_RESOURCE_PREFIX:$_COMMIT_SHA'
