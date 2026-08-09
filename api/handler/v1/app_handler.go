@@ -1,11 +1,8 @@
 package v1
 
 import (
-	"encoding/json"
 	"net/http"
-	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/service"
 )
@@ -21,7 +18,7 @@ func HandleGetAppList(r *http.Request, requestData map[string]interface{}) (http
 
 // HandleGetApp はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetApp(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +32,7 @@ func HandleGetApp(r *http.Request, requestData map[string]interface{}) (http.Han
 // HandleCreateApp はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleCreateApp(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	var req entity.CreateAppRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
 	if req.Slug == "" || req.Name == "" {
@@ -50,12 +47,12 @@ func HandleCreateApp(r *http.Request, requestData map[string]interface{}) (http.
 
 // HandleUpdateApp はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateApp(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
 	var req entity.UpdateAppRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
 	if req.Slug == "" || req.Name == "" {
@@ -70,12 +67,12 @@ func HandleUpdateApp(r *http.Request, requestData map[string]interface{}) (http.
 
 // HandleDeleteApp はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleDeleteApp(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
 	if err := service.DeleteApp(r.Context(), id); err != nil {
 		return nil, err
 	}
-	return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil
+	return deletedResponse("deleted"), nil
 }

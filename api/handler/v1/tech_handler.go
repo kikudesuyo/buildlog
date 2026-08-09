@@ -1,11 +1,9 @@
 package v1
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/service"
 )
@@ -44,7 +42,7 @@ func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (htt
 
 // HandleGetTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +62,7 @@ func HandleGetTech(r *http.Request, requestData map[string]interface{}) (http.Ha
 // HandleCreateTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleCreateTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	var req entity.CreateTechRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
 	if req.Title == "" || req.Content == "" || !entity.IsValidTechCategory(req.Category) {
@@ -79,12 +77,12 @@ func HandleCreateTech(r *http.Request, requestData map[string]interface{}) (http
 
 // HandleUpdateTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
 	var req entity.UpdateTechRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
 	if req.Title == "" || req.Content == "" || !entity.IsValidTechCategory(req.Category) {
@@ -99,12 +97,12 @@ func HandleUpdateTech(r *http.Request, requestData map[string]interface{}) (http
 
 // HandleDeleteTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleDeleteTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
 	if err := service.DeleteTech(r.Context(), id); err != nil {
 		return nil, err
 	}
-	return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil
+	return deletedResponse("deleted"), nil
 }
