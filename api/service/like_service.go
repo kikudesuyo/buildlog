@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
@@ -13,11 +14,12 @@ type LikeStatus struct {
 
 // LikePost はこの処理に必要な内部処理を実行します。
 func LikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
-	if err := repository.CreateLike(ctx, database, postID, ipAddress); err != nil {
+	db := library.GetDB(ctx)
+	if err := repository.CreateLike(ctx, db, postID, ipAddress); err != nil {
 		return LikeStatus{}, err
 	}
 
-	count, hasLiked, err := repository.GetLikeStatus(ctx, database, postID, ipAddress)
+	count, hasLiked, err := repository.GetLikeStatus(ctx, db, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}
@@ -30,11 +32,12 @@ func LikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, 
 
 // UnlikePost はこの処理に必要な内部処理を実行します。
 func UnlikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
-	if err := repository.DeleteLike(ctx, database, postID, ipAddress); err != nil {
+	db := library.GetDB(ctx)
+	if err := repository.DeleteLike(ctx, db, postID, ipAddress); err != nil {
 		return LikeStatus{}, err
 	}
 
-	count, hasLiked, err := repository.GetLikeStatus(ctx, database, postID, ipAddress)
+	count, hasLiked, err := repository.GetLikeStatus(ctx, db, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}
@@ -47,7 +50,8 @@ func UnlikePost(ctx context.Context, postID int64, ipAddress string) (LikeStatus
 
 // GetLikeStatus はデータを取得します。
 func GetLikeStatus(ctx context.Context, postID int64, ipAddress string) (LikeStatus, error) {
-	count, hasLiked, err := repository.GetLikeStatus(ctx, database, postID, ipAddress)
+	db := library.GetDB(ctx)
+	count, hasLiked, err := repository.GetLikeStatus(ctx, db, postID, ipAddress)
 	if err != nil {
 		return LikeStatus{}, err
 	}

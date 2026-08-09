@@ -6,12 +6,19 @@ import (
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
+type PostLikeCount struct {
+	PostID int64 `gorm:"column:post_id"`
+	Count  int64 `gorm:"column:count"`
+}
+
 // GetAnalytics はデータを取得します。
 func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
-	data, err := repository.GetAnalyticsData(ctx, database)
+	db := library.GetDB(ctx)
+	data, err := repository.GetAnalyticsData(ctx, db)
 	if err != nil {
 		return entity.AnalyticsResponse{}, err
 	}
