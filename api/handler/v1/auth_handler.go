@@ -23,7 +23,7 @@ func HandleAdminLogin(r *http.Request, requestData map[string]interface{}) (http
 	if err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
-	return entity.NewObjectResponse(map[string]string{"session": session}), nil
+	return entity.NewObjectResponse(map[string]string{"login_token": session}), nil
 }
 
 func HandleAdminSession(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {

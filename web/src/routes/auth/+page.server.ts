@@ -31,10 +31,10 @@ export const actions: Actions = {
 			body: JSON.stringify({ password })
 		});
 		if (!response.ok) return fail(response.status === 503 ? 500 : 401, { error: 'パスワードが正しくありません。' });
-		const result = (await response.json()) as { data?: { session?: string } };
-		if (!result.data?.session) return fail(500, { error: '認証設定が不足しています。' });
+		const result = (await response.json()) as { data?: { login_token?: string } };
+		if (!result.data?.login_token) return fail(500, { error: '認証設定が不足しています。' });
 
-		cookies.set(ADMIN_SESSION_COOKIE, result.data.session, {
+		cookies.set(ADMIN_SESSION_COOKIE, result.data.login_token, {
 			path: '/',
 			httpOnly: true,
 			sameSite: 'lax',

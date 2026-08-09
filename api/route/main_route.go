@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	authmiddleware "github.com/kikudesuyo/buildlog/api/middleware"
 	v1 "github.com/kikudesuyo/buildlog/api/handler/v1"
+	authmiddleware "github.com/kikudesuyo/buildlog/api/middleware"
 )
 
 // NewRouter は値を生成します。
@@ -16,6 +16,7 @@ func NewRouter() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(corsMiddleware)
+	r.Use(authmiddleware.JWTAdminToCtx())
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Post("/auth/login", handleFunc(v1.HandleAdminLogin))
