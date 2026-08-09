@@ -87,21 +87,26 @@
 	<div class="grid gap-4 md:grid-cols-2">
 		{#each goals.goals as goal (goal.id)}
 			{@const percentage = Math.round((goal.progressValue / goal.targetValue) * 100)}
+			{@const isCompleted = goal.progressValue >= goal.targetValue}
 			<div
-				class="cursor-pointer rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-4 transition-colors hover:border-primary/50 hover:bg-surface-container-low"
-				role="button"
-				tabindex="0"
-				aria-label={`${goal.title}を編集`}
-				onclick={openGoalDialog}
-				onkeydown={openGoalDialogWithKeyboard}
+				class="rounded-xl border {isCompleted ? 'border-primary/40 bg-primary/5' : 'border-outline-variant/30 bg-surface-container-lowest'} p-4 transition-colors hover:border-primary/50 hover:bg-surface-container-low"
 			>
-				<div class="mb-2 flex items-center justify-between gap-3">
-					<h2 class="font-label-md text-label-md font-semibold text-primary">{goal.title}</h2>
-					<span class="font-label-sm text-label-sm text-on-surface-variant">{goal.progressValue} / {goal.targetValue} ({percentage}%)</span>
+				<div class="mb-3 flex items-start justify-between gap-3">
+					<div>
+						<h2 class="font-label-md text-label-md font-semibold text-primary">{goal.title}</h2>
+						<p class="font-label-sm text-label-sm mt-1 text-on-surface-variant">{goal.progressValue} / {goal.targetValue} ({Math.min(percentage, 100)}%)</p>
+					</div>
+					{#if isCompleted}
+						<span class="font-label-sm text-label-sm flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 font-semibold text-primary" role="status">
+							<span class="material-symbols-outlined text-[16px]">check_circle</span>
+							達成
+						</span>
+					{/if}
 				</div>
 				<div class="h-3 overflow-hidden rounded-full bg-surface-container-high" role="progressbar" aria-label={`${goal.title}の進捗`} aria-valuemin="0" aria-valuemax={goal.targetValue} aria-valuenow={goal.progressValue}>
-					<div class="h-full rounded-full bg-primary transition-all" style={`width: ${Math.min(percentage, 100)}%`}></div>
+					<div class="h-full rounded-full bg-gradient-to-r from-primary/60 via-primary to-emerald-400 transition-all duration-700" style={`width: ${Math.min(percentage, 100)}%`}></div>
 				</div>
+				{#if isCompleted}<p class="font-body-sm text-body-sm mt-3 flex items-center gap-1 text-primary"><span class="material-symbols-outlined text-[17px]">celebration</span>目標達成おめでとうございます！</p>{/if}
 			</div>
 		{:else}
 			<p class="font-body-md text-body-md text-on-surface-variant">今月の目標はまだ登録されていません。</p>
