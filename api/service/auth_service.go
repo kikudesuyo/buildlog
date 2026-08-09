@@ -1,4 +1,4 @@
-package library
+package service
 
 import (
 	"time"
@@ -6,15 +6,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const AdminSessionCookie = "buildlog_admin_session"
+const JWTCookie = "buildlog_jwt_token"
 
-const adminSessionIssuer = "buildlog-api"
-const adminSessionSubject = "admin"
+const jwtIssuer = "buildlog-api"
+const jwtSubject = "admin"
 
-func CreateAdminSession(secret string, now time.Time) (string, error) {
+func GetJWTToken(secret string, now time.Time) (string, error) {
 	claims := jwt.RegisteredClaims{
-		Issuer:    adminSessionIssuer,
-		Subject:   adminSessionSubject,
+		Issuer:    jwtIssuer,
+		Subject:   jwtSubject,
 		IssuedAt:  jwt.NewNumericDate(now),
 		ExpiresAt: jwt.NewNumericDate(now.Add(30 * 24 * time.Hour)),
 	}
@@ -22,7 +22,7 @@ func CreateAdminSession(secret string, now time.Time) (string, error) {
 	return token.SignedString([]byte(secret))
 }
 
-func IsValidAdminSession(value, secret string) bool {
+func ValidateJWTToken(value, secret string) bool {
 	if value == "" || secret == "" {
 		return false
 	}
@@ -33,6 +33,6 @@ func IsValidAdminSession(value, secret string) bool {
 			return nil, jwt.ErrSignatureInvalid
 		}
 		return []byte(secret), nil
-	}, jwt.WithIssuer(adminSessionIssuer), jwt.WithSubject(adminSessionSubject))
+	}, jwt.WithIssuer(jwtIssuer), jwt.WithSubject(jwtSubject))
 	return err == nil && token.Valid
 }

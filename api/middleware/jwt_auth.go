@@ -8,10 +8,11 @@ import (
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/library"
+	"github.com/kikudesuyo/buildlog/api/service"
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
-func RequireAdmin(next http.Handler) http.Handler {
+func RequireAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := handler.ValidateRequestWithAuth(r); err != nil {
 			entity.NewErrorResponse(err).ServeHTTP(w, r)
@@ -21,43 +22,41 @@ func RequireAdmin(next http.Handler) http.Handler {
 	})
 }
 
-// JWTAdminToCtx はJWTを検証し、結果をcontextへ保存します。
+// JWTAuthToCtx はJWTを検証し、結果をcontextへ保存します。
 // 公開APIを壊さないよう、このmiddleware自体は認証エラーで処理を止めません。
-func JWTAdminToCtx() func(next http.Handler) http.Handler {
+func JWTAuthToCtx() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			token := r.Header.Get("Authorization")
 			if strings.HasPrefix(token, "Bearer ") {
 				token = strings.TrimSpace(strings.TrimPrefix(token, "Bearer "))
 			} else {
-				token = adminSessionValue(r)
+				token = jwtTokenValue(r)
 			}
 
-			ctx := library.CtxSetAdminAuthenticated(r.Context(), false)
-			if token == "" {
-				ctx = library.CtxSetJWTError(ctx, authRequiredError())
-			} else if !library.IsValidAdminSession(token, os.Getenv("ADMIN_SESSION_SECRET")) {
+			ctx := library.CtxSetJWTAuthenticated(r.Context(), false)
+			if token == "" || !service.ValidateJWTToken(token, os.Getenv("ADMIN_SESSION_SECRET")) {
 				ctx = library.CtxSetJWTError(ctx, authRequiredError())
 			} else {
-				ctx = library.CtxSetAdminAuthenticated(ctx, true)
+				ctx = library.CtxSetJWTAuthenticated(ctx, true)
 			}
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
 
-func RequireAdminForAll(next http.Handler) http.Handler {
+func RequireAuthForAll(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("all") != "true" {
 			next.ServeHTTP(w, r)
 			return
 		}
-		RequireAdmin(next).ServeHTTP(w, r)
+		RequireAuth(next).ServeHTTP(w, r)
 	})
 }
 
-func adminSessionValue(r *http.Request) string {
-	value, err := r.Cookie(library.AdminSessionCookie)
+func jwtTokenValue(r *http.Request) string {
+	value, err := r.Cookie(service.JWTCookie)
 	if err != nil {
 		return ""
 	}
@@ -65,5 +64,5 @@ func adminSessionValue(r *http.Request) string {
 }
 
 func authRequiredError() error {
-	return xerror.AuthAdminSessionInvalid()
+	return xerror.AuthJWTInvalidTokenErr(nil)
 }

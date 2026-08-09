@@ -34,8 +34,8 @@ func ValidateRequestWithAuth(r *http.Request) error {
 	if err, ok := library.CtxGetJWTError(r.Context()); ok && err != nil {
 		return err
 	}
-	if !library.CtxIsAdminAuthenticated(r.Context()) {
-		return xerror.AuthAdminSessionInvalid()
+	if !library.CtxIsJWTAuthenticated(r.Context()) {
+		return xerror.AuthJWTInvalidTokenErr(nil)
 	}
 	return nil
 }

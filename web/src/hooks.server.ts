@@ -1,12 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 
-const ADMIN_SESSION_COOKIE = 'buildlog_admin_session';
+const JWT_TOKEN_COOKIE = 'buildlog_jwt_token';
 
 export const handle = async ({ event, resolve }) => {
 	if (event.url.pathname.startsWith('/admin')) {
-		const session = event.cookies.get(ADMIN_SESSION_COOKIE);
+		const session = event.cookies.get(JWT_TOKEN_COOKIE);
 		const response = session
-			? await event.fetch('/api/v1/auth/session', { headers: { cookie: `${ADMIN_SESSION_COOKIE}=${session}` } })
+			? await event.fetch('/api/v1/auth/session', { headers: { cookie: `${JWT_TOKEN_COOKIE}=${session}` } })
 			: null;
 		if (!response?.ok) {
 			const redirectTo = `${event.url.pathname}${event.url.search}`;

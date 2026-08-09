@@ -1,21 +1,21 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-const ADMIN_SESSION_COOKIE = 'buildlog_admin_session';
+const JWT_TOKEN_COOKIE = 'buildlog_jwt_token';
 
 function getSafeRedirectTarget(value: string | null): string {
 	return value?.startsWith('/admin') ? value : '/admin';
 }
 
 export const load: PageServerLoad = async ({ cookies, fetch, url }) => {
-	const session = cookies.get(ADMIN_SESSION_COOKIE);
+	const session = cookies.get(JWT_TOKEN_COOKIE);
 	if (!session) return;
 
 	const response = await fetch('/api/v1/auth/session', {
-		headers: { cookie: `${ADMIN_SESSION_COOKIE}=${session}` }
+		headers: { cookie: `${JWT_TOKEN_COOKIE}=${session}` }
 	});
 	if (response.ok) throw redirect(303, getSafeRedirectTarget(url.searchParams.get('redirect')));
-	cookies.delete(ADMIN_SESSION_COOKIE, { path: '/' });
+	cookies.delete(JWT_TOKEN_COOKIE, { path: '/' });
 };
 
 export const actions: Actions = {
@@ -34,7 +34,7 @@ export const actions: Actions = {
 		const result = (await response.json()) as { data?: { login_token?: string } };
 		if (!result.data?.login_token) return fail(500, { error: '認証設定が不足しています。' });
 
-		cookies.set(ADMIN_SESSION_COOKIE, result.data.login_token, {
+	cookies.set(JWT_TOKEN_COOKIE, result.data.login_token, {
 			path: '/',
 			httpOnly: true,
 			sameSite: 'lax',

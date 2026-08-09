@@ -17,11 +17,11 @@ func CtxGetJWTError(ctx context.Context) (error, bool) {
 	return v, ok
 }
 
-func CtxSetAdminAuthenticated(ctx context.Context, authenticated bool) context.Context {
-	return context.WithValue(ctx, xconst.ContextKeyAdminAuthenticated{}, authenticated)
+func CtxSetJWTAuthenticated(ctx context.Context, authenticated bool) context.Context {
+	return context.WithValue(ctx, xconst.ContextKeyJWTAuthenticated{}, authenticated)
 }
 
-func CtxIsAdminAuthenticated(ctx context.Context) bool {
-	v, _ := ctx.Value(xconst.ContextKeyAdminAuthenticated{}).(bool)
+func CtxIsJWTAuthenticated(ctx context.Context) bool {
+	v, _ := ctx.Value(xconst.ContextKeyJWTAuthenticated{}).(bool)
 	return v
 }

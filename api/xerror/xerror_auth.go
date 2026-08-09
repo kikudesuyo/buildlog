@@ -22,7 +22,6 @@ const (
 	CodeAuthEmptyAccountError              failure.StringCode = "C-0-40001"
 	CodeAuthDisabledAccountError           failure.StringCode = "C-0-40002"
 	CodeAuthTooManyTryError                failure.StringCode = "C-0-41001"
-	CodeAuthAdminSessionInvalidError       failure.StringCode = "C-0-50001"
 
 	CodeAuthDummyError failure.StringCode = "C-1-00001"
 )
@@ -118,10 +117,6 @@ func AuthDisabledAccount(meta ...map[string]string) error {
 // AuthTooManyTry はこの処理に必要な内部処理を実行します。
 func AuthTooManyTry(meta ...map[string]string) error {
 	return generateErrFromText("認証の上限を超えました。しばらくしてからお試しください。", CodeAuthTooManyTryError, meta...)
-}
-
-func AuthAdminSessionInvalid(meta ...map[string]string) error {
-	return generateErrFromText("Invalid admin session", CodeAuthAdminSessionInvalidError, meta...)
 }
 
 // AuthDummyErr は対応するエラーを生成します。

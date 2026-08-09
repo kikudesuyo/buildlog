@@ -8,7 +8,7 @@ const forward: RequestHandler = async ({ request, params, url, fetch }) => {
 		const value = request.headers.get(name);
 		if (value) headers.set(name, value);
 	}
-	const session = request.headers.get('cookie')?.match(/(?:^|;\s*)buildlog_admin_session=([^;]+)/)?.[1];
+	const session = request.headers.get('cookie')?.match(/(?:^|;\s*)buildlog_jwt_token=([^;]+)/)?.[1];
 	if (session) headers.set('authorization', `Bearer ${session}`);
 
 	const response = await fetch(`${apiBaseUrl}/api/v1/${params.path}${url.search}`, {

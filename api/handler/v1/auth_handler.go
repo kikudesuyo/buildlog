@@ -7,25 +7,25 @@ import (
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
-	"github.com/kikudesuyo/buildlog/api/library"
+	"github.com/kikudesuyo/buildlog/api/service"
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
-func HandleAdminLogin(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+func HandleAuthLogin(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	password, ok := requestData["password"].(string)
 	configuredPassword := os.Getenv("ADMIN_PASSWORD")
 	configuredSecret := os.Getenv("ADMIN_SESSION_SECRET")
 	if !ok || configuredPassword == "" || configuredSecret == "" || subtle.ConstantTimeCompare([]byte(password), []byte(configuredPassword)) != 1 {
-		return nil, xerror.AuthAdminSessionInvalid()
+		return nil, xerror.AuthJWTInvalidTokenErr(nil)
 	}
 
-	session, err := library.CreateAdminSession(configuredSecret, time.Now())
+	session, err := service.GetJWTToken(configuredSecret, time.Now())
 	if err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
 	return entity.NewObjectResponse(map[string]string{"login_token": session}), nil
 }
 
-func HandleAdminSession(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+func HandleAuthSession(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	return entity.NewObjectResponse(map[string]bool{"authenticated": true}), nil
 }
