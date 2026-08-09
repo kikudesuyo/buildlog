@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
@@ -22,6 +23,11 @@ func parsePaginationValue(value string) (int, error) {
 // HandleGetTechList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	query := r.URL.Query()
+	if query.Get("all") == "true" {
+		if err := handler.ValidateRequestWithAuth(r); err != nil {
+			return nil, err
+		}
+	}
 	offset, err := parsePaginationValue(query.Get("offset"))
 	if err != nil {
 		return nil, err
@@ -61,6 +67,9 @@ func HandleGetTech(r *http.Request, requestData map[string]interface{}) (http.Ha
 
 // HandleCreateTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleCreateTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	var req entity.CreateTechRequest
 	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
@@ -77,6 +86,9 @@ func HandleCreateTech(r *http.Request, requestData map[string]interface{}) (http
 
 // HandleUpdateTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	id, err := parseID(r)
 	if err != nil {
 		return nil, err
@@ -97,6 +109,9 @@ func HandleUpdateTech(r *http.Request, requestData map[string]interface{}) (http
 
 // HandleDeleteTech はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleDeleteTech(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	id, err := parseID(r)
 	if err != nil {
 		return nil, err

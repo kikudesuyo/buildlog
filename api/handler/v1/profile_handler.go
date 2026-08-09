@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
@@ -19,6 +20,9 @@ func HandleGetProfile(r *http.Request, requestData map[string]interface{}) (http
 
 // HandleUpdateProfile はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateProfile(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	var req entity.UpdateProfileRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err

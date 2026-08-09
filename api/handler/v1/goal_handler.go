@@ -5,12 +5,16 @@ import (
 	"net/http"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
 // HandleGetCurrentGoals はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetCurrentGoals(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	goals, err := service.GetCurrentGoals(r.Context())
 	if err != nil {
 		return nil, err
@@ -20,6 +24,9 @@ func HandleGetCurrentGoals(r *http.Request, requestData map[string]interface{}) 
 
 // HandleSaveCurrentGoals はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleSaveCurrentGoals(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	var req entity.SaveGoalsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, xerror.ClientValidationErr(err)

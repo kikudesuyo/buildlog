@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	v1 "github.com/kikudesuyo/buildlog/api/handler/v1"
+	authmiddleware "github.com/kikudesuyo/buildlog/api/middleware"
 )
 
 // NewRouter は値を生成します。
@@ -15,8 +16,11 @@ func NewRouter() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(corsMiddleware)
+	r.Use(authmiddleware.JWTToCtx())
 
 	r.Route("/api/v1", func(r chi.Router) {
+		r.Post("/auth/login", handleFunc(v1.HandleAuthLogin))
+		r.Get("/auth/session", handleFunc(v1.HandleAuthSession))
 		r.Get("/diaries", handleFunc(v1.HandleGetDiaryList))
 		r.Get("/diaries/{id}", handleFunc(v1.HandleGetDiary))
 		r.Post("/diaries", handleFunc(v1.HandleCreateDiary))
@@ -63,6 +67,9 @@ func corsMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if allowedOrigin != "*" {
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+		}
 
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)

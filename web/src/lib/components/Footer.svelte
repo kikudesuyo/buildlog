@@ -1,18 +1,32 @@
 <script lang="ts">
 	import * as env from '$env/static/public';
+	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
 	const publicEnv = env as unknown as Record<string, string | undefined>;
 	const githubUrl = publicEnv.PUBLIC_GITHUB_URL || 'https://github.com/kikudesuyo';
 	const xUrl = publicEnv.PUBLIC_X_URL || 'https://x.com/kikudesuyo';
+	let buildlogTapCount = 0;
+	let buildlogTapReset: ReturnType<typeof setTimeout> | undefined;
+
+	function handleBuildlogTap() {
+		buildlogTapCount += 1;
+		if (buildlogTapReset) clearTimeout(buildlogTapReset);
+		if (buildlogTapCount >= 5) {
+			buildlogTapCount = 0;
+			goto(resolve('/auth'));
+			return;
+		}
+		buildlogTapReset = setTimeout(() => (buildlogTapCount = 0), 1500);
+	}
 </script>
 
 <!-- Footer -->
 <footer class="bg-surface w-full border-t border-outline-variant/20 py-section-gap">
 	<div class="mx-auto flex max-w-container-max flex-col items-start justify-between gap-stack-md px-gutter md:flex-row md:items-center">
-		<div class="font-label-md text-label-md text-primary font-semibold">
+		<button type="button" onclick={handleBuildlogTap} class="font-label-md text-label-md text-primary font-semibold" aria-label="Buildlog。5回押すと認証ページを開きます">
 			Buildlog
-		</div>
+		</button>
 		<div class="flex flex-wrap items-center gap-2">
 			<a href={resolve('/contact')} class="font-label-sm text-label-sm flex min-h-11 items-center rounded-lg px-3 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary">Contact</a>
 			{#if githubUrl}
