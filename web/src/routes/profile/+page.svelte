@@ -26,13 +26,13 @@
 	<section class="mb-section-gap flex flex-col gap-stack-lg">
 		<div class="flex items-center gap-stack-md">
 			<div class="h-16 w-16 shrink-0 overflow-hidden rounded-full border border-outline-variant/30">
-				{#if avatarFailed || !data.profileData.avatarUrl}
+				{#if avatarFailed}
 					<span class="flex h-full w-full items-center justify-center bg-surface-container-low text-headline-md text-outline" aria-label="プロフィール画像なし">{data.profileData.name.slice(0, 1)}</span>
 				{:else}
 					<img
 						class="aspect-square h-full w-full object-cover grayscale transition-all duration-300 hover:grayscale-0"
 						alt={data.profileData.name}
-						src={data.profileData.avatarUrl}
+						src="/profile.jpg"
 						onerror={handleAvatarError}
 						loading="lazy"
 					/>

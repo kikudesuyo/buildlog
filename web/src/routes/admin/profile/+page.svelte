@@ -3,14 +3,14 @@
 	import { updateProfile } from '$lib/api/client';
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
+	const localAvatarUrl = '/profile.jpg';
+
 	let { data } = $props();
 	let savedProfile = $state(data.profileData);
 
 	let name = $state(data.profileData.name);
 	let title = $state(data.profileData.title);
 	let subtitle = $state(data.profileData.subtitle);
-	let avatarUrl = $state(data.profileData.avatarUrl);
-	let avatarPreviewFailed = $state(false);
 	let quote = $state(data.profileData.quote);
 	
 	// bio は配列なので、改行で繋げてテキストエリアで編集
@@ -35,7 +35,6 @@
 		name !== savedProfile.name ||
 		title !== savedProfile.title ||
 		subtitle !== savedProfile.subtitle ||
-		avatarUrl !== savedProfile.avatarUrl ||
 		quote !== savedProfile.quote ||
 		bioText !== savedProfile.bio.join('\n\n') ||
 		JSON.stringify(highlights) !== JSON.stringify(savedProfile.highlights) ||
@@ -71,7 +70,7 @@
 				name,
 				title,
 				subtitle,
-				avatarUrl,
+				avatarUrl: localAvatarUrl,
 				quote,
 				bio,
 				highlights,
@@ -152,16 +151,11 @@
 				</div>
 
 				<div class="flex flex-col gap-1.5 md:col-span-2">
-					<label for="avatarUrl" class="font-label-md text-label-md font-bold text-on-surface">アバター画像 URL / Avatar URL</label>
-					<input id="avatarUrl" type="url" bind:value={avatarUrl} oninput={() => (avatarPreviewFailed = false)} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
-					{#if avatarUrl && !avatarPreviewFailed}
-						<div class="flex items-center gap-3 text-body-sm text-on-surface-variant">
-							<img src={avatarUrl} alt="アバター画像のプレビュー" class="h-16 w-16 rounded-full border border-outline-variant/30 object-cover" onerror={() => (avatarPreviewFailed = true)} />
-							<span>入力中の画像をプレビューしています。</span>
-						</div>
-					{:else if avatarUrl}
-						<p class="font-body-sm text-body-sm text-error" role="alert">アバター画像を読み込めませんでした。</p>
-					{/if}
+					<span class="font-label-md text-label-md font-bold text-on-surface">アバター画像 / Avatar</span>
+					<div class="flex items-center gap-3 text-body-sm text-on-surface-variant">
+						<img src={localAvatarUrl} alt="プロフィール画像" class="h-16 w-16 rounded-full border border-outline-variant/30 object-cover" />
+						<span>static/profile.jpg を使用しています。</span>
+					</div>
 				</div>
 			</div>
 		</section>
