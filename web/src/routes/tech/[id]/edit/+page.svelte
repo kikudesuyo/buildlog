@@ -25,8 +25,6 @@
 		views !== (data.tech.views ?? 0)
 	);
 
-	// ダミーのUIステート (image.pngの再現用)
-	let tags = $state(['技術', 'プログラミング']);
 	let isCommentsAllowed = $state(true);
 
 	// オートリサイズ用のアクション
@@ -68,16 +66,6 @@
 		}
 	}
 
-	function removeTag(tagToRemove: string) {
-		tags = tags.filter(t => t !== tagToRemove);
-	}
-
-	function addTag() {
-		const newTag = prompt('タグ名を入力してください：');
-		if (newTag && newTag.trim()) {
-			tags = [...tags, newTag.trim()];
-		}
-	}
 </script>
 
 <UnsavedChangesGuard {isDirty} {isSubmitting} />
@@ -206,7 +194,7 @@
 
 		<!-- 下部設定セクション -->
 		<footer class="border-t border-outline-variant/10 pt-8 mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-			<!-- 左カラム: タグ・カテゴリ設定 -->
+			<!-- 左カラム: カテゴリ設定 -->
 			<div class="flex flex-col gap-5">
 				<!-- カテゴリ選択 -->
 				<div class="flex flex-col gap-1.5">
@@ -223,25 +211,6 @@
 					</select>
 				</div>
 
-				<!-- タグ設定 -->
-				<div class="flex flex-col gap-3 mt-2">
-					<h3 class="font-label-md text-label-md font-bold text-on-surface">タグ設定</h3>
-					<div class="flex flex-wrap gap-2 items-center">
-						{#each tags as tag (tag)}
-							<span class="inline-flex items-center gap-1 bg-surface-container-high px-3 py-1 rounded text-body-sm text-on-surface-variant">
-								{tag}
-								<button type="button" onclick={() => removeTag(tag)} class="hover:text-error transition-colors cursor-pointer font-bold text-[10px]">×</button>
-							</span>
-						{/each}
-						<button
-							type="button"
-							onclick={addTag}
-							class="border border-dashed border-outline-variant/60 hover:border-primary px-3 py-1 rounded text-body-sm text-outline hover:text-primary transition-all cursor-pointer"
-						>
-							+ タグを追加
-						</button>
-					</div>
-				</div>
 			</div>
 
 			<!-- 右カラム: 記事設定 & 公開設定 -->
