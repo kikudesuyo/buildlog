@@ -1,4 +1,4 @@
-h1:FbVUHE34t4OQdIhWc9vzlsK0k+74eBj50g5phBhca2c=
+h1:votkT1iEim+GrMUEMjON4AcrMl0uuIDaVlan+ai+M70=
 20260720120000_post.sql h1:W6Ug8xDzRjSbgAX3EuUM+xS6N5ODi7g0W8vw1Kp/mso=
 20260727000000_profile.sql h1:Twgzan+Zizx70YPpctzcT3BhE0OhoDW+4E81yOpK4Kc=
 20260727010000_app.sql h1:fnbdrJSmoj+1Qwrfuephc27x7VDW07laYXhtwYY43yA=
@@ -9,3 +9,4 @@ h1:FbVUHE34t4OQdIhWc9vzlsK0k+74eBj50g5phBhca2c=
 20260802140000_remove_author_name_from_comments.sql h1:zNEIlmpAFoalIsYdmavUyJz6vBf6kjj0IGWnVK74rQY=
 20260802150000_goals.sql h1:tjyzXISp6o3Hx9KVVQhEK0PMz+2XVBbdUzrz9DBT7n0=
 20260808000000_change_views_to_bigint.sql h1:r8fRU3DI+I6Wetj6gaGYOeGmyOzxWQon1D16WQrnY18=
+20260809000000_learnings.sql h1:fwuIjCU6bP3uuF3EbQqvPb5mVTunsKw0YA47Lvn8Alc=
