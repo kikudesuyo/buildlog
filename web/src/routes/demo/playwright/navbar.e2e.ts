@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('verify public Navbar does not contain admin or settings icons and capture screenshots', async ({ page }) => {
+test('verify public Navbar does not contain admin, settings, or search icons and capture screenshots', async ({ page }) => {
 	await page.goto('http://localhost:5173/');
 	await page.waitForLoadState('networkidle');
 
@@ -16,9 +16,9 @@ test('verify public Navbar does not contain admin or settings icons and capture 
 	const adminIcon = page.locator('a[title="管理画面に切り替え"]');
 	await expect(adminIcon).not.toBeVisible();
 
-	// 検索 (search) アイコンは存在することを確認
-	const searchIcon = page.locator('button[aria-label="Search"]');
-	await expect(searchIcon).toBeVisible();
+	// 検索 (search) アイコンが存在しないことを確認
+	const searchIcon = page.locator('button[aria-label="検索を開く"]');
+	await expect(searchIcon).not.toBeVisible();
 
 	// スクリーンショット撮影
 	await page.screenshot({ path: 'static/screenshots/navbar-cleaned.png', fullPage: false });

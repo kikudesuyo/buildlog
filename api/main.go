@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -21,20 +20,14 @@ func main() {
 	if envPort := os.Getenv("PORT"); envPort != "" {
 		port = envPort
 	}
-
-	db, err := library.OpenDatabase(context.Background())
+	err := library.InitDB()
 	if err != nil {
-		log.Fatalf("database initialization failed: %v", err)
+		panic("DB Error")
 	}
-	sqlDB, err := db.DB()
-	if err != nil {
-		log.Fatalf("database connection failed: %v", err)
-	}
-	defer sqlDB.Close()
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),
-		Handler: route.NewRouter(db),
+		Handler: route.NewRouter(),
 	}
 
 	log.Printf("API server is running on port %s", port)

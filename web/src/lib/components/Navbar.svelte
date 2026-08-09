@@ -3,12 +3,7 @@ import { onMount } from 'svelte';
 import { page } from '$app/state';
 import { resolve } from '$app/paths';
 
-	let isSearchOpen = $state(false);
-	let searchQuery = $state('');
 	let isDarkMode = $state(false);
-	let searchInput = $state<HTMLInputElement | null>(null);
-	let previouslyFocused: HTMLElement | null = null;
-	let searchHistoryEntry = false;
 
 	onMount(() => {
 		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -18,34 +13,10 @@ import { resolve } from '$app/paths';
 		};
 		syncTheme();
 		mediaQuery.addEventListener('change', syncTheme);
-		const handlePopState = () => {
-			if (isSearchOpen) closeSearch(true);
-		};
-		window.addEventListener('popstate', handlePopState);
 		return () => {
 			mediaQuery.removeEventListener('change', syncTheme);
-			window.removeEventListener('popstate', handlePopState);
 		};
 	});
-
-	function openSearch() {
-		previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-		isSearchOpen = true;
-		window.history.pushState({ searchModal: true }, '');
-		searchHistoryEntry = true;
-	}
-
-	function closeSearch(fromHistory = false) {
-		if (!isSearchOpen) return;
-		isSearchOpen = false;
-		if (!fromHistory && searchHistoryEntry) {
-			searchHistoryEntry = false;
-			window.history.back();
-		} else {
-			searchHistoryEntry = false;
-		}
-		requestAnimationFrame(() => previouslyFocused?.focus());
-	}
 
 	function toggleTheme() {
 		isDarkMode = !isDarkMode;
@@ -62,16 +33,6 @@ import { resolve } from '$app/paths';
 		}
 	}
 
-	function handleWindowKeydown(event: KeyboardEvent) {
-		if (event.key === 'Escape' && isSearchOpen) {
-			closeSearch();
-		}
-	}
-
-	$effect(() => {
-		if (isSearchOpen) requestAnimationFrame(() => searchInput?.focus());
-	});
-
 	const navItems = [
 		{ href: '/', label: 'Diary' },
 		{ href: '/tech', label: 'Tech' },
@@ -87,8 +48,6 @@ import { resolve } from '$app/paths';
 		return current.startsWith(path);
 	}
 </script>
-
-<svelte:window onkeydown={handleWindowKeydown} />
 
 <!-- TopNavBar -->
 <nav class="site-nav fixed top-0 z-50 w-full border-b border-outline-variant/30 bg-surface/80 backdrop-blur-md transition-all duration-300">
@@ -111,14 +70,6 @@ import { resolve } from '$app/paths';
 		<div class="site-nav-actions flex items-center gap-stack-md">
 			<button
 				type="button"
-				aria-label="検索を開く"
-				onclick={() => (isSearchOpen ? closeSearch() : openSearch())}
-				class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-low rounded-lg p-2 transition-all duration-300"
-			>
-				search
-			</button>
-			<button
-				type="button"
 				aria-pressed={isDarkMode}
 				aria-label={isDarkMode ? '現在はダークモード。ライトモードに切り替える' : '現在はライトモード。ダークモードに切り替える'}
 				onclick={toggleTheme}
@@ -130,51 +81,6 @@ import { resolve } from '$app/paths';
 		</div>
 	</div>
 </nav>
-
-<!-- Search Modal (Minimalist) -->
-{#if isSearchOpen}
-	<div
-		class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-primary/20 px-4 pt-[max(7rem,calc(env(safe-area-inset-top)+5rem))] pb-8 backdrop-blur-xs"
-		onclick={(event) => event.target === event.currentTarget && closeSearch()}
-	>
-		<div
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="search-modal-title"
-			tabindex="-1"
-			class="max-h-[calc(100dvh-8rem)] w-full max-w-[540px] overflow-y-auto rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xl"
-			onclick={(e) => e.stopPropagation()}
-		>
-			<div class="flex items-center gap-3 border-b border-outline-variant/20 pb-3">
-				<span class="material-symbols-outlined text-on-surface-variant">search</span>
-				<h2 id="search-modal-title" class="sr-only">記事を検索</h2>
-				<input
-					bind:this={searchInput}
-					type="text"
-					bind:value={searchQuery}
-					aria-label="記事やキーワード"
-					placeholder="記事やキーワードを検索..."
-					class="w-full bg-transparent text-primary outline-none font-body-md placeholder:text-outline"
-				/>
-				<button
-					type="button"
-					aria-label="検索を閉じる"
-					onclick={() => closeSearch()}
-					class="min-h-11 min-w-11 rounded-lg px-2 text-label-sm text-outline hover:bg-surface-container-low hover:text-primary"
-				>
-					閉じる
-				</button>
-			</div>
-			<div class="mt-4 text-label-sm text-on-surface-variant">
-				{#if searchQuery.trim()}
-					<p class="py-2">「{searchQuery}」の検索結果（デモ機能）</p>
-				{:else}
-					<p class="py-2 text-outline">キーワードを入力してください</p>
-				{/if}
-			</div>
-		</div>
-</div>
-{/if}
 
 <style>
 	.site-nav {

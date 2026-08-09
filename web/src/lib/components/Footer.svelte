@@ -28,8 +28,7 @@
 			Buildlog
 		</button>
 		<div class="flex flex-wrap items-center gap-2">
-			<a href={resolve('/rss.xml')} class="font-label-sm text-label-sm flex min-h-11 items-center rounded-lg px-3 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary">RSS</a>
-			<a href={resolve('/profile')} class="font-label-sm text-label-sm flex min-h-11 items-center rounded-lg px-3 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary">Contact</a>
+			<a href={resolve('/contact')} class="font-label-sm text-label-sm flex min-h-11 items-center rounded-lg px-3 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary">Contact</a>
 			{#if githubUrl}
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href={githubUrl} target="_blank" rel="noopener noreferrer" class="font-label-sm text-label-sm flex min-h-11 items-center gap-2 rounded-lg px-3 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary" title="GitHub（外部サイト）" aria-label="GitHub（外部サイト）">

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
@@ -32,7 +33,8 @@ func mapToAppResponse(dbApp *entity.DBTableApp) (*entity.AppResponse, error) {
 
 // ListApps は一覧を取得します。
 func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
-	dbApps, err := repository.ListApps(ctx, database)
+	db := library.GetDB(ctx)
+	dbApps, err := repository.ListApps(ctx, db)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +53,8 @@ func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
 
 // GetAppByID はデータを取得します。
 func GetAppByID(ctx context.Context, id int64) (*entity.AppResponse, error) {
-	dbApp, err := repository.GetAppByID(ctx, database, id)
+	db := library.GetDB(ctx)
+	dbApp, err := repository.GetAppByID(ctx, db, id)
 	if err != nil {
 		return nil, err
 	}
@@ -60,6 +63,7 @@ func GetAppByID(ctx context.Context, id int64) (*entity.AppResponse, error) {
 
 // CreateApp はデータを作成します。
 func CreateApp(ctx context.Context, req entity.CreateAppRequest) (*entity.AppResponse, error) {
+	db := library.GetDB(ctx)
 	tagsJSON, err := json.Marshal(req.Tags)
 	if err != nil {
 		return nil, err
@@ -77,7 +81,7 @@ func CreateApp(ctx context.Context, req entity.CreateAppRequest) (*entity.AppRes
 		CodeURL:     req.CodeURL,
 	}
 
-	if err := repository.CreateApp(ctx, database, &app); err != nil {
+	if err := repository.CreateApp(ctx, db, &app); err != nil {
 		return nil, err
 	}
 
@@ -86,7 +90,8 @@ func CreateApp(ctx context.Context, req entity.CreateAppRequest) (*entity.AppRes
 
 // UpdateApp はデータを更新します。
 func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*entity.AppResponse, error) {
-	app, err := repository.GetAppByID(ctx, database, id)
+	db := library.GetDB(ctx)
+	app, err := repository.GetAppByID(ctx, db, id)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +111,7 @@ func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*ent
 	app.DemoURL = req.DemoURL
 	app.CodeURL = req.CodeURL
 
-	if err := repository.UpdateApp(ctx, database, app); err != nil {
+	if err := repository.UpdateApp(ctx, db, app); err != nil {
 		return nil, err
 	}
 
@@ -115,5 +120,6 @@ func UpdateApp(ctx context.Context, id int64, req entity.UpdateAppRequest) (*ent
 
 // DeleteApp はデータを削除します。
 func DeleteApp(ctx context.Context, id int64) error {
-	return repository.DeleteApp(ctx, database, id)
+	db := library.GetDB(ctx)
+	return repository.DeleteApp(ctx, db, id)
 }

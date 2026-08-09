@@ -6,15 +6,12 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	v1 "github.com/kikudesuyo/buildlog/api/handler/v1"
 	authmiddleware "github.com/kikudesuyo/buildlog/api/middleware"
-	"github.com/kikudesuyo/buildlog/api/service"
-	"gorm.io/gorm"
+	v1 "github.com/kikudesuyo/buildlog/api/handler/v1"
 )
 
 // NewRouter は値を生成します。
-func NewRouter(db *gorm.DB) http.Handler {
-	service.SetDatabase(db)
+func NewRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -49,7 +46,7 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.With(authmiddleware.RequireAdmin).Put("/profile", handleFunc(v1.HandleUpdateProfile))
 		r.Get("/posts/{id}/comments", handleFunc(v1.HandleGetCommentList))
 		r.Post("/posts/{id}/comments", handleFunc(v1.HandleCreateComment))
-		r.With(authmiddleware.RequireAdmin).Get("/posts/history", handleFunc(v1.HandleGetPostHistory(db)))
+		r.With(authmiddleware.RequireAdmin).Get("/posts/history", handleFunc(v1.HandleGetPostHistory))
 		r.With(authmiddleware.RequireAdmin).Get("/admin/analytics", handleFunc(v1.HandleGetAnalytics))
 		r.With(authmiddleware.RequireAdmin).Get("/goals/current", handleFunc(v1.HandleGetCurrentGoals))
 		r.With(authmiddleware.RequireAdmin).Put("/goals/current", handleFunc(v1.HandleSaveCurrentGoals))

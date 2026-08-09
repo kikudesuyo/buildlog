@@ -232,8 +232,8 @@ export async function deleteTech(id: number): Promise<void> {
 	await sendRequest<void>('DELETE', `/techs/${id}`);
 }
 
-export async function fetchDiary(fetchFn: ApiFetch, id: number): Promise<DiaryEntry> {
-	const response = await get<ApiObjectResponse<ApiPost>>(fetchFn, `/diaries/${id}`);
+export async function fetchDiary(fetchFn: ApiFetch, id: number, countView = false): Promise<DiaryEntry> {
+	const response = await get<ApiObjectResponse<ApiPost>>(fetchFn, `/diaries/${id}${countView ? '?count_view=true' : ''}`);
 	return {
 		id: response.data.id,
 		title: response.data.title,
@@ -247,8 +247,8 @@ export async function fetchDiary(fetchFn: ApiFetch, id: number): Promise<DiaryEn
 	};
 }
 
-export async function fetchTech(fetchFn: ApiFetch, id: number): Promise<TechArticle> {
-	const response = await get<ApiObjectResponse<ApiPost>>(fetchFn, `/techs/${id}`);
+export async function fetchTech(fetchFn: ApiFetch, id: number, countView = false): Promise<TechArticle> {
+	const response = await get<ApiObjectResponse<ApiPost>>(fetchFn, `/techs/${id}${countView ? '?count_view=true' : ''}`);
 	return {
 		id: response.data.id,
 		title: response.data.title,
