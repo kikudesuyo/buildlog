@@ -26,7 +26,7 @@
 	<section class="mb-section-gap flex flex-col gap-stack-lg">
 		<div class="flex items-center gap-stack-md">
 			<div class="h-16 w-16 shrink-0 overflow-hidden rounded-full border border-outline-variant/30">
-				{#if avatarFailed}
+				{#if avatarFailed || !data.profileData.avatarUrl}
 					<span class="flex h-full w-full items-center justify-center bg-surface-container-low text-headline-md text-outline" aria-label="プロフィール画像なし">{data.profileData.name.slice(0, 1)}</span>
 				{:else}
 					<img
