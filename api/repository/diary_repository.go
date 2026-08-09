@@ -32,6 +32,13 @@ func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePo
 	return &diary, err
 }
 
+// IncrementPostViews は投稿の閲覧数を 1 増やします。
+func IncrementPostViews(ctx context.Context, db *gorm.DB, postType string, id int64) error {
+	return db.WithContext(ctx).Model(&entity.DBTablePost{}).
+		Where("type = ? AND id = ?", postType, id).
+		UpdateColumn("views", gorm.Expr("views + 1")).Error
+}
+
 // CreateDiary はデータを作成します。
 func CreateDiary(ctx context.Context, db *gorm.DB, diary *entity.DBTablePost) error {
 	diary.Type = "diary"

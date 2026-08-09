@@ -51,6 +51,11 @@ func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTa
 	return diary, nil
 }
 
+// IncrementDiaryViews は公開詳細ページの閲覧数を 1 増やします。
+func IncrementDiaryViews(ctx context.Context, id int64) error {
+	return repository.IncrementPostViews(ctx, library.GetDB(ctx), "diary", id)
+}
+
 // CreateDiary はデータを作成します。
 func CreateDiary(ctx context.Context, req entity.CreateDiaryRequest) (entity.CreateDiaryResponse, error) {
 	db := library.GetDB(ctx)

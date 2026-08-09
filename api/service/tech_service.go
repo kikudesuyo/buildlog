@@ -49,6 +49,11 @@ func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTab
 	return tech, nil
 }
 
+// IncrementTechViews は公開詳細ページの閲覧数を 1 増やします。
+func IncrementTechViews(ctx context.Context, id int64) error {
+	return repository.IncrementPostViews(ctx, library.GetDB(ctx), "tech", id)
+}
+
 // CreateTech はデータを作成します。
 func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.CreateTechResponse, error) {
 	db := library.GetDB(ctx)
