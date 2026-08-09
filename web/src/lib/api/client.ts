@@ -8,7 +8,9 @@ import type {
 	AnalyticsData,
 	HistoryItem,
 	CommentEntry,
-	GoalPeriod
+	GoalPeriod,
+	Learning,
+	LearningPeriodType
 } from '$lib/api/types';
 
 export type ApiFetch = LoadEvent['fetch'];
@@ -319,6 +321,49 @@ export async function saveCurrentGoals(goals: Array<{ title: string; targetValue
 		}))
 	});
 	return mapGoalPeriod(response.data);
+}
+
+type ApiLearning = {
+	id: number;
+	period_type: LearningPeriodType;
+	period_start: string;
+	period_end: string;
+	content: string;
+	level?: Learning['level'];
+	generated_by: Learning['generatedBy'];
+};
+
+function mapLearning(item: ApiLearning): Learning {
+	return {
+		id: item.id,
+		periodType: item.period_type,
+		periodStart: item.period_start,
+		periodEnd: item.period_end,
+		content: item.content,
+		level: item.level,
+		generatedBy: item.generated_by
+	};
+}
+
+export async function fetchCurrentLearnings(fetchFn: ApiFetch, periodType: LearningPeriodType): Promise<Learning[]> {
+	const response = await get<ApiListResponse<ApiLearning>>(fetchFn, `/learnings?period_type=${periodType}`);
+	return response.data_list.map(mapLearning);
+}
+
+export async function createDailyLearning(content: string, level: NonNullable<Learning['level']>): Promise<Learning> {
+	const response = await sendRequest<ApiObjectResponse<ApiLearning>>('POST', '/learnings', {
+		period_start: new Date().toISOString().slice(0, 10),
+		content,
+		level
+	});
+	return mapLearning(response.data);
+}
+
+export async function generateLearning(periodType: Exclude<LearningPeriodType, 'daily'>): Promise<Learning> {
+	const response = await sendRequest<ApiObjectResponse<ApiLearning>>('POST', `/learnings/generate?period_type=${periodType}`, {
+		period_start: new Date().toISOString().slice(0, 10)
+	});
+	return mapLearning(response.data);
 }
 export type ApiApp = {
 	id: number;
