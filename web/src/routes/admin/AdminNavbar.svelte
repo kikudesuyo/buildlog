@@ -112,13 +112,6 @@
 			{/each}
 		</nav>
 
-		<div class="mt-auto rounded-xl border border-outline-variant/20 bg-surface-container-low p-4">
-			<p class="font-label-sm text-label-sm mb-1 text-outline">現在のモード</p>
-			<p class="font-label-md text-label-md flex items-center gap-2 font-semibold text-primary">
-				<span class="h-2 w-2 rounded-full bg-primary"></span>
-				Content Manager
-			</p>
-		</div>
 	</div>
 
 	<div class="border-t border-outline-variant/20 p-4">
