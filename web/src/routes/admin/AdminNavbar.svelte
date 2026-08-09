@@ -114,12 +114,6 @@
 
 	</div>
 
-	<div class="border-t border-outline-variant/20 p-4">
-		<a href={resolve('/')} onclick={closeMenu} class="font-label-md text-label-md flex items-center gap-2 rounded-lg px-3 py-2 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary">
-			<span class="material-symbols-outlined text-[18px]">visibility</span>
-			公開サイトを見る
-		</a>
-	</div>
 </aside>
 
 <header class="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-outline-variant/20 bg-surface-container-lowest px-gutter md:hidden">
@@ -136,7 +130,6 @@
 		</button>
 		<a href={resolve('/admin')} class="font-headline-md text-headline-md font-bold tracking-tight text-primary">Buildlog <span class="font-label-sm text-label-sm ml-2 text-outline">Admin</span></a>
 	</div>
-	<a href={resolve('/')} class="material-symbols-outlined rounded-lg p-2 text-on-surface-variant hover:bg-surface-container">visibility</a>
 	<button type="button" aria-label="テーマを切り替える" onclick={toggleTheme} class="material-symbols-outlined min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container" title={isDarkMode ? "ライトモードに切り替え" : "ダークモードに切り替え"}>
 		{isDarkMode ? 'light_mode' : 'dark_mode'}
 	</button>
