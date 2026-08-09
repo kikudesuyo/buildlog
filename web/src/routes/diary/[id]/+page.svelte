@@ -5,6 +5,15 @@
 
 	let { data } = $props();
 
+	function goBack(event: MouseEvent) {
+		event.preventDefault();
+		if (history.length > 1 && document.referrer.startsWith(window.location.origin)) {
+			history.back();
+			return;
+		}
+		window.location.href = resolve('/');
+	}
+
 	function formatDate(dateStr: string) {
 		if (!dateStr) return '';
 		const date = new Date(dateStr);
@@ -20,6 +29,7 @@
 <div class="editorial-container mx-auto max-w-[800px] px-gutter pt-24 pb-20">
 	<a
 		href={resolve('/')}
+		onclick={goBack}
 		class="font-label-md text-label-md mb-8 inline-flex items-center gap-2 text-outline transition-colors duration-200 hover:text-primary"
 	>
 		<span class="material-symbols-outlined text-[18px]">arrow_back</span>

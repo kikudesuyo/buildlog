@@ -113,6 +113,19 @@
 		</nav>
 
 	</div>
+	<div class="border-t border-outline-variant/20 px-3 py-4">
+		<a
+			href={resolve('/')}
+			onclick={closeMenu}
+			class="flex items-center gap-3 rounded-xl px-3 py-3 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+		>
+			<span class="material-symbols-outlined text-[21px]">public</span>
+			<span class="flex flex-col">
+				<span class="font-label-md text-label-md font-semibold">公開サイト</span>
+				<span class="font-label-sm text-label-sm text-outline">サイトを確認</span>
+			</span>
+		</a>
+	</div>
 
 </aside>
 

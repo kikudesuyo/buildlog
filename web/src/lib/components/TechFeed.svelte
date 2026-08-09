@@ -25,6 +25,8 @@
 	let loadMoreError = $state(false);
 	let deletedIds = $state<number[]>([]);
 	let selectedCategory = $state<string | null>(null);
+	const storageKey = 'tech-feed-count:public';
+	let isRestoring = $state(false);
 	const categories = ['All', ...techCategories];
 	let categoryScroller = $state<HTMLDivElement | null>(null);
 	let canScrollLeft = $state(false);
@@ -58,6 +60,7 @@
 			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, 3);
 			loadedTechArticles = [...loadedTechArticles, ...next.techArticles];
 			hasMoreArticles = next.hasMore;
+			sessionStorage.setItem(storageKey, String(articles.length));
 		} catch {
 			loadMoreError = true;
 		} finally {
@@ -87,6 +90,14 @@
 	onMount(() => {
 		updateCategoryOverflow();
 		window.addEventListener('resize', updateCategoryOverflow);
+		void (async () => {
+			const savedCount = Number(sessionStorage.getItem(storageKey));
+			if (savedCount > articles.length) {
+				isRestoring = true;
+				while (articles.length < savedCount && hasMoreArticles && !loadMoreError) await loadMore();
+				isRestoring = false;
+			}
+		})();
 		return () => window.removeEventListener('resize', updateCategoryOverflow);
 	});
 </script>
@@ -201,7 +212,7 @@
 		{/each}
 	</div>
 
-	{#if !isAdmin && hasMoreArticles}
+	{#if !isAdmin && hasMoreArticles && !isRestoring}
 		<div class="flex flex-col items-center gap-3">
 			{#if loadMoreError}<p class="font-body-sm text-body-sm text-error" role="alert">記事を追加で読み込めませんでした。</p>{/if}
 			<button type="button" onclick={loadMore} disabled={isLoadingMore} class="font-label-md text-label-md min-h-11 rounded-lg border border-outline-variant/60 px-6 py-2 text-primary transition-colors hover:bg-surface-container-high disabled:cursor-wait disabled:opacity-60">

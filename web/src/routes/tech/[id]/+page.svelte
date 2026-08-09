@@ -11,6 +11,15 @@
 	let copyMessage = $state('');
 	let copyMessageTimer: ReturnType<typeof setTimeout> | undefined;
 
+	function goBack(event: MouseEvent) {
+		event.preventDefault();
+		if (history.length > 1 && document.referrer.startsWith(window.location.origin)) {
+			history.back();
+			return;
+		}
+		window.location.href = resolve('/tech');
+	}
+
 	function escapeHtml(value: string) {
 		return value
 			.replaceAll('&', '&amp;')
@@ -94,6 +103,7 @@
 	<!-- 戻るリンク -->
 	<a
 		href={resolve('/tech')}
+		onclick={goBack}
 		class="font-label-md text-label-md mb-8 inline-flex items-center gap-2 text-outline hover:text-primary transition-colors duration-200"
 	>
 		<span class="material-symbols-outlined text-[18px]">arrow_back</span>
