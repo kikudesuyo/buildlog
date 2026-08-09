@@ -9,7 +9,7 @@
 		{ href: '/admin/profile', label: 'Profile', description: '自己紹介を管理', icon: 'person' },
 		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' },
 		{ href: '/admin/analytics', label: 'Analytics', description: 'アクセス統計・分析', icon: 'analytics' },
-		{ href: '/admin/trash', label: 'Trash', description: 'ゴミ箱', icon: 'delete_outline' }
+		{ href: '/admin/trash', label: 'Archive', description: 'アーカイブ', icon: 'inventory_2' }
 	] as const;
 
 	function resolveAdminPath(path: (typeof navItems)[number]['href']) {
