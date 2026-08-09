@@ -6,11 +6,15 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
 // HandleGetDeletedPosts はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetDeletedPosts(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	posts, err := service.ListDeletedPosts(r.Context())
 	if err != nil {
 		return nil, err
@@ -20,6 +24,9 @@ func HandleGetDeletedPosts(r *http.Request, requestData map[string]interface{}) 
 
 // HandleRestorePost はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleRestorePost(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		return nil, err

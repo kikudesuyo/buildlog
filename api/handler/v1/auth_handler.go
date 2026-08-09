@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
@@ -27,5 +28,8 @@ func HandleAuthLogin(r *http.Request, requestData map[string]interface{}) (http.
 }
 
 func HandleAuthSession(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	return entity.NewObjectResponse(map[string]bool{"authenticated": true}), nil
 }

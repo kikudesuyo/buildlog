@@ -5,26 +5,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/kikudesuyo/buildlog/api/entity"
-	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/service"
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
-func RequireAuth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err := handler.ValidateRequestWithAuth(r); err != nil {
-			entity.NewErrorResponse(err).ServeHTTP(w, r)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
-// JWTAuthToCtx はJWTを検証し、結果をcontextへ保存します。
-// 公開APIを壊さないよう、このmiddleware自体は認証エラーで処理を止めません。
-func JWTAuthToCtx() func(next http.Handler) http.Handler {
+// JWTToCtx はJWTを検証し、結果をcontextへ保存します。
+// 認証が必要かどうかの判定は各handlerが行います。
+func JWTToCtx() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			token := r.Header.Get("Authorization")
@@ -34,25 +22,15 @@ func JWTAuthToCtx() func(next http.Handler) http.Handler {
 				token = jwtTokenValue(r)
 			}
 
-			ctx := library.CtxSetJWTAuthenticated(r.Context(), false)
-			if token == "" || !service.ValidateJWTToken(token, os.Getenv("ADMIN_SESSION_SECRET")) {
-				ctx = library.CtxSetJWTError(ctx, authRequiredError())
-			} else {
-				ctx = library.CtxSetJWTAuthenticated(ctx, true)
+			ctx := r.Context()
+			if token == "" {
+				ctx = library.CtxSetJWTError(ctx, xerror.AuthJWTEmptyToken())
+			} else if !service.ValidateJWTToken(token, os.Getenv("ADMIN_SESSION_SECRET")) {
+				ctx = library.CtxSetJWTError(ctx, xerror.AuthJWTInvalidTokenErr(nil))
 			}
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
-}
-
-func RequireAuthForAll(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Query().Get("all") != "true" {
-			next.ServeHTTP(w, r)
-			return
-		}
-		RequireAuth(next).ServeHTTP(w, r)
-	})
 }
 
 func jwtTokenValue(r *http.Request) string {
@@ -61,8 +39,4 @@ func jwtTokenValue(r *http.Request) string {
 		return ""
 	}
 	return value.Value
-}
-
-func authRequiredError() error {
-	return xerror.AuthJWTInvalidTokenErr(nil)
 }

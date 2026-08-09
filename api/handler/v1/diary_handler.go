@@ -7,12 +7,18 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
 // HandleGetDiaryList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	all := r.URL.Query().Get("all") == "true"
+	if all {
+		if err := handler.ValidateRequestWithAuth(r); err != nil {
+			return nil, err
+		}
+	}
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	if offset < 0 {
@@ -49,6 +55,9 @@ func HandleGetDiary(r *http.Request, requestData map[string]interface{}) (http.H
 
 // HandleCreateDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleCreateDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	var req entity.CreateDiaryRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
@@ -65,6 +74,9 @@ func HandleCreateDiary(r *http.Request, requestData map[string]interface{}) (htt
 
 // HandleUpdateDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		return nil, err
@@ -85,6 +97,9 @@ func HandleUpdateDiary(r *http.Request, requestData map[string]interface{}) (htt
 
 // HandleDeleteDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleDeleteDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		return nil, err

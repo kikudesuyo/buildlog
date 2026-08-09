@@ -34,10 +34,7 @@ func ValidateRequestWithAuth(r *http.Request) error {
 	if err, ok := library.CtxGetJWTError(r.Context()); ok && err != nil {
 		return err
 	}
-	if !library.CtxIsJWTAuthenticated(r.Context()) {
-		return xerror.AuthJWTInvalidTokenErr(nil)
-	}
-	return nil
+	return xerror.AuthJWTEmptyToken()
 }
 
 // handleRequest handles a request, process it and return response.
