@@ -61,6 +61,17 @@ git log --oneline --decorate -10
 
 ---
 
+## IssueとPull Requestの対応単位
+
+IssueとPull Requestは必ず1対1にしてください。
+
+- `issue/x〜x+10` のように複数Issueをまとめて依頼された場合でも、Issue番号ごとに個別の作業branch（`issue/<number>`）と個別のPRを作成する。
+- 1つのbranchやPRに複数Issueの実装を混在させない。共通変更が必要な場合も、どのIssueに属する変更かを分離して判断する。
+- Issueごとに実装・検証・レビュー・commit・push・PR作成を完了してから、次のIssueへ進む。依存関係がある場合は、先行IssueのPRを明記して順序を記録する。
+- 各PR descriptionには、そのPRが対応するIssueだけを `Closes #<issue-number>` などのキーワードで記載する。
+
+---
+
 ## UI変更時の必須確認
 
 UIを変更した場合、**スクリーンショットまたは動画のないPRを完成扱いにしてはいけません。**
@@ -150,6 +161,8 @@ PC:
 ```
 
 動画はGitHub上から参照できるURLを記載してください。
+
+UI変更のPRは、スクリーンショット・動画のアップロードとPR descriptionへの添付が完了するまで作成完了としてはいけません。PR作成後に `gh pr view <number>` 等でdescriptionを確認し、Mobile・PCの各画像がGitHubのURL（`https://`）で埋め込まれていることを確認してください。ローカルパス、リポジトリ内相対パス、画像未添付の説明だけでは要件を満たしません。
 
 PR作成後、**GitHub上で画像・動画が実際に表示・参照できることを確認してください。**
 
