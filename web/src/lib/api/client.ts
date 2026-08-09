@@ -76,14 +76,22 @@ export async function fetchDiaryEntries(fetchFn: ApiFetch, all = false, offset =
 	}));
 }
 
-export async function fetchTechFeed(fetchFn: ApiFetch, all = false): Promise<{
-	featuredArticle: FeaturedTechArticle;
+export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, limit = 0): Promise<{
+	featuredArticle: FeaturedTechArticle | null;
 	techArticles: TechArticle[];
+	hasMore: boolean;
 }> {
-	const url = all ? '/techs?all=true' : '/techs';
+	const params = new URLSearchParams();
+	if (all) params.set('all', 'true');
+	if (!all && offset && offset > 0) params.set('offset', String(offset));
+	if (!all && limit && limit > 0) params.set('limit', String(limit));
+	const query = params.toString();
+	const url = query ? `/techs?${query}` : '/techs';
 	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);
+	const hasMore = !all && !!limit && response.data_list.length > limit;
+	const page = limit && limit > 0 ? response.data_list.slice(0, limit) : response.data_list;
 	
-	const allArticles: TechArticle[] = response.data_list.map((post) => ({
+	const allArticles: TechArticle[] = page.map((post) => ({
 		id: post.id,
 		title: post.title,
 		content: post.content,
@@ -93,10 +101,12 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false): Promise<{
 		createdAt: post.created_at,
 		updatedAt: post.updated_at,
 		likesCount: post.likes_count,
+		commentsCount: post.comments_count,
 		hasLiked: post.has_liked
 	}));
 
-	const featured = allArticles.length > 0 ? allArticles[0] : {
+	const featured = !offset && allArticles.length > 0 ? allArticles[0] : null;
+	const fallbackFeatured: FeaturedTechArticle = {
 		id: 0,
 		title: '',
 		content: '',
@@ -106,13 +116,15 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false): Promise<{
 		createdAt: '',
 		updatedAt: '',
 		likesCount: 0,
+		commentsCount: 0,
 		hasLiked: false
 	};
-	const remaining = allArticles.length > 1 ? allArticles.slice(1) : [];
+	const remaining = featured ? allArticles.slice(1) : allArticles;
 
 	return {
-		featuredArticle: featured,
-		techArticles: remaining
+		featuredArticle: featured ?? (offset ? null : fallbackFeatured),
+		techArticles: remaining,
+		hasMore
 	};
 }
 
@@ -186,6 +198,7 @@ export async function createTech(req: {
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }
@@ -214,6 +227,7 @@ export async function updateTech(id: number, req: {
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }
@@ -249,6 +263,7 @@ export async function fetchTech(fetchFn: ApiFetch, id: number, countView = false
 		createdAt: response.data.created_at,
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
+		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
 	};
 }

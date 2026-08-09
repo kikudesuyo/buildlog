@@ -23,7 +23,7 @@
 			if (res.ok) {
 				data = await res.json();
 			}
-		} catch (e) {
+		} catch {
 			// ignore
 		} finally {
 			loading = false;

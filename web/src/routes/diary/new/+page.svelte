@@ -12,15 +12,13 @@
 	let errorMessage = $state('');
 	let isDirty = $derived(title.trim().length > 0 || content.trim().length > 0);
 
-	// ダミーのUIステート (image.pngの再現用)
-	let tags = $state(['エッセイ', '創作']);
-	let isPublicLimited = $state(false);
-
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
 		function adjust() {
-			node.style.height = 'auto';
+			const scrollY = window.scrollY;
+			node.style.height = '0px';
 			node.style.height = `${node.scrollHeight}px`;
+			window.scrollTo(0, scrollY);
 		}
 		adjust();
 		node.addEventListener('input', adjust);
@@ -164,26 +162,5 @@
 		></textarea>
 		</div>
 
-		<!-- 下部設定セクション -->
-		<footer id="editor-settings" class="border-t border-outline-variant/10 pt-8 mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-			<!-- 公開設定 -->
-			<div class="flex flex-col gap-3">
-				<h3 class="font-label-md text-label-md font-bold text-on-surface">公開設定</h3>
-				<div class="flex flex-col gap-4">
-					<!-- トグル 1 -->
-					<div class="flex items-center justify-between">
-						<span class="text-body-md text-on-surface-variant">公開範囲を限定する</span>
-						<button
-							type="button"
-							aria-label="公開範囲限定トグル"
-							onclick={() => (isPublicLimited = !isPublicLimited)}
-							class="w-10 h-6 rounded-full p-0.5 transition-colors relative flex items-center cursor-pointer {isPublicLimited ? 'bg-primary' : 'bg-outline-variant/40'}"
-						>
-							<div class="w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 {isPublicLimited ? 'translate-x-4' : 'translate-x-0'}"></div>
-						</button>
-						</div>
-					</div>
-				</div>
-		</footer>
 	</main>
 </div>

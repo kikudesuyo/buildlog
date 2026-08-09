@@ -30,8 +30,10 @@
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
 		function adjust() {
-			node.style.height = 'auto';
+			const scrollY = window.scrollY;
+			node.style.height = '0px';
 			node.style.height = `${node.scrollHeight}px`;
+			window.scrollTo(0, scrollY);
 		}
 		adjust();
 		node.addEventListener('input', adjust);
@@ -248,10 +250,10 @@
 						<label for="tech-views" class="font-label-xs text-[11px] text-outline">閲覧数（任意）</label>
 						<input
 							id="tech-views"
-							type="number"
-							min="0"
-							bind:value={views}
-							placeholder="例: 1024"
+							 type="number"
+							 min="0"
+							 bind:value={views}
+							 placeholder="例: 1024"
 							disabled={isSubmitting}
 							class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md"
 						/>

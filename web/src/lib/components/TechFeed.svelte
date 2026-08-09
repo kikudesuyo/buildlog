@@ -5,17 +5,24 @@
 	import { techCategories } from '$lib/tech/categories';
 	import LikeButton from './LikeButton.svelte';
 	import { invalidateAll } from '$app/navigation';
+	import { fetchTechFeed, type ApiFetch } from '$lib/api/client';
 
 	type Props = {
 		featuredArticle?: FeaturedTechArticle | null;
 		techArticles?: TechArticle[];
+		hasMore?: boolean;
 		loadError?: boolean;
 		isAdmin?: boolean;
 		onEdit?: (id: number) => void;
 		onDelete?: (id: number) => void | Promise<boolean | void>;
 	};
 
-	let { featuredArticle = null, techArticles = [], loadError = false, isAdmin = false, onEdit, onDelete }: Props = $props();
+	let { featuredArticle = null, techArticles = [], hasMore = false, loadError = false, isAdmin = false, onEdit, onDelete }: Props = $props();
+	let loadedTechArticles = $state(techArticles);
+	let loadedFeaturedArticle = $state(featuredArticle);
+	let hasMoreArticles = $state(hasMore);
+	let isLoadingMore = $state(false);
+	let loadMoreError = $state(false);
 	let deletedIds = $state<number[]>([]);
 	let selectedCategory = $state<string | null>(null);
 	const categories = ['All', ...techCategories];
@@ -23,7 +30,7 @@
 	let canScrollLeft = $state(false);
 	let canScrollRight = $state(false);
 	let articles = $derived(
-		(featuredArticle?.title ? [featuredArticle, ...techArticles] : techArticles).filter(
+		(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles).filter(
 			(article) => !deletedIds.includes(article.id)
 		)
 	);
@@ -40,6 +47,22 @@
 
 	async function deleteArticle(id: number) {
 		if ((await onDelete?.(id)) !== false) deletedIds = [...deletedIds, id];
+	}
+
+	async function loadMore() {
+		if (isLoadingMore || !hasMoreArticles) return;
+		isLoadingMore = true;
+		loadMoreError = false;
+		try {
+			const offset = (loadedFeaturedArticle?.title ? 1 : 0) + loadedTechArticles.length;
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, 3);
+			loadedTechArticles = [...loadedTechArticles, ...next.techArticles];
+			hasMoreArticles = next.hasMore;
+		} catch {
+			loadMoreError = true;
+		} finally {
+			isLoadingMore = false;
+		}
 	}
 
 	function updateCategoryOverflow() {
@@ -135,13 +158,16 @@
 				{/if}
 				{#if isAdmin}<div class="ml-auto flex gap-2"><button type="button" onclick={() => onEdit?.(featured.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(featured.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}
 			</div>
-			<h2 class="font-display-lg mb-stack-md text-[24px] leading-tight text-primary transition-colors group-hover:text-primary/80 md:text-[28px]">
+			<h2 class="font-display-lg mb-stack-md text-[22px] leading-tight text-primary transition-colors group-hover:text-primary/80 md:text-[28px]">
 				<a href={resolve(`/tech/${featured.id}`)} class="hover:underline">{featured.title}</a>
 			</h2>
 			<p class="font-body-md text-body-md mb-4 text-on-surface-variant line-clamp-2 md:mb-6 md:line-clamp-3">{featured.content}</p>
 			<a href={resolve(`/tech/${featured.id}`)} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 			<div class="flex items-center justify-between mb-4">
 				<LikeButton postId={featured.id} initialLikesCount={featured.likesCount} initialHasLiked={featured.hasLiked} />
+				<a href={resolve(`/tech/${featured.id}`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${featured.commentsCount}件を表示`}>
+					<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>{featured.commentsCount}
+				</a>
 			</div>
 			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
 		</article>
@@ -159,18 +185,30 @@
 					</div>
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>{#if isAdmin}<div class="flex gap-2"><button type="button" onclick={() => onEdit?.(article.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(article.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}</div>
 				</div>
-				<h3 class="font-headline-lg text-[22px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-headline-lg">
+				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-headline-lg">
 					<a href={resolve(`/tech/${article.id}`)}>{article.title}</a>
 				</h3>
 				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
 				<a href={resolve(`/tech/${article.id}`)} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 				<div class="mt-3 flex items-center gap-4">
 					<LikeButton postId={article.id} initialLikesCount={article.likesCount} initialHasLiked={article.hasLiked} />
+					<a href={resolve(`/tech/${article.id}`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${article.commentsCount}件を表示`}>
+						<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>{article.commentsCount}
+					</a>
 					{#if article.views}<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views.toLocaleString()}</span>{/if}
 				</div>
 			</article>
 		{/each}
 	</div>
+
+	{#if !isAdmin && hasMoreArticles}
+		<div class="flex flex-col items-center gap-3">
+			{#if loadMoreError}<p class="font-body-sm text-body-sm text-error" role="alert">記事を追加で読み込めませんでした。</p>{/if}
+			<button type="button" onclick={loadMore} disabled={isLoadingMore} class="font-label-md text-label-md min-h-11 rounded-lg border border-outline-variant/60 px-6 py-2 text-primary transition-colors hover:bg-surface-container-high disabled:cursor-wait disabled:opacity-60">
+				{isLoadingMore ? '読み込み中…' : 'もっと見る'}
+			</button>
+		</div>
+	{/if}
 
 	<style>
 		.category-scroller {

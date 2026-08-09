@@ -43,7 +43,6 @@
 		localStorage.setItem('theme', isDarkMode ? "dark" : "light");
 	}
 	let menuButton: HTMLButtonElement | null = null;
-	let closeButton = $state<HTMLButtonElement | null>(null);
 	let previouslyFocused: HTMLElement | null = null;
 
 	function isActive(href: string) {
@@ -67,7 +66,6 @@
 
 	$effect(() => {
 		document.body.style.overflow = isOpen ? 'hidden' : '';
-		if (isOpen) requestAnimationFrame(() => closeButton?.focus());
 		return () => {
 			document.body.style.overflow = '';
 		};
@@ -86,15 +84,6 @@
 {/if}
 
 <aside aria-label="管理メニュー" aria-modal={isOpen ? 'true' : undefined} class="fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-outline-variant/20 bg-surface-container-lowest {isOpen ? 'flex' : 'hidden'} md:flex">
-	<button
-		bind:this={closeButton}
-		type="button"
-		aria-label="管理メニューを閉じる"
-		onclick={closeMenu}
-		class="material-symbols-outlined absolute right-3 top-3 z-10 min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container md:hidden"
-	>
-		close
-	</button>
 	<div class="flex h-20 items-center border-b border-outline-variant/20 px-6">
 		<a href={resolve('/admin')} class="flex items-center gap-3 text-primary transition-opacity hover:opacity-80">
 			<span class="material-symbols-outlined text-2xl">dashboard_customize</span>

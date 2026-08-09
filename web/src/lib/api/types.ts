@@ -20,6 +20,7 @@ export interface TechArticle {
 	createdAt: string;
 	updatedAt: string;
 	likesCount: number;
+	commentsCount: number;
 	hasLiked?: boolean;
 }
 

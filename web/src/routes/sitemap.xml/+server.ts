@@ -40,6 +40,11 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		<priority>0.8</priority>
 	</url>
 	<url>
+		<loc>${domain}/contact</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.7</priority>
+	</url>
+	<url>
 		<loc>${domain}/apps</loc>
 		<changefreq>weekly</changefreq>
 		<priority>0.8</priority>

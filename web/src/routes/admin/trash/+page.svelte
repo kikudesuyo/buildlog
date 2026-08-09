@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import { restoreEntry } from '$lib/api/client';
 
 	let { data } = $props();
@@ -30,7 +29,7 @@
 	<!-- ヘッダー -->
 	<header class="mb-8">
 		<h1 class="font-display-lg text-display-lg text-primary font-bold tracking-tight">ゴミ箱 (削除済み一覧)</h1>
-		<p class="font-body-md text-body-md text-on-surface-variant mt-1">論理削除されたつぶやきや技術記事を管理・復元できます。</p>
+		<p class="font-body-md text-body-md text-on-surface-variant mt-1">削除されたつぶやきや技術記事を管理・復元できます。</p>
 	</header>
 
 	<!-- ゴミ箱一覧 -->
