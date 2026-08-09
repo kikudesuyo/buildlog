@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import LikeButton from '$lib/components/LikeButton.svelte';
 	import CommentSection from '$lib/components/CommentSection.svelte';
 	import { Marked, type Tokens } from 'marked';
@@ -8,6 +9,8 @@
 	import 'highlight.js/styles/github-dark.css';
 
 	let { data } = $props();
+	const returnPath = $derived(page.url.searchParams.get('from') === 'calendar' ? '/profile#post-history' : '/tech');
+	const returnLabel = $derived(page.url.searchParams.get('from') === 'calendar' ? '投稿履歴とカレンダーへ戻る' : '技術録へ戻る');
 	let copyMessage = $state('');
 	let copyMessageTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -93,11 +96,11 @@
 <div class="editorial-container mx-auto px-gutter pt-24 pb-20 max-w-[800px]">
 	<!-- 戻るリンク -->
 	<a
-		href={resolve('/tech')}
+		href={resolve(returnPath)}
 		class="font-label-md text-label-md mb-8 inline-flex items-center gap-2 text-outline hover:text-primary transition-colors duration-200"
 	>
 		<span class="material-symbols-outlined text-[18px]">arrow_back</span>
-		技術録へ戻る
+		{returnLabel}
 	</a>
 
 	<article class="flex flex-col gap-6">

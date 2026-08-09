@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import LikeButton from '$lib/components/LikeButton.svelte';
 	import CommentSection from '$lib/components/CommentSection.svelte';
 
 	let { data } = $props();
+	const returnPath = $derived(page.url.searchParams.get('from') === 'calendar' ? '/profile#post-history' : '/');
+	const returnLabel = $derived(page.url.searchParams.get('from') === 'calendar' ? '投稿履歴とカレンダーへ戻る' : '日々のつぶやきへ戻る');
 
 	function formatDate(dateStr: string) {
 		if (!dateStr) return '';
@@ -19,11 +22,11 @@
 
 <div class="editorial-container mx-auto max-w-[800px] px-gutter pt-24 pb-20">
 	<a
-		href={resolve('/')}
+		href={resolve(returnPath)}
 		class="font-label-md text-label-md mb-8 inline-flex items-center gap-2 text-outline transition-colors duration-200 hover:text-primary"
 	>
 		<span class="material-symbols-outlined text-[18px]">arrow_back</span>
-		日々のつぶやきへ戻る
+		{returnLabel}
 	</a>
 
 	<article class="flex flex-col gap-6">
