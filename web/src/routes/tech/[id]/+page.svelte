@@ -114,7 +114,7 @@
 					<span class="h-1.5 w-1.5 rounded-full bg-outline-variant/30"></span>
 					<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant">
 						<span class="material-symbols-outlined text-[14px]">trending_up</span>
-						{data.tech.views}
+						{data.tech.views.toLocaleString()}
 					</span>
 				{/if}
 			</div>

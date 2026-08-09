@@ -36,7 +36,7 @@ func GetDiaryByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePo
 func IncrementPostViews(ctx context.Context, db *gorm.DB, postType string, id int64) error {
 	return db.WithContext(ctx).Model(&entity.DBTablePost{}).
 		Where("type = ? AND id = ?", postType, id).
-		UpdateColumn("views", gorm.Expr("CAST((COALESCE(NULLIF(regexp_replace(views, '[^0-9]', '', 'g'), ''), '0')::BIGINT + 1) AS TEXT)")).Error
+		UpdateColumn("views", gorm.Expr("views + 1")).Error
 }
 
 // CreateDiary はデータを作成します。

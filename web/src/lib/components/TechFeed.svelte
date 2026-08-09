@@ -166,7 +166,7 @@
 				<a href={resolve(`/tech/${article.id}`)} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 				<div class="mt-3 flex items-center gap-4">
 					<LikeButton postId={article.id} initialLikesCount={article.likesCount} initialHasLiked={article.hasLiked} />
-					{#if article.views}<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views}</span>{/if}
+					{#if article.views}<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views.toLocaleString()}</span>{/if}
 				</div>
 			</article>
 		{/each}

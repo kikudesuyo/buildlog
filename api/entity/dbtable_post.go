@@ -12,7 +12,7 @@ type DBTablePost struct {
 	Title         string         `gorm:"column:title" json:"title"`
 	Content       string         `gorm:"column:content" json:"content"`
 	Category      string         `gorm:"column:category" json:"category"`
-	Views         string         `gorm:"column:views" json:"views"`
+	Views         int64          `gorm:"column:views" json:"views"`
 	Status        string         `gorm:"column:status;default:draft" json:"status"`
 	CreatedAt     time.Time      `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt     time.Time      `gorm:"column:updated_at" json:"updated_at"`

@@ -42,7 +42,7 @@ func HandleGetDiary(r *http.Request, requestData map[string]interface{}) (http.H
 		if err := service.IncrementDiaryViews(r.Context(), id); err != nil {
 			return nil, err
 		}
-		diary.Views = incrementViewString(diary.Views)
+		diary.Views++
 	}
 	return entity.NewObjectResponse(diary), nil
 }

@@ -46,7 +46,7 @@ export type ApiPost = {
 	content: string;
 	excerpt: string;
 	category: string;
-	views: string;
+	views: number;
 	status: 'draft' | 'published';
 	created_at: string;
 	updated_at: string;
@@ -101,7 +101,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false): Promise<{
 		title: '',
 		content: '',
 		category: '',
-		views: '',
+		views: 0,
 		status: 'draft' as const,
 		createdAt: '',
 		updatedAt: '',
@@ -166,14 +166,14 @@ export async function createTech(req: {
 	title: string;
 	content: string;
 	category: string;
-	views?: string;
+	views?: number;
 	status?: 'draft' | 'published';
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/techs', {
 		title: req.title,
 		content: req.content,
 		category: req.category,
-		views: req.views || '',
+		views: req.views ?? 0,
 		status: req.status || 'draft'
 	});
 	return {
@@ -194,14 +194,14 @@ export async function updateTech(id: number, req: {
 	title: string;
 	content: string;
 	category: string;
-	views?: string;
+	views?: number;
 	status?: 'draft' | 'published';
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/techs/${id}`, {
 		title: req.title,
 		content: req.content,
 		category: req.category,
-		views: req.views || '',
+		views: req.views ?? 0,
 		status: req.status || 'draft'
 	});
 	return {

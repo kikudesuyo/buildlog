@@ -11,7 +11,7 @@
 	let title = $state(data.tech.title);
 	let content = $state(data.tech.content || '');
 	let category = $state(data.tech.category);
-	let views = $state(data.tech.views || '');
+	let views = $state(data.tech.views ?? 0);
 
 	let previewMode = $state<'edit' | 'preview'>('edit');
 	let parsedContent = $derived(marked.parse(content) as string);
@@ -22,7 +22,7 @@
 		title !== data.tech.title ||
 		content !== (data.tech.content || '') ||
 		category !== data.tech.category ||
-		views !== (data.tech.views || '')
+		views !== (data.tech.views ?? 0)
 	);
 
 	// ダミーのUIステート (image.pngの再現用)
@@ -250,7 +250,8 @@
 						<label for="tech-views" class="font-label-xs text-[11px] text-outline">閲覧数（任意）</label>
 						<input
 							id="tech-views"
-							type="text"
+							type="number"
+							min="0"
 							bind:value={views}
 							disabled={isSubmitting}
 							class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md"
