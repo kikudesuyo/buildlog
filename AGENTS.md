@@ -142,7 +142,7 @@ DevTools のデバイスツールバーなどでviewportを設定して確認し
 
 ローカルファイルのパスだけをPR descriptionへ記載してはいけません。
 
-スクリーンショットはリポジトリへコミットしてPR descriptionから参照するのではなく、GitHubから直接参照できるアップロードURLを使用してください。PR description に画像ファイルの相対パス（例: `docs/screenshots/...png`）を記載してはいけません。
+スクリーンショットは原則としてGitHubから直接参照できるアップロードURLを使用してください。アップロード機能を利用できない場合は、元画像を `docs/screenshots/<issue-number>/` 配下へcommit・pushし、PR descriptionからGitHubの絶対URL（例: `https://github.com/<owner>/<repo>/blob/<commit>/docs/screenshots/<issue-number>/mobile.png?raw=1`）で参照する方法をフォールバックとして認めます。PR descriptionにローカルパスやリポジトリ内の相対パスだけを記載してはいけません。
 
 GitHubから参照可能なURLへアップロードし、そのURLをPR descriptionへ記載してください。
 
@@ -162,9 +162,7 @@ PC:
 
 動画はGitHub上から参照できるURLを記載してください。
 
-UI変更のPRは、スクリーンショット・動画のアップロードとPR descriptionへの添付が完了するまで作成完了としてはいけません。PR作成後に `gh pr view <number>` 等でdescriptionを確認し、Mobile・PCの各画像がGitHubのURL（`https://`）で埋め込まれていることを確認してください。ローカルパス、リポジトリ内相対パス、画像未添付の説明だけでは要件を満たしません。
-
-PR作成後、**GitHub上で画像・動画が実際に表示・参照できることを確認してください。**
+UI変更のPRは、スクリーンショット・動画のアップロードまたは上記フォールバックによるpushと、PR descriptionへの添付が完了するまで作成完了としてはいけません。PR作成後、`gh pr view <number>` 等でdescriptionを確認し、Mobile・PCの各画像がGitHubのURL（`https://`）で埋め込まれていることを確認してください。ローカルパス、相対パス、画像未添付の説明だけでは要件を満たしません。**GitHub上で画像・動画が実際に表示・参照できることも確認してください。**
 
 確認が終わるまでローカルの一時ファイルを削除してはいけません。
 
