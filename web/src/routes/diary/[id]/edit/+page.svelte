@@ -108,7 +108,7 @@
 			{isSubmitting ? '更新中...' : '更新する'}
 		</button>
 		<img
-			src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
+			src="/profile.jpg"
 			alt="Profile"
 			class="h-8 w-8 rounded-full object-cover border border-outline-variant/20"
 		/>

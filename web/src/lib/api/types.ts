@@ -43,7 +43,6 @@ export interface ProfileData {
 	name: string;
 	subtitle: string;
 	title: string;
-	avatarUrl: string;
 	quote: string;
 	bio: string[];
 	highlights: {
