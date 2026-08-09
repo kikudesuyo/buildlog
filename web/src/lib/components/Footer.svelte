@@ -14,7 +14,6 @@
 			Buildlog
 		</div>
 		<div class="flex flex-wrap items-center gap-2">
-			<a href={resolve('/rss.xml')} class="font-label-sm text-label-sm flex min-h-11 items-center rounded-lg px-3 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary">RSS</a>
 			<a href={resolve('/contact')} class="font-label-sm text-label-sm flex min-h-11 items-center rounded-lg px-3 text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary">Contact</a>
 			{#if githubUrl}
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
