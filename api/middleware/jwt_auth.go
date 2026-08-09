@@ -27,6 +27,8 @@ func JWTToCtx() func(next http.Handler) http.Handler {
 				ctx = library.CtxSetJWTError(ctx, xerror.AuthJWTEmptyToken())
 			} else if !service.ValidateJWTToken(token, os.Getenv("ADMIN_SESSION_SECRET")) {
 				ctx = library.CtxSetJWTError(ctx, xerror.AuthJWTInvalidTokenErr(nil))
+			} else {
+				ctx = library.CtxSetJWTAuthenticated(ctx)
 			}
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

@@ -31,6 +31,9 @@ func HandleRequestAndResponse(r *http.Request, w http.ResponseWriter, processFn 
 // ValidateRequestWithAuth はJWT middlewareが保存した認証結果を検証します。
 // 公開APIでは呼び出さず、認証が必要なhandler/middlewareから利用します。
 func ValidateRequestWithAuth(r *http.Request) error {
+	if library.CtxIsJWTAuthenticated(r.Context()) {
+		return nil
+	}
 	if err, ok := library.CtxGetJWTError(r.Context()); ok && err != nil {
 		return err
 	}

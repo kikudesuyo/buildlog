@@ -16,3 +16,12 @@ func CtxGetJWTError(ctx context.Context) (error, bool) {
 	v, ok := ctx.Value(xconst.ContextKeyJWTAuth{}).(error)
 	return v, ok
 }
+
+func CtxSetJWTAuthenticated(ctx context.Context) context.Context {
+	return context.WithValue(ctx, xconst.ContextKeyJWTAuthenticated{}, true)
+}
+
+func CtxIsJWTAuthenticated(ctx context.Context) bool {
+	authenticated, _ := ctx.Value(xconst.ContextKeyJWTAuthenticated{}).(bool)
+	return authenticated
+}
