@@ -7,13 +7,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	v1 "github.com/kikudesuyo/buildlog/api/handler/v1"
-	"github.com/kikudesuyo/buildlog/api/service"
-	"gorm.io/gorm"
 )
 
 // NewRouter は値を生成します。
-func NewRouter(db *gorm.DB) http.Handler {
-	service.SetDatabase(db)
+func NewRouter() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -46,7 +43,7 @@ func NewRouter(db *gorm.DB) http.Handler {
 		r.Put("/profile", handleFunc(v1.HandleUpdateProfile))
 		r.Get("/posts/{id}/comments", handleFunc(v1.HandleGetCommentList))
 		r.Post("/posts/{id}/comments", handleFunc(v1.HandleCreateComment))
-		r.Get("/posts/history", handleFunc(v1.HandleGetPostHistory(db)))
+		r.Get("/posts/history", handleFunc(v1.HandleGetPostHistory))
 		r.Get("/admin/analytics", handleFunc(v1.HandleGetAnalytics))
 		r.Get("/goals/current", handleFunc(v1.HandleGetCurrentGoals))
 		r.Put("/goals/current", handleFunc(v1.HandleSaveCurrentGoals))

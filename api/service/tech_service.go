@@ -5,18 +5,22 @@ import (
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
 // ListTechs は一覧を取得します。
 func ListTechs(ctx context.Context, all bool, offset, limit int, ipAddress string) ([]entity.DBTablePost, error) {
-	techList, err := repository.ListTechs(ctx, database, all, offset, limit)
+	db := library.GetDB(ctx)
+	techList, err := repository.ListTechs(ctx, db, all, offset, limit)
 	if err != nil {
 		return nil, err
 	}
 	for i := range techList {
-		count, _ := repository.CountLikesByPostID(ctx, database, techList[i].ID)
-		liked, _ := repository.HasLiked(ctx, database, techList[i].ID, ipAddress)
+
+		count, _ := repository.CountLikesByPostID(ctx, db, techList[i].ID)
+
+		liked, _ := repository.HasLiked(ctx, db, techList[i].ID, ipAddress)
 		techList[i].LikesCount = count
 		techList[i].HasLiked = liked
 	}
@@ -25,12 +29,15 @@ func ListTechs(ctx context.Context, all bool, offset, limit int, ipAddress strin
 
 // GetTechByID はデータを取得します。
 func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTablePost, error) {
-	tech, err := repository.GetTechByID(ctx, database, id)
+	db := library.GetDB(ctx)
+	tech, err := repository.GetTechByID(ctx, db, id)
 	if err != nil {
 		return nil, err
 	}
-	count, _ := repository.CountLikesByPostID(ctx, database, tech.ID)
-	liked, _ := repository.HasLiked(ctx, database, tech.ID, ipAddress)
+
+	count, _ := repository.CountLikesByPostID(ctx, db, tech.ID)
+
+	liked, _ := repository.HasLiked(ctx, db, tech.ID, ipAddress)
 	tech.LikesCount = count
 	tech.HasLiked = liked
 	return tech, nil
@@ -38,6 +45,7 @@ func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTab
 
 // CreateTech はデータを作成します。
 func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.CreateTechResponse, error) {
+	db := library.GetDB(ctx)
 	status := req.Status
 	if status == "" {
 		status = "draft"
@@ -49,7 +57,8 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 		Views:    req.Views,
 		Status:   status,
 	}
-	if err := repository.CreateTech(ctx, database, &tech); err != nil {
+
+	if err := repository.CreateTech(ctx, db, &tech); err != nil {
 		return entity.CreateTechResponse{}, err
 	}
 	return entity.CreateTechResponse{
@@ -66,7 +75,8 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 
 // UpdateTech はデータを更新します。
 func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (entity.UpdateTechResponse, error) {
-	tech, err := repository.GetTechByID(ctx, database, id)
+	db := library.GetDB(ctx)
+	tech, err := repository.GetTechByID(ctx, db, id)
 	if err != nil {
 		return entity.UpdateTechResponse{}, err
 	}
@@ -79,7 +89,7 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 		tech.Status = req.Status
 	}
 
-	if err := repository.UpdateTech(ctx, database, tech); err != nil {
+	if err := repository.UpdateTech(ctx, db, tech); err != nil {
 		return entity.UpdateTechResponse{}, err
 	}
 
@@ -97,5 +107,6 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 
 // DeleteTech はデータを削除します。
 func DeleteTech(ctx context.Context, id int64) error {
-	return repository.DeleteTech(ctx, database, id)
+	db := library.GetDB(ctx)
+	return repository.DeleteTech(ctx, db, id)
 }

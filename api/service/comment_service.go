@@ -4,13 +4,15 @@ import (
 	"context"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/repository"
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
 // ListCommentsByPostID は一覧を取得します。
 func ListCommentsByPostID(ctx context.Context, postID int64) ([]entity.DBTableComment, error) {
-	commentList, err := repository.ListCommentsByPostID(ctx, database, postID)
+	db := library.GetDB(ctx)
+	commentList, err := repository.ListCommentsByPostID(ctx, db, postID)
 	if err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
@@ -19,11 +21,12 @@ func ListCommentsByPostID(ctx context.Context, postID int64) ([]entity.DBTableCo
 
 // CreateComment はデータを作成します。
 func CreateComment(ctx context.Context, postID int64, req entity.CreateCommentRequest) (*entity.DBTableComment, error) {
+	db := library.GetDB(ctx)
 	comment := &entity.DBTableComment{
 		PostID:  postID,
 		Content: req.Content,
 	}
-	if err := repository.CreateComment(ctx, database, comment); err != nil {
+	if err := repository.CreateComment(ctx, db, comment); err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
 
