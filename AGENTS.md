@@ -153,6 +153,10 @@ gh pr create --body-file /tmp/pr-body.md
 
 PR descriptionは直接コマンドライン引数へ埋め込まず、一度Markdownファイルを作成して `--body-file` を使用してください。
 
+PR descriptionには、対応するIssueをGitHubの自動クローズ対象として登録するため、必ず `Closes #<issue-number>`、`Fixes #<issue-number>`、または `Resolves #<issue-number>` のいずれかを記載してください。複数のIssueに対応する場合は、対象Issueごとに記載します。Issue番号が特定できない場合は、推測してPRを作成せず、ユーザーに確認してください。
+
+このキーワードによるIssueの自動クローズは、PRがマージされた時点で実行されます。PR作成直後にIssueを手動で閉じてはいけません。
+
 PR作成後は `gh pr view` 等を使用して、以下を確認してください。
 
 - PRが作成されている
@@ -174,6 +178,8 @@ PR descriptionには最低限以下を記載してください。
 ## 概要
 
 変更内容を簡潔に記載する。
+
+Closes #123
 
 ## 変更内容
 
