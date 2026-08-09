@@ -120,7 +120,7 @@ import { SvelteMap } from 'svelte/reactivity';
 	];
 </script>
 
-<div class="flex flex-col gap-10 mt-10 p-6 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest">
+<div id="post-history" class="flex flex-col gap-10 mt-10 p-6 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest">
 	<!-- ヘッダー -->
 	<header class="flex flex-col gap-2">
 		<h2 class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2">
@@ -220,7 +220,7 @@ import { SvelteMap } from 'svelte/reactivity';
 			{#each selectedPosts as post (post.id)}
 				<li class="flex flex-col gap-1 text-body-md">
 					<a
-						href={post.type === 'tech' ? resolve(`/tech/${post.id}`) : resolve(`/diary/${post.id}`)}
+						href={post.type === 'tech' ? resolve(`/tech/${post.id}?from=calendar`) : resolve(`/diary/${post.id}?from=calendar`)}
 						class="text-on-surface hover:text-primary hover:underline transition-colors font-medium leading-snug"
 						onclick={closePopover}
 					>
