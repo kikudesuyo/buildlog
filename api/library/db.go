@@ -2,36 +2,45 @@ package library
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
-	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-// OpenDatabase はこの処理に必要な内部処理を実行します。
-func OpenDatabase(ctx context.Context) (*gorm.DB, error) {
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
-		return nil, fmt.Errorf("DATABASE_URL is required")
+var db *gorm.DB
+
+func InitDB() error {
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		return errors.New("DATABASE_URL is not set")
 	}
 
-	db, err := gorm.Open(postgres.Open(databaseURL), &gorm.Config{})
+	gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("open database: %w", err)
+		return fmt.Errorf("open database: %w", err)
 	}
 
-	pingCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-	sqlDB, err := db.DB()
+	sqlDB, err := gormDB.DB()
 	if err != nil {
-		return nil, fmt.Errorf("get database connection: %w", err)
-	}
-	if err := sqlDB.PingContext(pingCtx); err != nil {
-		_ = sqlDB.Close()
-		return nil, fmt.Errorf("ping database: %w", err)
+		return fmt.Errorf("get sql.DB: %w", err)
 	}
 
-	return db, nil
+	if err := sqlDB.Ping(); err != nil {
+		return fmt.Errorf("ping database: %w", err)
+	}
+
+	db = gormDB
+
+	return nil
+}
+
+func GetDB(ctx context.Context) *gorm.DB {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	return db.WithContext(ctx)
 }

@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
 // GetProfile はデータを取得します。
 func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
-	dbProfile, err := repository.GetProfile(ctx, database)
+	db := library.GetDB(ctx)
+	dbProfile, err := repository.GetProfile(ctx, db)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +85,8 @@ func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entit
 		FinalQuote:   req.FinalQuote,
 	}
 
-	if err := repository.UpdateProfile(ctx, database, &dbProfile); err != nil {
+	db := library.GetDB(ctx)
+	if err := repository.UpdateProfile(ctx, db, &dbProfile); err != nil {
 		return nil, err
 	}
 

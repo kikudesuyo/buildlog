@@ -35,3 +35,21 @@
   - `git diff --check`
 - 実行したコマンドと結果（成功・失敗、既知の警告を含む）を PR description に記載してください。
 - 本番 migration は、承認済みのデプロイ・運用手順またはGitHub Actionsから実行してください。
+
+## ローカル環境での動作確認方法
+
+APIサーバー立ち上げ
+
+```
+cd api
+make dev
+```
+
+Webサーバー立ち上げ
+
+```
+cd web
+pnpm run dev
+```
+
+これでローカルの動作確認をする際に利用してください。

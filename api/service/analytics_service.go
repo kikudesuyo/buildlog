@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
+	"github.com/kikudesuyo/buildlog/api/library"
 )
 
 type PostLikeCount struct {
@@ -15,16 +16,17 @@ type PostLikeCount struct {
 
 // GetAnalytics はデータを取得します。
 func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
+	db := library.GetDB(ctx)
 	var posts []entity.DBTablePost
-	if err := database.WithContext(ctx).Where("deleted_at IS NULL").Find(&posts).Error; err != nil {
+	if err := db.WithContext(ctx).Where("deleted_at IS NULL").Find(&posts).Error; err != nil {
 		return entity.AnalyticsResponse{}, err
 	}
 	var totalLikes int64
-	if err := database.WithContext(ctx).Model(&entity.DBTableLike{}).Count(&totalLikes).Error; err != nil {
+	if err := db.WithContext(ctx).Model(&entity.DBTableLike{}).Count(&totalLikes).Error; err != nil {
 		return entity.AnalyticsResponse{}, err
 	}
 	var likeCounts []PostLikeCount
-	if err := database.WithContext(ctx).Model(&entity.DBTableLike{}).Select("post_id, COUNT(*) as count").Group("post_id").Scan(&likeCounts).Error; err != nil {
+	if err := db.WithContext(ctx).Model(&entity.DBTableLike{}).Select("post_id, COUNT(*) as count").Group("post_id").Scan(&likeCounts).Error; err != nil {
 		return entity.AnalyticsResponse{}, err
 	}
 	likesMap := make(map[int64]int64)
