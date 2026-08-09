@@ -9,7 +9,7 @@
 		{ href: '/admin/profile', label: 'Profile', description: '自己紹介を管理', icon: 'person' },
 		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' },
 		{ href: '/admin/analytics', label: 'Analytics', description: 'アクセス統計・分析', icon: 'analytics' },
-		{ href: '/admin/trash', label: 'Trash', description: 'ゴミ箱', icon: 'delete_outline' }
+		{ href: '/admin/trash', label: 'Archive', description: 'アーカイブ', icon: 'inventory_2' }
 	] as const;
 
 	function resolveAdminPath(path: (typeof navItems)[number]['href']) {
@@ -112,20 +112,6 @@
 			{/each}
 		</nav>
 
-		<div class="mt-auto rounded-xl border border-outline-variant/20 bg-surface-container-low p-4">
-			<p class="font-label-sm text-label-sm mb-1 text-outline">現在のモード</p>
-			<p class="font-label-md text-label-md flex items-center gap-2 font-semibold text-primary">
-				<span class="h-2 w-2 rounded-full bg-primary"></span>
-				Content Manager
-			</p>
-		</div>
-	</div>
-
-	<div class="border-t border-outline-variant/20 p-4">
-		<a href={resolve('/')} onclick={closeMenu} class="font-label-md text-label-md flex items-center gap-2 rounded-lg px-3 py-2 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary">
-			<span class="material-symbols-outlined text-[18px]">visibility</span>
-			公開サイトを見る
-		</a>
 	</div>
 </aside>
 
@@ -143,7 +129,6 @@
 		</button>
 		<a href={resolve('/admin')} class="font-headline-md text-headline-md font-bold tracking-tight text-primary">Buildlog <span class="font-label-sm text-label-sm ml-2 text-outline">Admin</span></a>
 	</div>
-	<a href={resolve('/')} class="material-symbols-outlined rounded-lg p-2 text-on-surface-variant hover:bg-surface-container">visibility</a>
 	<button type="button" aria-label="テーマを切り替える" onclick={toggleTheme} class="material-symbols-outlined min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container" title={isDarkMode ? "ライトモードに切り替え" : "ダークモードに切り替え"}>
 		{isDarkMode ? 'light_mode' : 'dark_mode'}
 	</button>
