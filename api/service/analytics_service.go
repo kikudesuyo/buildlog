@@ -28,9 +28,10 @@ func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
 	for i, post := range data.Posts {
 		views := post.Views
 		totalViews += views
-		if post.Type == "diary" {
+		switch post.Type {
+		case "diary":
 			diaryCount++
-		} else if post.Type == "tech" {
+		case "tech":
 			techCount++
 		}
 		items[i] = entity.AnalyticsArticleItem{ID: post.ID, Type: post.Type, Title: post.Title, Views: views, Likes: data.LikeCounts[post.ID]}

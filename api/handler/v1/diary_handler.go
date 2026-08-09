@@ -1,11 +1,9 @@
 package v1
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/service"
 )
@@ -30,7 +28,7 @@ func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (ht
 
 // HandleGetDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +48,7 @@ func HandleGetDiary(r *http.Request, requestData map[string]interface{}) (http.H
 // HandleCreateDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleCreateDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	var req entity.CreateDiaryRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
 	if req.Title == "" || req.Content == "" {
@@ -65,12 +63,12 @@ func HandleCreateDiary(r *http.Request, requestData map[string]interface{}) (htt
 
 // HandleUpdateDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleUpdateDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
 	var req entity.UpdateDiaryRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
 	if req.Title == "" || req.Content == "" {
@@ -85,12 +83,12 @@ func HandleUpdateDiary(r *http.Request, requestData map[string]interface{}) (htt
 
 // HandleDeleteDiary はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleDeleteDiary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	id, err := parseID(r)
 	if err != nil {
 		return nil, err
 	}
 	if err := service.DeleteDiary(r.Context(), id); err != nil {
 		return nil, err
 	}
-	return entity.NewObjectResponse(map[string]string{"status": "deleted"}), nil
+	return deletedResponse("deleted"), nil
 }
