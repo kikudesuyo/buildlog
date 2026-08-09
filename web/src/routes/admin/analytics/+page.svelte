@@ -107,7 +107,7 @@
 			
 			<div class="flex flex-col justify-end h-64 w-full mt-4">
 				<div class="flex items-end justify-between h-48 w-full gap-2 border-b border-outline-variant/20 pb-1">
-					{#each analytics.monthlyActivities as activity}
+					{#each analytics.monthlyActivities as activity (activity.month)}
 						<div class="flex flex-col items-center flex-1 group">
 							<!-- ツールチップ -->
 							<span class="opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface text-surface-container-lowest text-[10px] font-bold px-1.5 py-0.5 rounded shadow mb-1.5 absolute -translate-y-8 select-none pointer-events-none z-10">
@@ -124,7 +124,7 @@
 				</div>
 				<!-- 月ラベル列 -->
 				<div class="flex justify-between w-full mt-2 text-[10px] text-outline font-medium">
-					{#each analytics.monthlyActivities as activity}
+					{#each analytics.monthlyActivities as activity (activity.month)}
 						<span class="flex-1 text-center truncate">{activity.month.substring(5)}月</span>
 					{/each}
 				</div>
@@ -159,7 +159,7 @@
 				{#if currentRanking.length === 0}
 					<p class="text-center text-outline text-body-sm py-8">データがありません</p>
 				{:else}
-					{#each currentRanking as item, i}
+					{#each currentRanking as item, i (item.id)}
 						<div class="flex items-center justify-between gap-4 p-2.5 rounded-xl border border-outline-variant/10 bg-surface-container-low/30 hover:bg-surface-container-low/60 transition-colors">
 							<div class="flex items-center gap-3 truncate">
 								<!-- 順位バッジ -->

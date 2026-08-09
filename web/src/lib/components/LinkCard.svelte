@@ -43,6 +43,7 @@
 			<div class="hidden sm:block w-32 h-full bg-outline-variant/10"></div>
 		</div>
 	{:else if data}
+		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a 
 			href={url} 
 			target="_blank" 
@@ -76,8 +77,10 @@
 				</div>
 			{/if}
 		</a>
+		<!-- eslint-enable svelte/no-navigation-without-resolve -->
 	{:else}
 		<!-- Fallback simple link -->
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 		<a href={url} target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">
 			{url}
 		</a>
