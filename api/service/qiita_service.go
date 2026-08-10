@@ -34,8 +34,8 @@ func SyncQiitaArticles(ctx context.Context) (int, error) {
 	return len(items), nil
 }
 
-func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int, ipAddress string) ([]entity.TechFeedItem, error) {
-	externalPosts, err := repository.ListExternalPosts(ctx, db)
+func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, error) {
+	externalPosts, err := repository.ListExternalPosts(ctx, db, order)
 	if err != nil {
 		return nil, err
 	}

@@ -59,6 +59,7 @@ export type ApiPost = {
 
 export type DiarySort = 'newest' | 'likes';
 export type DiarySortOrder = 'asc' | 'desc';
+export type TechSortOrder = 'asc' | 'desc';
 
 export async function fetchDiaryEntries(
 	fetchFn: ApiFetch,
@@ -90,7 +91,7 @@ export async function fetchDiaryEntries(
 	}));
 }
 
-export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, limit = 0): Promise<{
+export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, limit = 0, order: TechSortOrder = 'desc'): Promise<{
 	featuredArticle: FeaturedTechArticle | null;
 	techArticles: TechArticle[];
 	hasMore: boolean;
@@ -99,6 +100,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 	if (all) params.set('all', 'true');
 	if (!all && offset && offset > 0) params.set('offset', String(offset));
 	if (!all && limit && limit > 0) params.set('limit', String(limit));
+	if (order !== 'desc') params.set('order', order);
 	const query = params.toString();
 	const url = query ? `/techs?${query}` : '/techs';
 	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);
