@@ -80,11 +80,9 @@
 		<div class="grid grid-cols-1 gap-stack-lg">
 			{#each data.profileData.highlights as item (item.title)}
 				<div class="group border-b border-outline-variant/20 pb-stack-md">
-					<div class="mb-2 flex items-baseline justify-between">
+					<div class="mb-2 flex flex-col gap-1">
+						<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">{item.period}</span>
 						<h3 class="font-headline-md text-headline-md text-primary">{item.title}</h3>
-						<span class="font-label-sm text-label-sm text-on-surface-variant uppercase"
-							>{item.period}</span
-						>
 					</div>
 					<p class="font-body-md text-body-md max-w-[600px] text-on-surface-variant">
 						{item.description}
