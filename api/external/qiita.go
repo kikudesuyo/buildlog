@@ -14,7 +14,6 @@ import (
 const (
 	QiitaProvider = "Qiita"
 	qiitaBaseURL  = "https://qiita.com/api/v2"
-	qiitaUser     = "kikudesuyo"
 	qiitaPerPage  = 100
 )
 
@@ -33,11 +32,11 @@ type QiitaClient struct {
 	HTTPClient *http.Client
 }
 
-func NewQiitaClient(httpClient *http.Client) *QiitaClient {
+func NewQiitaClient(httpClient *http.Client, user string) *QiitaClient {
 	if httpClient == nil {
 		httpClient = defaultHTTPClient()
 	}
-	return &QiitaClient{BaseURL: qiitaBaseURL, User: qiitaUser, HTTPClient: httpClient}
+	return &QiitaClient{BaseURL: qiitaBaseURL, User: user, HTTPClient: httpClient}
 }
 
 func (c *QiitaClient) FetchAll(ctx context.Context) ([]QiitaItem, error) {

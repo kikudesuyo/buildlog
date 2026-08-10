@@ -36,7 +36,7 @@ func TestQiitaClientFetchAllFetchesEveryPage(t *testing.T) {
 			Header:     make(http.Header),
 			Request:    r,
 		}, nil
-	})})
+	})}, "kikudesuyo")
 	client.BaseURL = "https://qiita.example/api/v2/"
 	items, err := client.FetchAll(context.Background())
 	if err != nil {

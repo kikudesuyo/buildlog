@@ -9,6 +9,7 @@ import (
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/external"
+	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/repository"
 	"gorm.io/gorm"
 )
@@ -19,6 +20,14 @@ type QiitaItemFetcher interface {
 
 type QiitaMetadataFetcher interface {
 	FetchOGP(context.Context, string) (external.OGPMetadata, error)
+}
+
+const qiitaUser = "kikudesuyo"
+
+// ImportQiita はアプリケーションで利用するQiitaユーザーの記事を同期します。
+func ImportQiita(ctx context.Context) (int, error) {
+	qiitaClient := external.NewQiitaClient(nil, qiitaUser)
+	return ImportQiitaItems(ctx, library.GetDB(ctx), qiitaClient, qiitaClient)
 }
 
 func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int, ipAddress string) ([]entity.TechFeedItem, error) {

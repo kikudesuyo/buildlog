@@ -4,9 +4,7 @@ import (
 	"net/http"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
-	"github.com/kikudesuyo/buildlog/api/external"
 	"github.com/kikudesuyo/buildlog/api/handler"
-	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
@@ -16,8 +14,7 @@ func HandleQiitaImportBatchJob(r *http.Request, requestData map[string]interface
 		return nil, err
 	}
 
-	qiitaClient := external.NewQiitaClient(nil)
-	count, err := service.ImportQiitaItems(r.Context(), library.GetDB(r.Context()), qiitaClient, qiitaClient)
+	count, err := service.ImportQiita(r.Context())
 	if err != nil {
 		return nil, err
 	}
