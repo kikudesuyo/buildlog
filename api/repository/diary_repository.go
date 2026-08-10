@@ -8,13 +8,17 @@ import (
 )
 
 // ListDiaries は日記一覧を取得し、公開一覧ではページ単位で絞り込みます。
-func ListDiaries(ctx context.Context, db *gorm.DB, all bool, offset int, limit int) ([]entity.DBTablePost, error) {
+func ListDiaries(ctx context.Context, db *gorm.DB, all bool, offset int, limit int, sortBy string, sortOrder string) ([]entity.DBTablePost, error) {
 	diaryList := make([]entity.DBTablePost, 0)
 	query := db.WithContext(ctx).Where("type = ?", "diary")
 	if !all {
 		query = query.Where("status = ?", "published")
 	}
-	query = query.Order("created_at DESC").Order("id DESC")
+	if sortBy == "likes" {
+		query = query.Order("COALESCE((SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id), 0) " + sortOrder).Order("id DESC")
+	} else {
+		query = query.Order("created_at " + sortOrder).Order("id " + sortOrder)
+	}
 	if !all {
 		query = query.Offset(offset)
 		if limit > 0 {

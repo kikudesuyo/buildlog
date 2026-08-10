@@ -57,11 +57,23 @@ export type ApiPost = {
 	};
 };
 
-export async function fetchDiaryEntries(fetchFn: ApiFetch, all = false, offset = 0, limit = 0): Promise<DiaryEntry[]> {
+export type DiarySort = 'newest' | 'likes';
+export type DiarySortOrder = 'asc' | 'desc';
+
+export async function fetchDiaryEntries(
+	fetchFn: ApiFetch,
+	all = false,
+	offset = 0,
+	limit = 0,
+	sort: DiarySort = 'newest',
+	order: DiarySortOrder = 'desc'
+): Promise<DiaryEntry[]> {
 	const params = new URLSearchParams();
 	if (all) params.set('all', 'true');
 	if (!all && offset > 0) params.set('offset', String(offset));
 	if (!all && limit > 0) params.set('limit', String(limit));
+	if (sort !== 'newest') params.set('sort', sort);
+	if (order !== 'desc') params.set('order', order);
 	const query = params.toString();
 	const url = query ? `/diaries?${query}` : '/diaries';
 	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);

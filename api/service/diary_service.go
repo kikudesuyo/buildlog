@@ -10,9 +10,9 @@ import (
 )
 
 // ListDiaries は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
-func ListDiaries(ctx context.Context, all bool, offset int, limit int, ipAddress string) ([]entity.DBTablePost, error) {
+func ListDiaries(ctx context.Context, all bool, offset int, limit int, sortBy string, sortOrder string, ipAddress string) ([]entity.DBTablePost, error) {
 	db := library.GetDB(ctx)
-	diaryList, err := repository.ListDiaries(ctx, db, all, offset, limit)
+	diaryList, err := repository.ListDiaries(ctx, db, all, offset, limit, sortBy, sortOrder)
 	if err != nil {
 		return nil, err
 	}
