@@ -84,7 +84,7 @@
 		{#if isAdmin}
 			<a
 				href={resolve(isAdmin ? '/admin/diary/new' : '/diary/new')}
-				class="font-label-md text-label-md flex min-h-11 min-w-32 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-on-primary transition-all hover:bg-primary/95 active:scale-95"
+				class="font-label-md text-label-md flex min-h-11 w-28 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-on-primary transition-all hover:bg-primary/95 active:scale-95 md:w-32 md:px-4"
 			>
 				<span class="material-symbols-outlined text-[18px]">add</span>
 				<span class="whitespace-nowrap">つぶやく</span>

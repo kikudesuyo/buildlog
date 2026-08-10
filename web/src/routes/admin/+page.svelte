@@ -99,7 +99,7 @@
 			<h1 id="goals-heading" class="font-headline-lg text-headline-lg text-primary">今月の目標</h1>
 			<p class="font-body-sm text-body-sm text-on-surface-variant">{goals.startsAt} — {goals.endsAt}</p>
 		</div>
-		<button type="button" onclick={() => openGoalDialog()} class="font-label-md text-label-md inline-flex min-h-11 min-w-32 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-primary px-4 py-2 text-primary hover:bg-primary hover:text-on-primary">目標を追加</button>
+		<button type="button" onclick={() => openGoalDialog()} class="font-label-md text-label-md inline-flex min-h-11 min-w-28 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-primary px-3 py-2 text-primary hover:bg-primary hover:text-on-primary md:min-w-32 md:px-4">目標を追加</button>
 	</div>
 	<div class="grid gap-4 md:grid-cols-2">
 		{#each goals.goals as goal (goal.id)}
