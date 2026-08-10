@@ -5,6 +5,8 @@
 	import { resolve } from '$app/paths';
 	import { tick } from 'svelte';
 	import LikeButton from './LikeButton.svelte';
+	import Button from './Button.svelte';
+	import IconButton from './IconButton.svelte';
 
 	type Props = {
 		entries: DiaryEntry[];
@@ -151,12 +153,8 @@
 					</div>
 					{#if isAdmin}
 						<div class="flex gap-2">
-							<button type="button" onclick={() => onEdit?.(entry.id)} class="min-h-11 min-w-11 rounded-lg p-1 text-outline opacity-60 transition-all duration-200 hover:text-primary hover:opacity-100" title={`編集: ${entry.title}`} aria-label={`編集: ${entry.title}`}>
-								<span class="material-symbols-outlined text-[18px]">edit</span>
-							</button>
-							<button bind:this={actionRefs[entry.id]} type="button" onclick={() => deleteEntry(entry)} class="min-h-11 min-w-11 rounded-lg p-1 text-outline opacity-60 transition-all duration-200 hover:text-error hover:opacity-100" title={`削除: ${entry.title}`} aria-label={`削除: ${entry.title}`}>
-								<span class="material-symbols-outlined text-[18px]">delete</span>
-							</button>
+							<IconButton icon="edit" type="button" onclick={() => onEdit?.(entry.id)} class="text-outline opacity-60 hover:opacity-100" title={`編集: ${entry.title}`} aria-label={`編集: ${entry.title}`} />
+							<IconButton bind:element={actionRefs[entry.id]} icon="delete" variant="danger" type="button" onclick={() => deleteEntry(entry)} class="text-outline opacity-60 hover:opacity-100" title={`削除: ${entry.title}`} aria-label={`削除: ${entry.title}`} />
 						</div>
 					{/if}
 				</div>
@@ -187,7 +185,7 @@
 	{#if loadError}
 		<div class="flex flex-col items-center gap-3" role="alert">
 			<p class="font-body-sm text-body-sm text-error">過去の記録を読み込めませんでした。</p>
-			<button type="button" onclick={loadMore} class="font-label-md text-label-md cursor-pointer rounded-lg border border-error px-6 py-2 text-error transition-colors hover:bg-error hover:text-on-error">再試行</button>
+			<Button type="button" variant="danger" onclick={loadMore} class="cursor-pointer px-6">再試行</Button>
 		</div>
 	{:else if isLoading}
 		<div class="flex items-center justify-center gap-2" role="status" aria-live="polite">
@@ -196,9 +194,9 @@
 		</div>
 	{:else if hasMore}
 		<div class="flex justify-center">
-			<button type="button" onclick={loadMore} class="font-label-md text-label-md cursor-pointer rounded-lg border border-primary px-8 py-3 text-primary transition-all hover:bg-primary hover:text-on-primary active:scale-95">
+			<Button type="button" variant="outline" onclick={loadMore} class="cursor-pointer px-8 py-3 active:scale-95">
 				過去の記録を見る
-			</button>
+			</Button>
 		</div>
 	{:else if !isAdmin}
 		<p class="font-body-sm text-body-sm text-center text-outline" role="status">すべての記録を表示しました。</p>

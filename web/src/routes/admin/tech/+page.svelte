@@ -2,6 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { syncQiitaArticles } from '$lib/api/client';
 	import TechFeed from '$lib/components/TechFeed.svelte';
+	import Button from '$lib/components/Button.svelte';
 	let { data } = $props();
 	let isSyncing = $state(false);
 	let syncMessage = $state('');
@@ -28,10 +29,10 @@
 <svelte:head><title>Buildlog — Admin Tech Feed</title></svelte:head>
 <div class="editorial-container mx-auto flex flex-col gap-6 px-gutter">
 	<section class="flex justify-end">
-		<button type="button" onclick={handleQiitaSync} disabled={isSyncing} class="font-label-md text-label-md flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-on-primary transition-colors hover:bg-primary/95 disabled:cursor-wait disabled:opacity-60">
+		<Button type="button" onclick={handleQiitaSync} disabled={isSyncing} class="shrink-0 gap-2 px-5 py-2.5 hover:bg-primary/95">
 			<span class="material-symbols-outlined text-[18px]">{isSyncing ? 'sync' : 'sync_alt'}</span>
 			{isSyncing ? '同期中…' : 'Qiitaから取り込む'}
-		</button>
+		</Button>
 	</section>
 	{#if syncMessage}<p class="font-body-sm text-body-sm rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-primary" role="status">{syncMessage}</p>{/if}
 	{#if syncError}<p class="font-body-sm text-body-sm rounded-lg border border-error/30 bg-error-container/30 px-4 py-3 text-error" role="alert">{syncError}</p>{/if}

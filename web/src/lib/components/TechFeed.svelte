@@ -4,6 +4,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { fetchTechFeed, type ApiFetch, type TechSortOrder } from '$lib/api/client';
+	import Button from './Button.svelte';
 
 	type Props = {
 		featuredArticle?: FeaturedTechArticle | null;
@@ -112,7 +113,7 @@
 		<section class="rounded-xl border border-error/30 bg-error-container/30 p-8 text-center" role="alert">
 			<h2 class="font-headline-md text-headline-md text-on-surface">記事を読み込めませんでした</h2>
 			<p class="font-body-md text-body-md mt-2 text-on-surface-variant">通信を確認して、もう一度お試しください。</p>
-			<button type="button" onclick={() => invalidateAll()} class="font-label-md text-label-md mt-5 min-h-11 rounded-lg bg-primary px-5 py-2 text-on-primary">再試行</button>
+			<Button type="button" class="mt-5" onclick={() => invalidateAll()}>再試行</Button>
 		</section>
 	{:else if articles.length === 0}
 		<section class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-8 text-center">
@@ -168,9 +169,9 @@
 	{#if !isAdmin && hasMoreArticles && !isRestoring}
 		<div class="flex flex-col items-center gap-3">
 			{#if loadMoreError}<p class="font-body-sm text-body-sm text-error" role="alert">記事を追加で読み込めませんでした。</p>{/if}
-			<button type="button" onclick={loadMore} disabled={isLoadingMore} class="font-label-md text-label-md min-h-11 rounded-lg border border-outline-variant/60 px-6 py-2 text-primary transition-colors hover:bg-surface-container-high disabled:cursor-wait disabled:opacity-60">
+			<Button type="button" variant="outline" onclick={loadMore} disabled={isLoadingMore} class="border-outline-variant/60 px-6 hover:bg-surface-container-high hover:text-primary">
 				{isLoadingMore ? '読み込み中…' : 'もっと見る'}
-			</button>
+			</Button>
 		</div>
 	{/if}
 

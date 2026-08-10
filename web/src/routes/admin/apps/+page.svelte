@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { deleteApp } from '$lib/api/client';
+	import IconButton from '$lib/components/IconButton.svelte';
 
 	let { data } = $props();
 	let appProjects = $state(data.appProjects);
@@ -68,14 +69,7 @@
 							>
 								edit
 							</a>
-							<button
-								type="button"
-								onclick={() => handleDelete(app.id)}
-								class="material-symbols-outlined rounded-lg p-2 text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors cursor-pointer"
-								title="削除"
-							>
-								delete
-							</button>
+							<IconButton icon="delete" variant="danger" type="button" onclick={() => handleDelete(app.id)} title="削除" aria-label="削除" />
 						</div>
 					</div>
 				{/each}
