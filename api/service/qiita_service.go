@@ -35,36 +35,12 @@ func SyncQiitaArticles(ctx context.Context) (int, error) {
 }
 
 func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int, ipAddress string) ([]entity.TechFeedItem, error) {
-	nativePosts, err := repository.ListTechs(ctx, db, all, 0, 0)
-	if err != nil {
-		return nil, err
-	}
-	postIDs := make([]int64, len(nativePosts))
-	for i := range nativePosts {
-		postIDs[i] = nativePosts[i].ID
-	}
-	engagements, err := repository.GetPostEngagements(ctx, db, postIDs, ipAddress)
-	if err != nil {
-		return nil, err
-	}
-	for i := range nativePosts {
-		engagement := engagements[nativePosts[i].ID]
-		nativePosts[i].LikesCount = engagement.LikesCount
-		nativePosts[i].HasLiked = engagement.HasLiked
-	}
 	externalPosts, err := repository.ListExternalPosts(ctx, db)
 	if err != nil {
 		return nil, err
 	}
 
-	items := make([]entity.TechFeedItem, 0, len(nativePosts)+len(externalPosts))
-	for _, post := range nativePosts {
-		items = append(items, entity.TechFeedItem{
-			Key: fmt.Sprintf("post:%d", post.ID), ID: post.ID, Type: "post", Title: post.Title, Content: post.Content,
-			Views: post.Views, Status: post.Status, CreatedAt: post.CreatedAt, UpdatedAt: post.UpdatedAt,
-			LikesCount: post.LikesCount, CommentsCount: post.CommentsCount, HasLiked: post.HasLiked,
-		})
-	}
+	items := make([]entity.TechFeedItem, 0, len(externalPosts))
 	for _, post := range externalPosts {
 		items = append(items, entity.TechFeedItem{
 			Key: fmt.Sprintf("external:%d", post.ID), ID: post.ID, Type: "external", Title: post.Title, Content: post.Excerpt,

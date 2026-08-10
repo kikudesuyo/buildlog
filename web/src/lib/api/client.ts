@@ -179,62 +179,9 @@ export async function deleteDiary(id: number): Promise<void> {
 	await sendRequest<void>('DELETE', `/diaries/${id}`);
 }
 
-export async function createTech(req: {
-	title: string;
-	content: string;
-	views?: number;
-	status?: 'draft' | 'published';
-}): Promise<TechArticle> {
-	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/techs', {
-		title: req.title,
-		content: req.content,
-		views: req.views ?? 0,
-		status: req.status || 'draft'
-	});
-	return {
-		key: response.data.key ?? `post:${response.data.id}`,
-		id: response.data.id,
-		title: response.data.title,
-		content: response.data.content,
-		views: response.data.views,
-		status: response.data.status,
-		createdAt: response.data.created_at,
-		updatedAt: response.data.updated_at,
-		likesCount: response.data.likes_count,
-		commentsCount: response.data.comments_count ?? 0,
-		hasLiked: response.data.has_liked
-	};
-}
-
-export async function updateTech(id: number, req: {
-	title: string;
-	content: string;
-	views?: number;
-	status?: 'draft' | 'published';
-}): Promise<TechArticle> {
-	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/techs/${id}`, {
-		title: req.title,
-		content: req.content,
-		views: req.views ?? 0,
-		status: req.status || 'draft'
-	});
-	return {
-		key: response.data.key ?? `post:${response.data.id}`,
-		id: response.data.id,
-		title: response.data.title,
-		content: response.data.content,
-		views: response.data.views,
-		status: response.data.status,
-		createdAt: response.data.created_at,
-		updatedAt: response.data.updated_at,
-		likesCount: response.data.likes_count,
-		commentsCount: response.data.comments_count ?? 0,
-		hasLiked: response.data.has_liked
-	};
-}
-
-export async function deleteTech(id: number): Promise<void> {
-	await sendRequest<void>('DELETE', `/techs/${id}`);
+export async function syncQiitaArticles(): Promise<number> {
+	const response = await sendRequest<ApiObjectResponse<{ synced: number }>>('POST', '/admin/tech/qiita/sync');
+	return response.data.synced;
 }
 
 export async function fetchDiary(fetchFn: ApiFetch, id: number, countView = false): Promise<DiaryEntry> {
@@ -249,23 +196,6 @@ export async function fetchDiary(fetchFn: ApiFetch, id: number, countView = fals
 		likesCount: response.data.likes_count,
 		commentsCount: response.data.comments_count ?? 0,
 		hasLiked: response.data.has_liked
-	};
-}
-
-export async function fetchTech(fetchFn: ApiFetch, id: number, countView = false): Promise<TechArticle> {
-	const response = await get<ApiObjectResponse<ApiPost>>(fetchFn, `/techs/${id}${countView ? '?count_view=true' : ''}`);
-	return {
-		key: response.data.key ?? `post:${response.data.id}`,
-		id: response.data.id,
-		title: response.data.title,
-		content: response.data.content,
-		views: response.data.views,
-		status: response.data.status,
-		createdAt: response.data.created_at,
-		updatedAt: response.data.updated_at,
-		likesCount: response.data.likes_count,
-		commentsCount: response.data.comments_count ?? 0,
-		hasLiked: response.data.has_liked,
 	};
 }
 

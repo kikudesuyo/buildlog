@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
-	import { resolve } from '$app/paths';
-	import LikeButton from './LikeButton.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { fetchTechFeed, type ApiFetch } from '$lib/api/client';
 
@@ -12,24 +10,17 @@
 		hasMore?: boolean;
 		loadError?: boolean;
 		isAdmin?: boolean;
-		onEdit?: (id: number) => void;
-		onDelete?: (id: number) => void | Promise<boolean | void>;
 	};
 
-	let { featuredArticle = null, techArticles = [], hasMore = false, loadError = false, isAdmin = false, onEdit, onDelete }: Props = $props();
+	let { featuredArticle = null, techArticles = [], hasMore = false, loadError = false, isAdmin = false }: Props = $props();
 	let loadedTechArticles = $state(techArticles);
 	let loadedFeaturedArticle = $state(featuredArticle);
 	let hasMoreArticles = $state(hasMore);
 	let isLoadingMore = $state(false);
 	let loadMoreError = $state(false);
-	let deletedIds = $state<number[]>([]);
 	const storageKey = 'tech-feed-count';
 	let isRestoring = $state(false);
-	let articles = $derived(
-		(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles).filter(
-			(article) => !deletedIds.includes(article.id)
-		)
-	);
+	let articles = $derived(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles);
 	let featured = $derived(articles.length > 0 ? articles[0] : null);
 	let filteredArticles = $derived(articles.slice(1));
 
@@ -40,11 +31,7 @@
 	}
 
 	function articleHref(article: TechArticle) {
-		return article.external?.url ?? resolve(`/tech/${article.id}`);
-	}
-
-	async function deleteArticle(id: number) {
-		if ((await onDelete?.(id)) !== false) deletedIds = [...deletedIds, id];
+		return article.external?.url ?? '/tech';
 	}
 
 	async function loadMore() {
@@ -86,9 +73,6 @@
 			<h1 class="font-display-lg text-display-lg mb-stack-sm text-primary">{isAdmin ? '技術記事管理' : '技術と美学'}</h1>
 			<p class="font-body-lg text-body-lg max-w-[600px] text-on-surface-variant">思考の断片を、構造化された知性へ。最新のテクノロジーと設計思想を綴る技術録。</p>
 		</div>
-		{#if isAdmin}
-			<a href={resolve(isAdmin ? '/admin/tech/new' : '/tech/new')} class="font-label-md text-label-md flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-6 py-2.5 text-on-primary transition-all hover:bg-primary/95 active:scale-95"><span class="material-symbols-outlined text-[18px]">add</span>記事を書く</a>
-		{/if}
 	</section>
 
 	{#if loadError}
@@ -111,7 +95,6 @@
 				{#if featured.status === 'draft'}
 					<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
 				{/if}
-				{#if isAdmin && !featured.external}<div class="ml-auto flex gap-2"><button type="button" onclick={() => onEdit?.(featured.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(featured.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}
 			</div>
 			{#if featured.external?.thumbnailUrl}<img src={featured.external.thumbnailUrl} alt="" class="mb-4 aspect-[2/1] w-full rounded-lg object-cover md:mb-6" loading="lazy" />{/if}
 			<h2 class="font-display-lg mb-stack-md text-[22px] leading-tight text-primary transition-colors group-hover:text-primary/80 md:text-[28px]">
@@ -119,13 +102,6 @@
 			</h2>
 			<p class="font-body-md text-body-md mb-4 text-on-surface-variant line-clamp-2 md:mb-6 md:line-clamp-3">{featured.content}</p>
 			<a href={articleHref(featured)} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
-			<div class="flex items-center justify-between mb-4">
-				{#if !featured.external}<LikeButton postId={featured.id} initialLikesCount={featured.likesCount} initialHasLiked={featured.hasLiked} />
-				<a href={resolve(`/tech/${featured.id}`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${featured.commentsCount}件を表示`}>
-					<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>{featured.commentsCount}
-				</a>
-				{/if}
-			</div>
 			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
 		</article>
 	{/if}
@@ -140,7 +116,7 @@
 							<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
 						{/if}
 					</div>
-					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>{#if isAdmin && !article.external}<div class="flex gap-2"><button type="button" onclick={() => onEdit?.(article.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(article.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}</div>
+					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span></div>
 				</div>
 				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-headline-lg">
 					<a href={articleHref(article)} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined}>{article.title}</a>
@@ -148,14 +124,6 @@
 				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
 				{#if article.external?.thumbnailUrl}<img src={article.external.thumbnailUrl} alt="" class="aspect-[2/1] w-full rounded-lg object-cover" loading="lazy" />{/if}
 				<a href={articleHref(article)} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
-				{#if !article.external}<div class="mt-3 flex items-center gap-4">
-					<LikeButton postId={article.id} initialLikesCount={article.likesCount} initialHasLiked={article.hasLiked} />
-					<a href={resolve(`/tech/${article.id}`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${article.commentsCount}件を表示`}>
-						<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>{article.commentsCount}
-					</a>
-					{#if article.views}<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views.toLocaleString()}</span>{/if}
-				</div>
-				{/if}
 			</article>
 		{/each}
 	</div>

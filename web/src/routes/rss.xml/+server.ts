@@ -2,6 +2,8 @@ import type { RequestHandler } from './$types';
 import { fetchDiaryEntries, fetchTechFeed } from '$lib/api/client';
 
 export const GET: RequestHandler = async ({ fetch }) => {
+	const siteUrl = 'http://localhost:5173';
+
 	// 並行して日記と技術記事を取得
 	const [diaries, techFeed] = await Promise.all([
 		fetchDiaryEntries(fetch),
@@ -21,13 +23,13 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			title: featuredArticle.title,
 			content: featuredArticle.content,
 			createdAt: featuredArticle.createdAt,
-			link: `/tech/${featuredArticle.id}`
+			link: featuredArticle.external?.url ?? `${siteUrl}/tech`
 		}] : []),
 		...techFeed.techArticles.map(t => ({
 			title: t.title,
 			content: t.content,
 			createdAt: t.createdAt,
-			link: `/tech/${t.id}`
+			link: t.external?.url ?? `${siteUrl}/tech`
 		}))
 	];
 
@@ -37,13 +39,11 @@ export const GET: RequestHandler = async ({ fetch }) => {
 	// 最新の 20 件に絞り込み
 	const latestArticles = articles.slice(0, 20);
 
-	const siteUrl = 'http://localhost:5173';
-
 	const rssItems = latestArticles.map(item => `
 		<item>
 			<title>${escapeXml(item.title)}</title>
-			<link>${siteUrl}${item.link}</link>
-			<guid>${siteUrl}${item.link}</guid>
+			<link>${item.link}</link>
+			<guid>${item.link}</guid>
 			<pubDate>${new Date(item.createdAt).toUTCString()}</pubDate>
 			<description>${escapeXml(item.content)}</description>
 		</item>
