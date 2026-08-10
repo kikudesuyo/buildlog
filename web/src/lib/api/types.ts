@@ -10,7 +10,14 @@ export interface DiaryEntry {
 	hasLiked?: boolean;
 }
 
+export interface ExternalPost {
+	provider: string;
+	url: string;
+	thumbnailUrl: string;
+}
+
 export interface TechArticle {
+	key: string;
 	id: number;
 	title: string;
 	content: string;
@@ -21,6 +28,7 @@ export interface TechArticle {
 	likesCount: number;
 	commentsCount: number;
 	hasLiked?: boolean;
+	external?: ExternalPost;
 }
 
 export type FeaturedTechArticle = TechArticle;

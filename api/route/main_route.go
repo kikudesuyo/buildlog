@@ -18,6 +18,10 @@ func NewRouter() http.Handler {
 	r.Use(corsMiddleware)
 	r.Use(authmiddleware.JWTToCtx())
 
+	r.Route("/batchjob", func(r chi.Router) {
+		r.Post("/qiita/sync", handleFunc(v1.HandleQiitaBatchJob))
+	})
+
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Post("/auth/login", handleFunc(v1.HandleAuthLogin))
 		r.Get("/auth/session", handleFunc(v1.HandleAuthSession))

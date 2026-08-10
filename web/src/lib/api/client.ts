@@ -36,6 +36,7 @@ async function get<T>(fetchFn: ApiFetch, path: string): Promise<T> {
 }
 
 export type ApiPost = {
+	key?: string;
 	id: number;
 	type: string;
 	title: string;
@@ -49,6 +50,11 @@ export type ApiPost = {
 	likes_count: number;
 	comments_count: number;
 	has_liked: boolean;
+	external?: {
+		provider: string;
+		url: string;
+		thumbnail_url: string;
+	};
 };
 
 export async function fetchDiaryEntries(fetchFn: ApiFetch, all = false, offset = 0, limit = 0): Promise<DiaryEntry[]> {
@@ -88,6 +94,7 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 	const page = limit && limit > 0 ? response.data_list.slice(0, limit) : response.data_list;
 	
 	const allArticles: TechArticle[] = page.map((post) => ({
+		key: post.key ?? `post:${post.id}`,
 		id: post.id,
 		title: post.title,
 		content: post.content,
@@ -97,11 +104,15 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 		updatedAt: post.updated_at,
 		likesCount: post.likes_count,
 		commentsCount: post.comments_count,
-		hasLiked: post.has_liked
+		hasLiked: post.has_liked,
+		external: post.external
+			? { provider: post.external.provider, url: post.external.url, thumbnailUrl: post.external.thumbnail_url }
+			: undefined
 	}));
 
 	const featured = !offset && allArticles.length > 0 ? allArticles[0] : null;
 	const fallbackFeatured: FeaturedTechArticle = {
+		key: 'fallback',
 		id: 0,
 		title: '',
 		content: '',
@@ -181,6 +192,7 @@ export async function createTech(req: {
 		status: req.status || 'draft'
 	});
 	return {
+		key: response.data.key ?? `post:${response.data.id}`,
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
@@ -207,6 +219,7 @@ export async function updateTech(id: number, req: {
 		status: req.status || 'draft'
 	});
 	return {
+		key: response.data.key ?? `post:${response.data.id}`,
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
@@ -242,6 +255,7 @@ export async function fetchDiary(fetchFn: ApiFetch, id: number, countView = fals
 export async function fetchTech(fetchFn: ApiFetch, id: number, countView = false): Promise<TechArticle> {
 	const response = await get<ApiObjectResponse<ApiPost>>(fetchFn, `/techs/${id}${countView ? '?count_view=true' : ''}`);
 	return {
+		key: response.data.key ?? `post:${response.data.id}`,
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
@@ -251,7 +265,7 @@ export async function fetchTech(fetchFn: ApiFetch, id: number, countView = false
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
 		commentsCount: response.data.comments_count ?? 0,
-		hasLiked: response.data.has_liked
+		hasLiked: response.data.has_liked,
 	};
 }
 

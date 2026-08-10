@@ -39,6 +39,10 @@
 		return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
 	}
 
+	function articleHref(article: TechArticle) {
+		return article.external?.url ?? resolve(`/tech/${article.id}`);
+	}
+
 	async function deleteArticle(id: number) {
 		if ((await onDelete?.(id)) !== false) deletedIds = [...deletedIds, id];
 	}
@@ -103,50 +107,55 @@
 	{#if featured}
 		<article aria-label="Featured article" class="group relative rounded-xl border border-outline-variant/40 bg-surface-container-low p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 			<div class="mb-stack-sm flex flex-wrap items-center gap-stack-sm">
-				<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>
+				{#if featured.external}<span class="font-label-sm text-label-sm rounded bg-secondary-container px-2 py-0.5 text-on-secondary-container">{featured.external.provider}</span>{:else}<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>{/if}
 				{#if featured.status === 'draft'}
 					<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
 				{/if}
-				{#if isAdmin}<div class="ml-auto flex gap-2"><button type="button" onclick={() => onEdit?.(featured.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(featured.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}
+				{#if isAdmin && !featured.external}<div class="ml-auto flex gap-2"><button type="button" onclick={() => onEdit?.(featured.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(featured.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}
 			</div>
+			{#if featured.external?.thumbnailUrl}<img src={featured.external.thumbnailUrl} alt="" class="mb-4 aspect-[2/1] w-full rounded-lg object-cover md:mb-6" loading="lazy" />{/if}
 			<h2 class="font-display-lg mb-stack-md text-[22px] leading-tight text-primary transition-colors group-hover:text-primary/80 md:text-[28px]">
-				<a href={resolve(`/tech/${featured.id}`)} class="hover:underline">{featured.title}</a>
+				<a href={articleHref(featured)} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="hover:underline">{featured.title}</a>
 			</h2>
 			<p class="font-body-md text-body-md mb-4 text-on-surface-variant line-clamp-2 md:mb-6 md:line-clamp-3">{featured.content}</p>
-			<a href={resolve(`/tech/${featured.id}`)} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+			<a href={articleHref(featured)} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 			<div class="flex items-center justify-between mb-4">
-				<LikeButton postId={featured.id} initialLikesCount={featured.likesCount} initialHasLiked={featured.hasLiked} />
+				{#if !featured.external}<LikeButton postId={featured.id} initialLikesCount={featured.likesCount} initialHasLiked={featured.hasLiked} />
 				<a href={resolve(`/tech/${featured.id}`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${featured.commentsCount}件を表示`}>
 					<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>{featured.commentsCount}
 				</a>
+				{/if}
 			</div>
 			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
 		</article>
 	{/if}
 
 	<div class="space-y-6 md:space-y-12">
-		{#each filteredArticles as article (article.id)}
+		{#each filteredArticles as article (article.key)}
 			<article class="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-stack-sm">
+						{#if article.external}<span class="font-label-sm text-label-sm rounded bg-secondary-container px-2 py-0.5 text-on-secondary-container">{article.external.provider}</span>{/if}
 						{#if article.status === 'draft'}
 							<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
 						{/if}
 					</div>
-					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>{#if isAdmin}<div class="flex gap-2"><button type="button" onclick={() => onEdit?.(article.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(article.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}</div>
+					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span>{#if isAdmin && !article.external}<div class="flex gap-2"><button type="button" onclick={() => onEdit?.(article.id)} class="p-1 text-outline opacity-60 hover:text-primary hover:opacity-100" title="編集"><span class="material-symbols-outlined text-[18px]">edit</span></button><button type="button" onclick={() => deleteArticle(article.id)} class="p-1 text-outline opacity-60 hover:text-error hover:opacity-100" title="削除"><span class="material-symbols-outlined text-[18px]">delete</span></button></div>{/if}</div>
 				</div>
 				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-headline-lg">
-					<a href={resolve(`/tech/${article.id}`)}>{article.title}</a>
+					<a href={articleHref(article)} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined}>{article.title}</a>
 				</h3>
 				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
-				<a href={resolve(`/tech/${article.id}`)} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
-				<div class="mt-3 flex items-center gap-4">
+				{#if article.external?.thumbnailUrl}<img src={article.external.thumbnailUrl} alt="" class="aspect-[2/1] w-full rounded-lg object-cover" loading="lazy" />{/if}
+				<a href={articleHref(article)} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+				{#if !article.external}<div class="mt-3 flex items-center gap-4">
 					<LikeButton postId={article.id} initialLikesCount={article.likesCount} initialHasLiked={article.hasLiked} />
 					<a href={resolve(`/tech/${article.id}`)} class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant hover:text-primary hover:underline" aria-label={`コメント${article.commentsCount}件を表示`}>
 						<span class="material-symbols-outlined text-[16px]" aria-hidden="true">comment</span>{article.commentsCount}
 					</a>
 					{#if article.views}<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-[14px]">trending_up</span>{article.views.toLocaleString()}</span>{/if}
 				</div>
+				{/if}
 			</article>
 		{/each}
 	</div>
