@@ -153,7 +153,7 @@ import { SvelteMap } from 'svelte/reactivity';
 			投稿履歴とカレンダー
 		</h2>
 		<p class="font-body-sm text-body-sm text-outline">
-			これまでの執筆活動の記録です。投稿のある日をクリックすると、その日の記事にアクセスできます。左右にスワイプして月を移動できます。
+			これまでの執筆活動の記録です。投稿のある日をクリックすると、その日の記事にアクセスできます。
 		</p>
 	</header>
 
