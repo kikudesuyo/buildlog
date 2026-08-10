@@ -17,7 +17,10 @@ func NewRouter() http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(corsMiddleware)
 	r.Use(authmiddleware.JWTToCtx())
-	r.Mount("/batchjob", NewBatchJobRouter())
+
+	r.Route("/batchjob", func(r chi.Router) {
+		r.Post("/qiita/import", handleFunc(v1.HandleQiitaImportBatchJob))
+	})
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Post("/auth/login", handleFunc(v1.HandleAuthLogin))
