@@ -77,8 +77,6 @@
 		<h2 class="font-label-md text-label-md mb-stack-lg tracking-widest text-outline uppercase">
 			主要な実績 / Highlights
 		</h2>
-		<details open class="group">
-			<summary class="mb-4 cursor-pointer text-label-sm text-outline md:hidden">実績を表示</summary>
 		<div class="grid grid-cols-1 gap-stack-lg">
 			{#each data.profileData.highlights as item (item.title)}
 				<div class="group border-b border-outline-variant/20 pb-stack-md">
@@ -101,8 +99,7 @@
 					</div>
 				</div>
 			{/if}
-		</div>
-		</details>
+			</div>
 	</section>
 
 	<!-- Skills & Expertise -->
@@ -110,8 +107,6 @@
 		<h2 class="font-label-md text-label-md mb-stack-md tracking-widest text-outline uppercase">
 			専門領域 / Expertise
 		</h2>
-		<details open class="group">
-			<summary class="mb-4 cursor-pointer text-label-sm text-outline md:hidden">専門領域を表示</summary>
 		<div class="flex flex-wrap gap-x-12 gap-y-stack-sm">
 			{#each data.profileData.expertise as skill (skill)}
 				<span
@@ -121,7 +116,6 @@
 				</span>
 			{/each}
 		</div>
-		</details>
 	</section>
 
 	<!-- Contact & SNS Section -->
