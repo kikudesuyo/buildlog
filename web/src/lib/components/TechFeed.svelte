@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
-	import { resolve } from '$app/paths';
 	import { invalidateAll } from '$app/navigation';
 	import { fetchTechFeed, type ApiFetch } from '$lib/api/client';
 
@@ -21,11 +20,7 @@
 	let loadMoreError = $state(false);
 	const storageKey = 'tech-feed-count';
 	let isRestoring = $state(false);
-	let articles = $derived(
-		(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles).filter(
-			(article) => Boolean(article.external?.url)
-		)
-	);
+	let articles = $derived(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles);
 	let featured = $derived(articles.length > 0 ? articles[0] : null);
 	let filteredArticles = $derived(articles.slice(1));
 
@@ -36,7 +31,7 @@
 	}
 
 	function articleHref(article: TechArticle) {
-		return article.external?.url ?? resolve('/tech');
+		return article.external?.url ?? '/tech';
 	}
 
 	async function loadMore() {
@@ -96,7 +91,10 @@
 	{#if featured}
 		<article aria-label="Featured article" class="group relative rounded-xl border border-outline-variant/40 bg-surface-container-low p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 			<div class="mb-stack-sm flex flex-wrap items-center gap-stack-sm">
-				<span class="font-label-sm text-label-sm rounded bg-secondary-container px-2 py-0.5 text-on-secondary-container">{featured.external?.provider ?? 'External'}</span>
+				{#if featured.external}<span class="font-label-sm text-label-sm rounded bg-secondary-container px-2 py-0.5 text-on-secondary-container">{featured.external.provider}</span>{:else}<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>{/if}
+				{#if featured.status === 'draft'}
+					<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
+				{/if}
 			</div>
 			{#if featured.external?.thumbnailUrl}<img src={featured.external.thumbnailUrl} alt="" class="mb-4 aspect-[2/1] w-full rounded-lg object-cover md:mb-6" loading="lazy" />{/if}
 			<h2 class="font-display-lg mb-stack-md text-[22px] leading-tight text-primary transition-colors group-hover:text-primary/80 md:text-[28px]">
@@ -114,6 +112,9 @@
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-stack-sm">
 						{#if article.external}<span class="font-label-sm text-label-sm rounded bg-secondary-container px-2 py-0.5 text-on-secondary-container">{article.external.provider}</span>{/if}
+						{#if article.status === 'draft'}
+							<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
+						{/if}
 					</div>
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span></div>
 				</div>

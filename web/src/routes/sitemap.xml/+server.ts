@@ -1,30 +1,15 @@
 import type { RequestHandler } from './$types';
-import { fetchDiaryEntries, fetchTechFeed } from '$lib/api/client';
+import { fetchDiaryEntries } from '$lib/api/client';
 
 export const GET: RequestHandler = async ({ fetch }) => {
 	const domain = 'https://buildlog.dev'; 
 
-	let techs: { url: string; updatedAt: string }[] = [];
 	let diaries: { id: number; updatedAt: string }[] = [];
 	try {
-		const [{ featuredArticle, techArticles }, diaryList] = await Promise.all([
-			fetchTechFeed(fetch),
-			fetchDiaryEntries(fetch)
-		]);
-		const all = [];
-		if (featuredArticle && featuredArticle.id !== 0) {
-			all.push(featuredArticle);
-		}
-		if (techArticles && techArticles.length > 0) {
-			all.push(...techArticles);
-		}
-		techs = all.map(t => ({
-			url: t.external?.url ?? '/tech',
-			updatedAt: t.updatedAt
-		}));
+		const diaryList = await fetchDiaryEntries(fetch);
 		diaries = diaryList.map(diary => ({ id: diary.id, updatedAt: diary.updatedAt }));
 	} catch (e) {
-		console.error('Failed to fetch techs for sitemap:', e);
+		console.error('Failed to fetch diaries for sitemap:', e);
 	}
 
 	const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -59,13 +44,6 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		<changefreq>daily</changefreq>
 		<priority>0.9</priority>
 	</url>
-	${techs.map(tech => `
-	<url>
-		<loc>${tech.url}</loc>
-		<lastmod>${tech.updatedAt ? new Date(tech.updatedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
-		<changefreq>weekly</changefreq>
-		<priority>0.7</priority>
-	</url>`).join('')}
 	${diaries.map(diary => `
 	<url>
 		<loc>${domain}/diary/${diary.id}</loc>

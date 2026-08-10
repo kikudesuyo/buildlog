@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
@@ -32,6 +34,41 @@ func SyncQiitaArticles(ctx context.Context) (int, error) {
 	return len(items), nil
 }
 
+func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int, ipAddress string) ([]entity.TechFeedItem, error) {
+	externalPosts, err := repository.ListExternalPosts(ctx, db)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]entity.TechFeedItem, 0, len(externalPosts))
+	for _, post := range externalPosts {
+		items = append(items, entity.TechFeedItem{
+			Key: fmt.Sprintf("external:%d", post.ID), ID: post.ID, Type: "external", Title: post.Title, Content: post.Excerpt,
+			Status: "published", CreatedAt: post.PublishedAt, UpdatedAt: post.UpdatedAt,
+			External: &entity.ExternalPost{Provider: post.Provider, URL: post.URL, ThumbnailURL: post.ThumbnailURL},
+		})
+	}
+
+	sortTechFeedItems(items)
+	if offset >= len(items) {
+		return []entity.TechFeedItem{}, nil
+	}
+	end := len(items)
+	if limit > 0 && offset+limit < end {
+		end = offset + limit
+	}
+	return items[offset:end], nil
+}
+
+func sortTechFeedItems(items []entity.TechFeedItem) {
+	sort.SliceStable(items, func(i, j int) bool {
+		if items[i].CreatedAt.Equal(items[j].CreatedAt) {
+			return items[i].ID > items[j].ID
+		}
+		return items[i].CreatedAt.After(items[j].CreatedAt)
+	})
+}
+
 func syncQiitaArticle(ctx context.Context, db *gorm.DB, item external.QiitaItem, metadata external.OGPMetadata) error {
 	return db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		post, err := repository.FindExternalPost(ctx, tx, external.QiitaProvider, item.ID)
@@ -53,9 +90,14 @@ func syncQiitaArticle(ctx context.Context, db *gorm.DB, item external.QiitaItem,
 		}
 
 		post = &entity.DBTableExternalPost{
-			Provider: external.QiitaProvider, ExternalID: item.ID, URL: item.URL, Title: item.Title,
-			Excerpt: excerptFor(item, metadata), ThumbnailURL: metadata.ImageURL,
-			PublishedAt: item.CreatedAt, UpdatedAt: item.UpdatedAt,
+			Provider:     external.QiitaProvider,
+			ExternalID:   item.ID,
+			URL:          item.URL,
+			Title:        item.Title,
+			Excerpt:      excerptFor(item, metadata),
+			ThumbnailURL: metadata.ImageURL,
+			PublishedAt:  item.CreatedAt,
+			UpdatedAt:    item.UpdatedAt,
 		}
 		return repository.InsertExternalPost(ctx, tx, post)
 	})

@@ -26,7 +26,6 @@ type ApiObjectResponse<T> = {
 
 
 const apiBaseUrl = '/api/v1';
-const batchJobBaseUrl = '/batchjob';
 
 async function get<T>(fetchFn: ApiFetch, path: string): Promise<T> {
 	const response = await fetchFn(`${apiBaseUrl}${path}`);
@@ -42,6 +41,7 @@ export type ApiPost = {
 	type: string;
 	title: string;
 	content: string;
+	excerpt: string;
 	category: string;
 	views: number;
 	status: 'draft' | 'published';
@@ -50,7 +50,6 @@ export type ApiPost = {
 	likes_count: number;
 	comments_count: number;
 	has_liked: boolean;
-	excerpt?: string;
 	external?: {
 		provider: string;
 		url: string;
@@ -98,13 +97,17 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 		key: post.key ?? `post:${post.id}`,
 		id: post.id,
 		title: post.title,
-		content: post.excerpt ?? '',
+		content: post.content,
+		views: post.views,
+		status: post.status,
 		createdAt: post.created_at,
 		updatedAt: post.updated_at,
-		likesCount: 0,
-		commentsCount: 0,
-		hasLiked: false,
-		external: { provider: post.external?.provider ?? 'External', url: post.external?.url ?? '', thumbnailUrl: post.external?.thumbnail_url ?? '' }
+		likesCount: post.likes_count,
+		commentsCount: post.comments_count,
+		hasLiked: post.has_liked,
+		external: post.external
+			? { provider: post.external.provider, url: post.external.url, thumbnailUrl: post.external.thumbnail_url }
+			: undefined
 	}));
 
 	const featured = !offset && allArticles.length > 0 ? allArticles[0] : null;
@@ -142,15 +145,6 @@ async function sendRequest<T>(method: string, path: string, body?: unknown): Pro
 	return response.json() as Promise<T>;
 }
 
-export async function syncQiitaArticles(): Promise<number> {
-	const response = await fetch(`${batchJobBaseUrl}/qiita/sync`, { method: 'POST' });
-	if (!response.ok) {
-		throw new Error(`Qiita sync failed: ${response.status} ${response.statusText}`);
-	}
-	const payload = (await response.json()) as ApiObjectResponse<{ synced: number }>;
-	return payload.data.synced;
-}
-
 export async function createDiary(title: string, content: string, status?: 'draft' | 'published'): Promise<DiaryEntry> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/diaries', { title, content, status: status || 'draft' });
 	return {
@@ -183,6 +177,11 @@ export async function updateDiary(id: number, title: string, content: string, st
 
 export async function deleteDiary(id: number): Promise<void> {
 	await sendRequest<void>('DELETE', `/diaries/${id}`);
+}
+
+export async function syncQiitaArticles(): Promise<number> {
+	const response = await sendRequest<ApiObjectResponse<{ synced: number }>>('POST', '/admin/tech/qiita/sync');
+	return response.data.synced;
 }
 
 export async function fetchDiary(fetchFn: ApiFetch, id: number, countView = false): Promise<DiaryEntry> {

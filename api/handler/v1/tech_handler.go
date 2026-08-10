@@ -19,9 +19,12 @@ func parsePaginationValue(value string) (int, error) {
 	return n, nil
 }
 
-// HandleGetTechList は同期済みの外部技術記事一覧を返します。
+// HandleGetTechList は外部記事の一覧を返します。
 func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	query := r.URL.Query()
+	if query.Get("all") == "true" {
+		return nil, http.ErrBodyNotAllowed
+	}
 	offset, err := parsePaginationValue(query.Get("offset"))
 	if err != nil {
 		return nil, err
@@ -33,9 +36,9 @@ func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (htt
 	if limit > 0 {
 		limit++
 	}
-	articles, err := service.ListTechArticles(r.Context(), offset, limit)
+	techList, err := service.ListTechs(r.Context(), false, offset, limit, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
-	return entity.NewListResponse(articles), nil
+	return entity.NewListResponse(techList), nil
 }

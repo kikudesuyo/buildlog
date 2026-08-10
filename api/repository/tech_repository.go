@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// ListExternalPosts は外部記事を公開日時の降順で取得します。
 func ListExternalPosts(ctx context.Context, db *gorm.DB) ([]entity.DBTableExternalPost, error) {
 	var posts []entity.DBTableExternalPost
 	err := db.WithContext(ctx).
