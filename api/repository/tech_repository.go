@@ -21,6 +21,7 @@ func ListTechs(ctx context.Context, db *gorm.DB, all bool, offset, limit int) ([
 		query = query.Limit(limit)
 	}
 	err := query.
+		Preload("Source").
 		Order("created_at DESC").
 		Order("id DESC").
 		Find(&techList).Error
@@ -30,7 +31,7 @@ func ListTechs(ctx context.Context, db *gorm.DB, all bool, offset, limit int) ([
 // GetTechByID はデータを取得します。
 func GetTechByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePost, error) {
 	var tech entity.DBTablePost
-	err := db.WithContext(ctx).Where("type = ?", "tech").First(&tech, id).Error
+	err := db.WithContext(ctx).Where("type = ?", "tech").Preload("Source").First(&tech, id).Error
 	return &tech, err
 }
 

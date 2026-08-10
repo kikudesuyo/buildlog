@@ -49,6 +49,10 @@ export type ApiPost = {
 	likes_count: number;
 	comments_count: number;
 	has_liked: boolean;
+	source?: {
+		provider: string;
+		url: string;
+	};
 };
 
 export async function fetchDiaryEntries(fetchFn: ApiFetch, all = false, offset = 0, limit = 0): Promise<DiaryEntry[]> {
@@ -97,7 +101,8 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 		updatedAt: post.updated_at,
 		likesCount: post.likes_count,
 		commentsCount: post.comments_count,
-		hasLiked: post.has_liked
+		hasLiked: post.has_liked,
+		source: post.source
 	}));
 
 	const featured = !offset && allArticles.length > 0 ? allArticles[0] : null;
@@ -251,7 +256,8 @@ export async function fetchTech(fetchFn: ApiFetch, id: number, countView = false
 		updatedAt: response.data.updated_at,
 		likesCount: response.data.likes_count,
 		commentsCount: response.data.comments_count ?? 0,
-		hasLiked: response.data.has_liked
+		hasLiked: response.data.has_liked,
+		source: response.data.source
 	};
 }
 
