@@ -176,7 +176,7 @@ import { SvelteMap } from 'svelte/reactivity';
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
 							onclick={(e) => day.dateStr && handleDateClick(e, day.dateStr)}
-							class="relative flex flex-col items-center justify-center h-8 w-8 mx-auto rounded-full transition-all duration-150 {day.hasPost ? 'hover:bg-primary/20 text-primary font-bold cursor-pointer' : 'text-on-surface-variant'}"
+							class="relative flex flex-col items-center justify-center h-8 w-8 mx-auto rounded-full transition-all duration-150 {day.hasPost ? 'bg-primary/10 hover:bg-primary/20 text-primary font-bold cursor-pointer' : 'text-on-surface-variant'}"
 						>
 							<span>{day.dayNum}</span>
 							{#if day.hasPost}
