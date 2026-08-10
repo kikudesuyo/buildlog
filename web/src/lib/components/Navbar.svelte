@@ -42,6 +42,7 @@ import { resolve } from '$app/paths';
 		{ href: '/profile', label: 'Profile' },
 		{ href: '/apps', label: 'Apps' }
 	] as const;
+	const desktopNavItems = [...navItems, { href: '/contact', label: 'Contact' }] as const;
 	const mobileNavItems = [...navItems, { href: '/contact', label: 'Contact' }] as const;
 
 	function isActive(path: string): boolean {
@@ -110,7 +111,7 @@ import { resolve } from '$app/paths';
 		</a>
 		</div>
 		<div class="site-nav-links flex items-center gap-stack-lg" aria-label="メインナビゲーション">
-			{#each navItems as item (item.href)}
+			{#each desktopNavItems as item (item.href)}
 				<a
 					href={resolve(item.href)}
 					class="font-label-md text-label-md transition-colors duration-200 pb-0.5 {isActive(item.href)
