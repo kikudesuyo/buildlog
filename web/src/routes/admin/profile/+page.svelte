@@ -125,36 +125,32 @@
 	</div>
 </header>
 
-<div class="editorial-container mx-auto px-gutter pt-32 pb-20 max-w-[800px] md:pt-24">
-	<h1 class="font-display-lg text-display-lg mb-8 text-primary font-bold tracking-tight">プロフィール編集</h1>
+	<div class="editorial-container mx-auto max-w-[800px] px-gutter pb-16 pt-28 md:pb-20 md:pt-24">
+	<h1 class="font-display-lg mb-6 text-display-lg text-primary font-bold tracking-tight md:mb-8">プロフィール編集</h1>
 
-	<form class="flex flex-col gap-8 bg-surface-container-lowest p-8 rounded-2xl border border-outline-variant/20 shadow-xs" onsubmit={(e) => e.preventDefault()}>
+	<form class="flex flex-col gap-7 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-xs md:gap-8 md:p-8" onsubmit={(e) => e.preventDefault()}>
 		<!-- 基本情報セクション -->
 		<section class="flex flex-col gap-6">
 			<h2 class="font-headline-md text-headline-md text-primary font-semibold border-b border-outline-variant/20 pb-2">基本情報</h2>
 			
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
 				<div class="flex flex-col gap-1.5">
 					<label for="name" class="font-label-md text-label-md font-bold text-on-surface">氏名 / Name *</label>
-					<input id="name" type="text" bind:value={name} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+					<input id="name" type="text" bind:value={name} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 				</div>
 
 				<div class="flex flex-col gap-1.5">
 					<label for="title" class="font-label-md text-label-md font-bold text-on-surface">肩書き / Title</label>
-					<input id="title" type="text" bind:value={title} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+					<input id="title" type="text" bind:value={title} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 				</div>
 
 				<div class="flex flex-col gap-1.5 md:col-span-2">
 					<label for="subtitle" class="font-label-md text-label-md font-bold text-on-surface">サブタイトル / Subtitle</label>
-					<input id="subtitle" type="text" bind:value={subtitle} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+					<input id="subtitle" type="text" bind:value={subtitle} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 				</div>
 
-				<div class="flex flex-col gap-1.5 md:col-span-2">
-					<span class="font-label-md text-label-md font-bold text-on-surface">アバター画像 / Avatar</span>
-					<div class="flex items-center gap-3 text-body-sm text-on-surface-variant">
-						<img src={localAvatarUrl} alt="プロフィール画像" class="h-16 w-16 rounded-full border border-outline-variant/30 object-cover" />
-						<span>static/profile.jpg を使用しています。</span>
-					</div>
+				<div class="flex md:col-span-2">
+					<img src={localAvatarUrl} alt="プロフィール画像" class="h-16 w-16 rounded-full border border-outline-variant/30 object-cover" />
 				</div>
 			</div>
 		</section>
@@ -165,17 +161,17 @@
 
 			<div class="flex flex-col gap-1.5">
 				<label for="quote" class="font-label-md text-label-md font-bold text-on-surface">座右の銘 / Quote</label>
-				<input id="quote" type="text" bind:value={quote} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+				<input id="quote" type="text" bind:value={quote} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 			</div>
 
 			<div class="flex flex-col gap-1.5">
 				<label for="bio" class="font-label-md text-label-md font-bold text-on-surface">自己紹介文 / Biography (改行で段落区切り)</label>
-				<textarea id="bio" bind:value={bioText} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md min-h-[160px] resize-y" disabled={isSubmitting}></textarea>
+				<textarea id="bio" bind:value={bioText} class="min-h-[120px] w-full min-w-0 resize-y rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0 md:min-h-[160px]" disabled={isSubmitting}></textarea>
 			</div>
 
 			<div class="flex flex-col gap-1.5">
 				<label for="finalQuote" class="font-label-md text-label-md font-bold text-on-surface">締めの言葉 / Final Quote</label>
-				<input id="finalQuote" type="text" bind:value={finalQuote} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+				<input id="finalQuote" type="text" bind:value={finalQuote} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 			</div>
 		</section>
 
@@ -190,22 +186,22 @@
 
 			<div class="flex flex-col gap-6">
 				{#each highlights as highlight, index (index)}
-					<div class="flex flex-col gap-4 p-5 rounded-xl border border-outline-variant/20 bg-surface-container-low relative group">
+					<div class="relative flex min-w-0 flex-col gap-4 rounded-xl border border-outline-variant/20 bg-surface-container-low p-4 group md:p-5">
 						<button type="button" onclick={() => removeHighlight(index)} class="absolute top-4 right-4 text-outline hover:text-error transition-colors cursor-pointer font-bold text-sm" title="削除">
 							削除
 						</button>
-						<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mr-10">
+						<div class="mr-10 grid min-w-0 grid-cols-1 gap-4 md:grid-cols-3">
 							<div class="flex flex-col gap-1">
 								<label for="hl-title-{index}" class="font-label-sm text-label-sm text-outline">実績名 / Title</label>
-								<input id="hl-title-{index}" type="text" bind:value={highlight.title} class="rounded-lg border border-outline-variant bg-surface-container-high px-2 py-1 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+								<input id="hl-title-{index}" type="text" bind:value={highlight.title} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-1 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 							</div>
 							<div class="flex flex-col gap-1 md:col-span-2">
 								<label for="hl-period-{index}" class="font-label-sm text-label-sm text-outline">期間 / Period</label>
-								<input id="hl-period-{index}" type="text" bind:value={highlight.period} class="rounded-lg border border-outline-variant bg-surface-container-high px-2 py-1 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+								<input id="hl-period-{index}" type="text" bind:value={highlight.period} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-1 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 							</div>
 							<div class="flex flex-col gap-1 md:col-span-3">
 								<label for="hl-desc-{index}" class="font-label-sm text-label-sm text-outline">説明 / Description</label>
-								<textarea id="hl-desc-{index}" bind:value={highlight.description} class="rounded-lg border border-outline-variant bg-surface-container-high px-2 py-1 text-on-surface focus:outline-none text-body-md resize-none h-16" disabled={isSubmitting}></textarea>
+								<textarea id="hl-desc-{index}" bind:value={highlight.description} class="h-16 w-full min-w-0 resize-none rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-1 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting}></textarea>
 							</div>
 						</div>
 					</div>
@@ -217,20 +213,20 @@
 		<section class="flex flex-col gap-6">
 			<h2 class="font-headline-md text-headline-md text-primary font-semibold border-b border-outline-variant/20 pb-2">専門スキル & 連絡先</h2>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<div class="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
 				<div class="flex flex-col gap-1.5 md:col-span-2">
 					<label for="expertise" class="font-label-md text-label-md font-bold text-on-surface">専門領域 / Expertise (カンマ区切り)</label>
-					<input id="expertise" type="text" bind:value={expertiseText} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+					<input id="expertise" type="text" bind:value={expertiseText} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 				</div>
 
 				<div class="flex flex-col gap-1.5">
 					<label for="award" class="font-label-md text-label-md font-bold text-on-surface">受賞歴 / Award</label>
-					<input id="award" type="text" bind:value={award} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+					<input id="award" type="text" bind:value={award} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 				</div>
 
 				<div class="flex flex-col gap-1.5">
 					<label for="contactEmail" class="font-label-md text-label-md font-bold text-on-surface">連絡先メール / Email *</label>
-					<input id="contactEmail" type="email" bind:value={contactEmail} class="rounded-lg border border-outline-variant bg-surface-container-high px-3 py-2 text-on-surface focus:outline-none text-body-md" disabled={isSubmitting} />
+					<input id="contactEmail" type="email" bind:value={contactEmail} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 				</div>
 			</div>
 		</section>

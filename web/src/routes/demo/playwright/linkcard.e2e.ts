@@ -4,13 +4,12 @@ test('verify link card rendering and OGP fetching', async ({ page }) => {
 	// テスト用の記事を作成するため、管理者APIを直接呼び出して作成する
 	const uniqueTitle = 'E2Eテスト_リンクカード_' + Date.now();
 	
-	// APIを叩いて、単独URLを含む記事を投稿 (有効なカテゴリである "Frontend" を指定)
+	// APIを叩いて、単独URLを含む記事を投稿
 	const apiContext = page.request;
 	const createRes = await apiContext.post('http://localhost:8081/api/v1/techs', {
 		data: {
 			title: uniqueTitle,
 			content: 'この記事には外部リンクが含まれます。\n\nhttps://github.com/kikudesuyo\n\n確認してください。',
-			category: 'Frontend',
 			status: 'published'
 		}
 	});

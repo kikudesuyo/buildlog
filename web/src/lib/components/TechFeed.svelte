@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
 	import { resolve } from '$app/paths';
-	import { techCategories } from '$lib/tech/categories';
 	import LikeButton from './LikeButton.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { fetchTechFeed, type ApiFetch } from '$lib/api/client';
@@ -24,22 +23,15 @@
 	let isLoadingMore = $state(false);
 	let loadMoreError = $state(false);
 	let deletedIds = $state<number[]>([]);
-	let selectedCategory = $state<string | null>(null);
 	const storageKey = 'tech-feed-count';
 	let isRestoring = $state(false);
-	const categories = ['All', ...techCategories];
-	let categoryScroller = $state<HTMLDivElement | null>(null);
-	let canScrollLeft = $state(false);
-	let canScrollRight = $state(false);
 	let articles = $derived(
 		(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles).filter(
 			(article) => !deletedIds.includes(article.id)
 		)
 	);
 	let featured = $derived(articles.length > 0 ? articles[0] : null);
-	let filteredArticles = $derived(
-		(selectedCategory ? articles.slice(1).filter((article) => article.category === selectedCategory) : articles.slice(1))
-	);
+	let filteredArticles = $derived(articles.slice(1));
 
 	function formatDate(dateStr: string) {
 		if (!dateStr) return '';
@@ -68,28 +60,7 @@
 		}
 	}
 
-	function updateCategoryOverflow() {
-		const scroller = categoryScroller;
-		if (!scroller) return;
-		canScrollLeft = scroller.scrollLeft > 0;
-		canScrollRight = scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 1;
-	}
-
-	function selectCategory(category: string) {
-		selectedCategory = category === 'All' ? null : category;
-		requestAnimationFrame(() => {
-			categoryScroller?.querySelector<HTMLElement>(`[data-category="${category}"]`)?.scrollIntoView({
-				behavior: 'smooth',
-				block: 'nearest',
-				inline: 'center'
-			});
-			updateCategoryOverflow();
-		});
-	}
-
 	onMount(() => {
-		updateCategoryOverflow();
-		window.addEventListener('resize', updateCategoryOverflow);
 		void (async () => {
 			const savedCount = Number(sessionStorage.getItem(storageKey));
 			if (!isAdmin && savedCount > articles.length) {
@@ -98,7 +69,7 @@
 				isRestoring = false;
 			}
 		})();
-		return () => window.removeEventListener('resize', updateCategoryOverflow);
+		return () => undefined;
 	});
 </script>
 
@@ -116,30 +87,6 @@
 		{/if}
 	</section>
 
-	<div class="relative" aria-label="技術記事カテゴリ">
-		<div
-			bind:this={categoryScroller}
-			class="category-scroller flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-contain px-1 py-1"
-			tabindex="0"
-			onscroll={updateCategoryOverflow}
-		>
-			{#each categories as category (category)}
-				<button
-					type="button"
-					data-category={category}
-					aria-pressed={selectedCategory === category || (category === 'All' && !selectedCategory)}
-					onclick={() => selectCategory(category)}
-					class="font-label-sm text-label-sm min-h-11 shrink-0 snap-start cursor-pointer rounded-full px-4 py-2 transition-all {selectedCategory === category || (category === 'All' && !selectedCategory) ? 'bg-primary font-semibold text-on-primary' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}"
-				>
-					{category}
-				</button>
-			{/each}
-		</div>
-		{#if canScrollLeft}<span class="pointer-events-none absolute inset-y-0 left-0 flex items-center bg-gradient-to-r from-surface to-transparent pr-3 pl-1 text-primary" aria-hidden="true">‹</span>{/if}
-		{#if canScrollRight}<span class="pointer-events-none absolute inset-y-0 right-0 flex items-center bg-gradient-to-l from-surface to-transparent pl-3 pr-1 text-primary" aria-hidden="true">›</span>{/if}
-		<p class="sr-only" aria-live="polite">{selectedCategory ?? 'All'}カテゴリを選択中</p>
-	</div>
-
 	{#if loadError}
 		<section class="rounded-xl border border-error/30 bg-error-container/30 p-8 text-center" role="alert">
 			<h2 class="font-headline-md text-headline-md text-on-surface">記事を読み込めませんでした</h2>
@@ -151,18 +98,11 @@
 			<h2 class="font-headline-md text-headline-md text-primary">技術記事はまだありません</h2>
 			<p class="font-body-md text-body-md mt-2 text-on-surface-variant">新しい記事が公開されるまでお待ちください。</p>
 		</section>
-	{:else if selectedCategory && filteredArticles.length === 0}
-		<section class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-8 text-center">
-			<h2 class="font-headline-md text-headline-md text-primary">該当する記事がありません</h2>
-			<p class="font-body-md text-body-md mt-2 text-on-surface-variant">「{selectedCategory}」の記事はありません。</p>
-			<button type="button" onclick={() => (selectedCategory = null)} class="font-label-md text-label-md mt-5 min-h-11 rounded-lg border border-outline-variant/50 px-5 py-2 text-primary">Allへ戻る</button>
-		</section>
 	{/if}
 
-	{#if (!selectedCategory || selectedCategory === featured?.category) && featured}
+	{#if featured}
 		<article aria-label="Featured article" class="group relative rounded-xl border border-outline-variant/40 bg-surface-container-low p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 			<div class="mb-stack-sm flex flex-wrap items-center gap-stack-sm">
-				<span class="font-label-sm text-label-sm rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container">{featured.category}</span>
 				<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>
 				{#if featured.status === 'draft'}
 					<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
@@ -189,7 +129,6 @@
 			<article class="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-stack-sm">
-						<span class="font-label-sm text-label-sm rounded bg-primary-fixed px-2 py-0.5 text-primary">{article.category}</span>
 						{#if article.status === 'draft'}
 							<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
 						{/if}
@@ -221,13 +160,4 @@
 		</div>
 	{/if}
 
-	<style>
-		.category-scroller {
-			scrollbar-width: none;
-		}
-
-		.category-scroller::-webkit-scrollbar {
-			display: none;
-		}
-	</style>
 </div>

@@ -6,7 +6,6 @@ test('verify syntax highlighting is applied to code blocks in article view', asy
 		data: {
 			title: 'Test Code Highlight',
 			content: '以下はJavaScriptのテストコードです。\n\n```javascript\nconst hello = "world";\nconsole.log(hello);\n```',
-			category: 'Frontend',
 			status: 'published'
 		}
 	});
