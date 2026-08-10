@@ -220,7 +220,7 @@ import { SvelteMap } from 'svelte/reactivity';
 			{#each selectedPosts as post (post.id)}
 				<li class="flex flex-col gap-1 text-body-md">
 					<a
-						href={post.type === 'tech' ? resolve(`/tech/${post.id}?from=calendar`) : resolve(`/diary/${post.id}?from=calendar`)}
+						href={post.type === 'tech' ? resolve('/tech') : resolve(`/diary/${post.id}?from=calendar`)}
 						class="text-on-surface hover:text-primary hover:underline transition-colors font-medium leading-snug"
 						onclick={closePopover}
 					>

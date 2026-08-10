@@ -8,8 +8,8 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
-// HandleQiitaBatchJob はQiita記事を同期するバッチジョブを実行します。
-func HandleQiitaBatchJob(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+// HandleSyncQiitaArticles は管理画面からQiita記事を同期します。
+func HandleSyncQiitaArticles(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	if err := handler.ValidateRequestWithAuth(r); err != nil {
 		return nil, err
 	}
