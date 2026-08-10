@@ -32,10 +32,6 @@ func NewRouter() http.Handler {
 		r.Delete("/diaries/{id}", handleFunc(v1.HandleDeleteDiary))
 
 		r.Get("/techs", handleFunc(v1.HandleGetTechList))
-		r.Get("/techs/{id}", handleFunc(v1.HandleGetTech))
-		r.Post("/techs", handleFunc(v1.HandleCreateTech))
-		r.Put("/techs/{id}", handleFunc(v1.HandleUpdateTech))
-		r.Delete("/techs/{id}", handleFunc(v1.HandleDeleteTech))
 
 		r.Post("/posts/{id}/like", handleFunc(v1.HandlePostLike))
 		r.Delete("/posts/{id}/like", handleFunc(v1.HandleDeleteLike))

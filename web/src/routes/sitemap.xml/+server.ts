@@ -4,7 +4,7 @@ import { fetchDiaryEntries, fetchTechFeed } from '$lib/api/client';
 export const GET: RequestHandler = async ({ fetch }) => {
 	const domain = 'https://buildlog.dev'; 
 
-	let techs: { id: number; updatedAt: string }[] = [];
+	let techs: { url: string; updatedAt: string }[] = [];
 	let diaries: { id: number; updatedAt: string }[] = [];
 	try {
 		const [{ featuredArticle, techArticles }, diaryList] = await Promise.all([
@@ -19,7 +19,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			all.push(...techArticles);
 		}
 		techs = all.map(t => ({
-			id: t.id,
+			url: t.external?.url ?? '/tech',
 			updatedAt: t.updatedAt
 		}));
 		diaries = diaryList.map(diary => ({ id: diary.id, updatedAt: diary.updatedAt }));
@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 	</url>
 	${techs.map(tech => `
 	<url>
-		<loc>${domain}/tech/${tech.id}</loc>
+		<loc>${tech.url}</loc>
 		<lastmod>${tech.updatedAt ? new Date(tech.updatedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}</lastmod>
 		<changefreq>weekly</changefreq>
 		<priority>0.7</priority>

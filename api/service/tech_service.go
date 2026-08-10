@@ -2,101 +2,39 @@ package service
 
 import (
 	"context"
-	"time"
+	"fmt"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/repository"
+	"gorm.io/gorm"
 )
 
-// ListTechs は一覧を取得します。
-func ListTechs(ctx context.Context, all bool, offset, limit int, ipAddress string) ([]entity.TechFeedItem, error) {
-	db := library.GetDB(ctx)
-	return ListTechFeed(ctx, db, all, offset, limit, ipAddress)
+// ListTechArticles は同期済みの外部技術記事を取得します。
+func ListTechArticles(ctx context.Context, offset, limit int) ([]entity.TechFeedItem, error) {
+	return ListExternalTechArticles(ctx, library.GetDB(ctx), offset, limit)
 }
 
-// GetTechByID はデータを取得します。
-func GetTechByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTablePost, error) {
-	db := library.GetDB(ctx)
-	tech, err := repository.GetTechByID(ctx, db, id)
+// ListExternalTechArticles は外部記事専用の一覧を返します。
+func ListExternalTechArticles(ctx context.Context, db *gorm.DB, offset, limit int) ([]entity.TechFeedItem, error) {
+	externalPosts, err := repository.ListExternalPosts(ctx, db)
 	if err != nil {
 		return nil, err
 	}
-	engagements, err := repository.GetPostEngagements(ctx, db, []int64{tech.ID}, ipAddress)
-	if err != nil {
-		return nil, err
+	items := make([]entity.TechFeedItem, 0, len(externalPosts))
+	for _, post := range externalPosts {
+		items = append(items, entity.TechFeedItem{
+			Key: fmt.Sprintf("external:%d", post.ID), ID: post.ID, Title: post.Title, Excerpt: post.Excerpt,
+			CreatedAt: post.PublishedAt, UpdatedAt: post.UpdatedAt,
+			External: entity.ExternalPost{Provider: post.Provider, URL: post.URL, ThumbnailURL: post.ThumbnailURL},
+		})
 	}
-	engagement := engagements[tech.ID]
-	tech.LikesCount = engagement.LikesCount
-	tech.HasLiked = engagement.HasLiked
-	return tech, nil
-}
-
-// IncrementTechViews は公開詳細ページの閲覧数を 1 増やします。
-func IncrementTechViews(ctx context.Context, id int64) error {
-	return repository.IncrementPostViews(ctx, library.GetDB(ctx), "tech", id)
-}
-
-// CreateTech はデータを作成します。
-func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.CreateTechResponse, error) {
-	db := library.GetDB(ctx)
-	status := req.Status
-	if status == "" {
-		status = "draft"
+	if offset >= len(items) {
+		return []entity.TechFeedItem{}, nil
 	}
-	tech := entity.DBTablePost{
-		Title:   req.Title,
-		Content: req.Content,
-		Views:   req.Views,
-		Status:  status,
+	end := len(items)
+	if limit > 0 && offset+limit < end {
+		end = offset + limit
 	}
-
-	if err := repository.CreateTech(ctx, db, &tech); err != nil {
-		return entity.CreateTechResponse{}, err
-	}
-	return entity.CreateTechResponse{
-		ID:        tech.ID,
-		Title:     tech.Title,
-		Content:   tech.Content,
-		Views:     tech.Views,
-		Status:    tech.Status,
-		CreatedAt: tech.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: tech.UpdatedAt.Format(time.RFC3339),
-	}, nil
-}
-
-// UpdateTech はデータを更新します。
-func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (entity.UpdateTechResponse, error) {
-	db := library.GetDB(ctx)
-	tech, err := repository.GetTechByID(ctx, db, id)
-	if err != nil {
-		return entity.UpdateTechResponse{}, err
-	}
-
-	tech.Title = req.Title
-	tech.Content = req.Content
-	tech.Views = req.Views
-	if req.Status != "" {
-		tech.Status = req.Status
-	}
-
-	if err := repository.UpdateTech(ctx, db, tech); err != nil {
-		return entity.UpdateTechResponse{}, err
-	}
-
-	return entity.UpdateTechResponse{
-		ID:        tech.ID,
-		Title:     tech.Title,
-		Content:   tech.Content,
-		Views:     tech.Views,
-		Status:    tech.Status,
-		CreatedAt: tech.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: tech.UpdatedAt.Format(time.RFC3339),
-	}, nil
-}
-
-// DeleteTech はデータを削除します。
-func DeleteTech(ctx context.Context, id int64) error {
-	db := library.GetDB(ctx)
-	return repository.DeleteTech(ctx, db, id)
+	return items[offset:end], nil
 }

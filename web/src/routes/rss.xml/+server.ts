@@ -21,13 +21,13 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			title: featuredArticle.title,
 			content: featuredArticle.content,
 			createdAt: featuredArticle.createdAt,
-			link: `/tech/${featuredArticle.id}`
+			link: featuredArticle.external?.url ?? '/tech'
 		}] : []),
 		...techFeed.techArticles.map(t => ({
 			title: t.title,
 			content: t.content,
 			createdAt: t.createdAt,
-			link: `/tech/${t.id}`
+			link: t.external?.url ?? '/tech'
 		}))
 	];
 
