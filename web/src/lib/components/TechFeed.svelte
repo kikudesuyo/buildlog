@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
 	import { invalidateAll } from '$app/navigation';
-	import { fetchTechFeed, type ApiFetch } from '$lib/api/client';
+	import { resolve } from '$app/paths';
+	import { fetchTechFeed, type ApiFetch, type TechSortOrder } from '$lib/api/client';
 
 	type Props = {
 		featuredArticle?: FeaturedTechArticle | null;
@@ -18,6 +19,7 @@
 	let hasMoreArticles = $state(hasMore);
 	let isLoadingMore = $state(false);
 	let loadMoreError = $state(false);
+	let sortOrder = $state<TechSortOrder>('desc');
 	const storageKey = 'tech-feed-count';
 	let isRestoring = $state(false);
 	let articles = $derived(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles);
@@ -40,8 +42,27 @@
 		loadMoreError = false;
 		try {
 			const offset = (loadedFeaturedArticle?.title ? 1 : 0) + loadedTechArticles.length;
-			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, 3);
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, 3, sortOrder);
 			loadedTechArticles = [...loadedTechArticles, ...next.techArticles];
+			hasMoreArticles = next.hasMore;
+			if (!isAdmin) sessionStorage.setItem(storageKey, String(articles.length));
+		} catch {
+			loadMoreError = true;
+		} finally {
+			isLoadingMore = false;
+		}
+	}
+
+	async function handleSortChange(nextOrder: TechSortOrder) {
+		if (sortOrder === nextOrder) return;
+
+		sortOrder = nextOrder;
+		isLoadingMore = true;
+		loadMoreError = false;
+		try {
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, 3, nextOrder);
+			loadedFeaturedArticle = next.featuredArticle;
+			loadedTechArticles = next.techArticles;
 			hasMoreArticles = next.hasMore;
 			if (!isAdmin) sessionStorage.setItem(storageKey, String(articles.length));
 		} catch {
@@ -65,7 +86,7 @@
 </script>
 
 <div class="editorial-container mx-auto flex flex-col gap-8 px-gutter">
-	<section class="flex items-start justify-between">
+	<section class="flex flex-wrap items-start justify-between gap-4">
 		<div>
 			{#if isAdmin}
 				<p class="font-label-sm text-label-sm mb-stack-sm tracking-[0.2em] text-outline uppercase">Content Manager / Tech</p>
@@ -73,6 +94,18 @@
 			<h1 class="font-display-lg text-display-lg mb-stack-sm text-primary">{isAdmin ? '技術記事管理' : '技術と美学'}</h1>
 			<p class="font-body-lg text-body-lg max-w-[600px] text-on-surface-variant">思考の断片を、構造化された知性へ。最新のテクノロジーと設計思想を綴る技術録。</p>
 		</div>
+		<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
+			<span>並び順</span>
+			<select
+				value={sortOrder}
+				onchange={(event) => handleSortChange(event.currentTarget.value as TechSortOrder)}
+				class="font-label-sm text-label-sm min-h-11 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2 text-primary"
+				aria-label="技術記事の並び順"
+			>
+				<option value="desc">新しい順</option>
+				<option value="asc">古い順</option>
+			</select>
+		</label>
 	</section>
 
 	{#if loadError}
@@ -98,10 +131,12 @@
 			</div>
 			{#if featured.external?.thumbnailUrl}<img src={featured.external.thumbnailUrl} alt="" class="mb-4 aspect-[2/1] w-full rounded-lg object-cover md:mb-6" loading="lazy" />{/if}
 			<h2 class="font-display-lg mb-stack-md text-[22px] leading-tight text-primary transition-colors group-hover:text-primary/80 md:text-[28px]">
-				<a href={articleHref(featured)} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="hover:underline">{featured.title}</a>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<a href={featured.external ? articleHref(featured) : resolve('/tech')} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="hover:underline">{featured.title}</a>
 			</h2>
 			<p class="font-body-md text-body-md mb-4 text-on-surface-variant line-clamp-2 md:mb-6 md:line-clamp-3">{featured.content}</p>
-			<a href={articleHref(featured)} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+		<a href={featured.external ? articleHref(featured) : resolve('/tech')} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
 		</article>
 	{/if}
@@ -119,11 +154,13 @@
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span></div>
 				</div>
 				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-headline-lg">
-					<a href={articleHref(article)} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined}>{article.title}</a>
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined}>{article.title}</a>
 				</h3>
 				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
 				{#if article.external?.thumbnailUrl}<img src={article.external.thumbnailUrl} alt="" class="aspect-[2/1] w-full rounded-lg object-cover" loading="lazy" />{/if}
-				<a href={articleHref(article)} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+			<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 			</article>
 		{/each}
 	</div>

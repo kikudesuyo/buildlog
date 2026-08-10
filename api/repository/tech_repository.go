@@ -7,14 +7,18 @@ import (
 	"gorm.io/gorm"
 )
 
-// ListExternalPosts は外部記事を公開日時の降順で取得します。
-func ListExternalPosts(ctx context.Context, db *gorm.DB) ([]entity.DBTableExternalPost, error) {
-	var posts []entity.DBTableExternalPost
+// ListExternalPosts は外部記事を公開日時順で取得します。
+func ListExternalPosts(ctx context.Context, db *gorm.DB, order string) ([]entity.DBTableExternalPost, error) {
+	orderBy := "DESC"
+	if order == "asc" {
+		orderBy = "ASC"
+	}
+	var postList []entity.DBTableExternalPost
 	err := db.WithContext(ctx).
-		Order("published_at DESC").
-		Order("id DESC").
-		Find(&posts).Error
-	return posts, err
+		Order("published_at " + orderBy).
+		Order("id " + orderBy).
+		Find(&postList).Error
+	return postList, err
 }
 
 // FindExternalPost は外部記事をプロバイダーと外部IDで取得します。
