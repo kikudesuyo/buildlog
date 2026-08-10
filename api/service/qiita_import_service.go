@@ -140,8 +140,9 @@ func excerptFor(item external.QiitaItem, metadata external.OGPMetadata) string {
 		return metadata.Description
 	}
 	content := strings.TrimSpace(markdownWhitespace.ReplaceAllString(item.Body, " "))
-	if len(content) > 240 {
-		return content[:240]
+	runes := []rune(content)
+	if len(runes) > 240 {
+		return string(runes[:240])
 	}
 	return content
 }
