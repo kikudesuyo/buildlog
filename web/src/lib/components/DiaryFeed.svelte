@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { DiaryEntry } from '$lib/api/types';
-	import { fetchDiaryEntries, type ApiFetch } from '$lib/api/client';
+	import { fetchDiaryEntries, type ApiFetch, type DiarySort, type DiarySortOrder } from '$lib/api/client';
 	import { resolve } from '$app/paths';
 	import { tick } from 'svelte';
 	import LikeButton from './LikeButton.svelte';
@@ -20,6 +20,8 @@
 	let loadError = $state(false);
 	let hasMore = $state(!isAdmin && initialEntries.length === pageSize);
 	const storageKey = `diary-feed-count:${isAdmin ? 'admin' : 'public'}`;
+	let sortBy = $state<DiarySort>('newest');
+	let sortOrder = $state<DiarySortOrder>('desc');
 	let restoreTarget = 0;
 	let displayEntries = $derived(entries);
 	let actionRefs = $state<Record<number, HTMLButtonElement | undefined>>({});
@@ -53,10 +55,29 @@
 		isLoading = true;
 		loadError = false;
 		try {
-			const nextEntries = await fetchDiaryEntries(fetch as ApiFetch, isAdmin, entries.length, pageSize);
+			const nextEntries = await fetchDiaryEntries(fetch as ApiFetch, isAdmin, entries.length, pageSize, sortBy, sortOrder);
 			entries = [...entries, ...nextEntries];
 			hasMore = nextEntries.length === pageSize;
 			sessionStorage.setItem(storageKey, String(entries.length));
+		} catch {
+			loadError = true;
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	async function handleSortChange(nextSortBy: DiarySort, nextSortOrder: DiarySortOrder) {
+		if (sortBy === nextSortBy && sortOrder === nextSortOrder) return;
+
+		sortBy = nextSortBy;
+		sortOrder = nextSortOrder;
+		isLoading = true;
+		loadError = false;
+		try {
+			const nextEntries = await fetchDiaryEntries(fetch as ApiFetch, isAdmin, 0, pageSize, nextSortBy, nextSortOrder);
+			entries = nextEntries;
+			hasMore = !isAdmin && nextEntries.length === pageSize;
+			sessionStorage.setItem(storageKey, String(nextEntries.length));
 		} catch {
 			loadError = true;
 		} finally {
@@ -74,13 +95,39 @@
 </script>
 
 <div class="editorial-container mx-auto px-gutter relative flex flex-col gap-8">
-	<header class="flex items-center justify-between">
+	<header class="flex flex-wrap items-center justify-between gap-4">
 		<div>
 			{#if isAdmin}
 				<p class="font-label-sm text-label-sm mb-stack-sm tracking-[0.2em] text-outline uppercase">Content Manager / Diary</p>
 			{/if}
 			<h1 bind:this={headingRef} tabindex="-1" class="font-display-lg text-display-lg text-primary">{isAdmin ? 'つぶやき管理' : '日々のつぶやき'}</h1>
-	</div>
+		</div>
+		<div class="flex flex-wrap items-center justify-end gap-2">
+			<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
+				<span>並び順</span>
+				<select
+					value={sortBy}
+					onchange={(event) => handleSortChange(event.currentTarget.value as DiarySort, sortOrder)}
+					class="font-label-sm text-label-sm min-h-11 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2 text-primary"
+					aria-label="つぶやきの並び順"
+				>
+					<option value="newest">新着順</option>
+					<option value="likes">いいね順</option>
+				</select>
+			</label>
+			<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
+				<span>順序</span>
+				<select
+					value={sortOrder}
+					onchange={(event) => handleSortChange(sortBy, event.currentTarget.value as DiarySortOrder)}
+					class="font-label-sm text-label-sm min-h-11 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2 text-primary"
+					aria-label="つぶやきの並び順序"
+				>
+					<option value="desc">降順</option>
+					<option value="asc">昇順</option>
+				</select>
+			</label>
+		</div>
 		{#if isAdmin}
 			<a
 				href={resolve(isAdmin ? '/admin/diary/new' : '/diary/new')}
