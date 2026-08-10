@@ -10,26 +10,9 @@ import (
 )
 
 // ListTechs は一覧を取得します。
-func ListTechs(ctx context.Context, all bool, offset, limit int, ipAddress string) ([]entity.DBTablePost, error) {
+func ListTechs(ctx context.Context, all bool, offset, limit int, ipAddress string) ([]entity.TechFeedItem, error) {
 	db := library.GetDB(ctx)
-	techList, err := repository.ListTechs(ctx, db, all, offset, limit)
-	if err != nil {
-		return nil, err
-	}
-	postIDs := make([]int64, len(techList))
-	for i := range techList {
-		postIDs[i] = techList[i].ID
-	}
-	engagements, err := repository.GetPostEngagements(ctx, db, postIDs, ipAddress)
-	if err != nil {
-		return nil, err
-	}
-	for i := range techList {
-		engagement := engagements[techList[i].ID]
-		techList[i].LikesCount = engagement.LikesCount
-		techList[i].HasLiked = engagement.HasLiked
-	}
-	return techList, nil
+	return ListTechFeed(ctx, db, all, offset, limit, ipAddress)
 }
 
 // GetTechByID はデータを取得します。

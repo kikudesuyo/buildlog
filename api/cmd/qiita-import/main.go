@@ -23,7 +23,8 @@ func main() {
 	}
 	defer sqlDB.Close()
 
-	count, err := service.ImportQiitaItems(ctx, db, external.NewQiitaClient(nil))
+	qiitaClient := external.NewQiitaClient(nil)
+	count, err := service.ImportQiitaItems(ctx, db, qiitaClient, qiitaClient)
 	if err != nil {
 		log.Fatalf("Qiita article import failed: %v", err)
 	}

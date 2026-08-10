@@ -35,7 +35,7 @@ type QiitaClient struct {
 
 func NewQiitaClient(httpClient *http.Client) *QiitaClient {
 	if httpClient == nil {
-		httpClient = &http.Client{Timeout: 15 * time.Second}
+		httpClient = defaultHTTPClient()
 	}
 	return &QiitaClient{BaseURL: qiitaBaseURL, User: qiitaUser, HTTPClient: httpClient}
 }
