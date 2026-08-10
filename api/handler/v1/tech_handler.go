@@ -74,7 +74,7 @@ func HandleCreateTech(r *http.Request, requestData map[string]interface{}) (http
 	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
-	if req.Title == "" || req.Content == "" || !entity.IsValidTechCategory(req.Category) {
+	if req.Title == "" || req.Content == "" {
 		return nil, http.ErrBodyNotAllowed
 	}
 	resp, err := service.CreateTech(r.Context(), req)
@@ -97,7 +97,7 @@ func HandleUpdateTech(r *http.Request, requestData map[string]interface{}) (http
 	if err := decodeJSON(r, &req); err != nil {
 		return nil, err
 	}
-	if req.Title == "" || req.Content == "" || !entity.IsValidTechCategory(req.Category) {
+	if req.Title == "" || req.Content == "" {
 		return nil, http.ErrBodyNotAllowed
 	}
 	resp, err := service.UpdateTech(r.Context(), id, req)

@@ -14,7 +14,6 @@ export interface TechArticle {
 	id: number;
 	title: string;
 	content: string;
-	category: string;
 	views?: number;
 	status?: 'draft' | 'published';
 	createdAt: string;
