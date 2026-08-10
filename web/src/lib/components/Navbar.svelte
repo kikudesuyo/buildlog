@@ -42,6 +42,7 @@ import { resolve } from '$app/paths';
 		{ href: '/profile', label: 'Profile' },
 		{ href: '/apps', label: 'Apps' }
 	] as const;
+	const mobileNavItems = [...navItems, { href: '/contact', label: 'Contact' }] as const;
 
 	function isActive(path: string): boolean {
 		const current = page.url.pathname;
@@ -83,7 +84,7 @@ import { resolve } from '$app/paths';
 			<button type="button" aria-label="メニューを閉じる" class="material-symbols-outlined min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container" onclick={closeMenu}>close</button>
 		</div>
 		<nav aria-label="メインメニュー" class="flex flex-col gap-1 p-4">
-			{#each navItems as item (item.href)}
+			{#each mobileNavItems as item (item.href)}
 				<a href={resolve(item.href)} onclick={closeMenu} class="font-label-md text-label-md rounded-lg px-4 py-3 {isActive(item.href) ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container hover:text-primary'}">{item.label}</a>
 			{/each}
 		</nav>
