@@ -91,7 +91,6 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 		id: post.id,
 		title: post.title,
 		content: post.content,
-		category: post.category,
 		views: post.views,
 		status: post.status,
 		createdAt: post.created_at,
@@ -106,7 +105,6 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 		id: 0,
 		title: '',
 		content: '',
-		category: '',
 		views: 0,
 		status: 'draft' as const,
 		createdAt: '',
@@ -173,14 +171,12 @@ export async function deleteDiary(id: number): Promise<void> {
 export async function createTech(req: {
 	title: string;
 	content: string;
-	category: string;
 	views?: number;
 	status?: 'draft' | 'published';
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('POST', '/techs', {
 		title: req.title,
 		content: req.content,
-		category: req.category,
 		views: req.views ?? 0,
 		status: req.status || 'draft'
 	});
@@ -188,7 +184,6 @@ export async function createTech(req: {
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
-		category: response.data.category,
 		views: response.data.views,
 		status: response.data.status,
 		createdAt: response.data.created_at,
@@ -202,14 +197,12 @@ export async function createTech(req: {
 export async function updateTech(id: number, req: {
 	title: string;
 	content: string;
-	category: string;
 	views?: number;
 	status?: 'draft' | 'published';
 }): Promise<TechArticle> {
 	const response = await sendRequest<ApiObjectResponse<ApiPost>>('PUT', `/techs/${id}`, {
 		title: req.title,
 		content: req.content,
-		category: req.category,
 		views: req.views ?? 0,
 		status: req.status || 'draft'
 	});
@@ -217,7 +210,6 @@ export async function updateTech(id: number, req: {
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
-		category: response.data.category,
 		views: response.data.views,
 		status: response.data.status,
 		createdAt: response.data.created_at,
@@ -253,7 +245,6 @@ export async function fetchTech(fetchFn: ApiFetch, id: number, countView = false
 		id: response.data.id,
 		title: response.data.title,
 		content: response.data.content,
-		category: response.data.category,
 		views: response.data.views,
 		status: response.data.status,
 		createdAt: response.data.created_at,

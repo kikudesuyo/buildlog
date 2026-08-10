@@ -107,9 +107,6 @@
 		<header class="flex flex-col gap-4 border-b border-outline-variant/20 pb-8">
 			<!-- メタ情報 -->
 			<div class="flex flex-wrap items-center gap-stack-sm">
-				<span class="font-label-sm text-label-sm rounded-full bg-secondary-container px-3 py-1 text-on-secondary-container">
-					{data.tech.category}
-				</span>
 				<span class="font-label-sm text-label-sm text-on-surface-variant">
 					{formatDate(data.tech.createdAt)}
 				</span>

@@ -38,6 +38,7 @@ import { resolve } from '$app/paths';
 
 	const navItems = [
 		{ href: '/', label: 'Diary' },
+		{ href: '/tech', label: 'Tech' },
 		{ href: '/profile', label: 'Profile' },
 		{ href: '/apps', label: 'Apps' }
 	] as const;

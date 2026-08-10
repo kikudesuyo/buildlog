@@ -62,11 +62,10 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 		status = "draft"
 	}
 	tech := entity.DBTablePost{
-		Title:    req.Title,
-		Content:  req.Content,
-		Category: req.Category,
-		Views:    req.Views,
-		Status:   status,
+		Title:   req.Title,
+		Content: req.Content,
+		Views:   req.Views,
+		Status:  status,
 	}
 
 	if err := repository.CreateTech(ctx, db, &tech); err != nil {
@@ -76,7 +75,6 @@ func CreateTech(ctx context.Context, req entity.CreateTechRequest) (entity.Creat
 		ID:        tech.ID,
 		Title:     tech.Title,
 		Content:   tech.Content,
-		Category:  tech.Category,
 		Views:     tech.Views,
 		Status:    tech.Status,
 		CreatedAt: tech.CreatedAt.Format(time.RFC3339),
@@ -94,7 +92,6 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 
 	tech.Title = req.Title
 	tech.Content = req.Content
-	tech.Category = req.Category
 	tech.Views = req.Views
 	if req.Status != "" {
 		tech.Status = req.Status
@@ -108,7 +105,6 @@ func UpdateTech(ctx context.Context, id int64, req entity.UpdateTechRequest) (en
 		ID:        tech.ID,
 		Title:     tech.Title,
 		Content:   tech.Content,
-		Category:  tech.Category,
 		Views:     tech.Views,
 		Status:    tech.Status,
 		CreatedAt: tech.CreatedAt.Format(time.RFC3339),
