@@ -190,16 +190,16 @@
 						<button type="button" onclick={() => removeHighlight(index)} class="absolute top-4 right-4 text-outline hover:text-error transition-colors cursor-pointer font-bold text-sm" title="削除">
 							削除
 						</button>
-						<div class="mr-10 grid min-w-0 grid-cols-1 gap-4 md:grid-cols-3">
+						<div class="mr-10 flex min-w-0 flex-col gap-4">
+							<div class="flex flex-col gap-1">
+								<label for="hl-period-{index}" class="font-label-sm text-label-sm text-outline">期間 / Period</label>
+								<input id="hl-period-{index}" type="text" bind:value={highlight.period} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-1 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
+							</div>
 							<div class="flex flex-col gap-1">
 								<label for="hl-title-{index}" class="font-label-sm text-label-sm text-outline">実績名 / Title</label>
 								<input id="hl-title-{index}" type="text" bind:value={highlight.title} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-1 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 							</div>
-							<div class="flex flex-col gap-1 md:col-span-2">
-								<label for="hl-period-{index}" class="font-label-sm text-label-sm text-outline">期間 / Period</label>
-								<input id="hl-period-{index}" type="text" bind:value={highlight.period} class="w-full min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-1 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
-							</div>
-							<div class="flex flex-col gap-1 md:col-span-3">
+							<div class="flex flex-col gap-1">
 								<label for="hl-desc-{index}" class="font-label-sm text-label-sm text-outline">説明 / Description</label>
 								<textarea id="hl-desc-{index}" bind:value={highlight.description} class="h-16 w-full min-w-0 resize-none rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-1 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting}></textarea>
 							</div>
