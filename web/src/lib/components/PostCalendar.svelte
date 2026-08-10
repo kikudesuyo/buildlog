@@ -57,6 +57,8 @@ import { SvelteMap } from 'svelte/reactivity';
 	// 月間カレンダーのデータ生成
 	let currentYear = $state(new Date().getFullYear());
 	let currentMonth = $state(new Date().getMonth()); // 0-indexed
+	let touchStartX = $state<number | null>(null);
+	let touchStartY = $state<number | null>(null);
 
 	function nextMonth() {
 		if (currentMonth === 11) {
@@ -76,6 +78,29 @@ import { SvelteMap } from 'svelte/reactivity';
 			currentMonth -= 1;
 		}
 		closePopover();
+	}
+
+	function handleTouchStart(event: TouchEvent) {
+		const touch = event.changedTouches[0];
+		touchStartX = touch?.clientX ?? null;
+		touchStartY = touch?.clientY ?? null;
+	}
+
+	function handleTouchEnd(event: TouchEvent) {
+		if (touchStartX === null || touchStartY === null) return;
+
+		const touch = event.changedTouches[0];
+		const deltaX = (touch?.clientX ?? touchStartX) - touchStartX;
+		const deltaY = (touch?.clientY ?? touchStartY) - touchStartY;
+		const isHorizontalSwipe = Math.abs(deltaX) >= 50 && Math.abs(deltaX) > Math.abs(deltaY);
+
+		if (isHorizontalSwipe) {
+			if (deltaX < 0) nextMonth();
+			else prevMonth();
+		}
+
+		touchStartX = null;
+		touchStartY = null;
 	}
 
 	const monthlyDays = $derived.by(() => {
@@ -128,7 +153,7 @@ import { SvelteMap } from 'svelte/reactivity';
 			投稿履歴とカレンダー
 		</h2>
 		<p class="font-body-sm text-body-sm text-outline">
-			これまでの執筆活動の記録です。緑色のセルやドットマークのある日をクリックすると、その日の記事にアクセスできます。
+			これまでの執筆活動の記録です。投稿のある日をクリックすると、その日の記事にアクセスできます。左右にスワイプして月を移動できます。
 		</p>
 	</header>
 
@@ -141,6 +166,7 @@ import { SvelteMap } from 'svelte/reactivity';
 					<button
 						type="button"
 						onclick={prevMonth}
+						aria-label="前の月"
 						class="p-1 rounded-md text-outline hover:bg-surface-container hover:text-primary transition-all cursor-pointer flex items-center justify-center"
 					>
 						<span class="material-symbols-outlined text-lg">chevron_left</span>
@@ -151,6 +177,7 @@ import { SvelteMap } from 'svelte/reactivity';
 					<button
 						type="button"
 						onclick={nextMonth}
+						aria-label="次の月"
 						class="p-1 rounded-md text-outline hover:bg-surface-container hover:text-primary transition-all cursor-pointer flex items-center justify-center"
 					>
 						<span class="material-symbols-outlined text-lg">chevron_right</span>
@@ -159,7 +186,13 @@ import { SvelteMap } from 'svelte/reactivity';
 			</header>
 
 			<!-- カレンダーグリッド -->
-			<div class="grid grid-cols-7 gap-y-2 text-center text-body-sm font-medium">
+			<div
+				role="group"
+				aria-label="月間カレンダー。左右にスワイプして月を移動できます"
+				class="grid grid-cols-7 gap-y-2 touch-pan-y text-center text-body-sm font-medium"
+				ontouchstart={handleTouchStart}
+				ontouchend={handleTouchEnd}
+			>
 				<!-- 曜日ヘッダー -->
 				<span class="text-error/85 py-1 text-[11px]">日</span>
 				<span class="text-outline py-1 text-[11px]">月</span>
