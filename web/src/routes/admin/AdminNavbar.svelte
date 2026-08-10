@@ -114,6 +114,20 @@
 
 	</div>
 	<div class="border-t border-outline-variant/20 px-3 py-4">
+		<button
+			type="button"
+			aria-pressed={isDarkMode}
+			aria-label={isDarkMode ? '現在はダークモード。ライトモードに切り替える' : '現在はライトモード。ダークモードに切り替える'}
+			onclick={toggleTheme}
+			class="mb-2 hidden min-h-11 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary md:flex"
+			title={isDarkMode ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
+		>
+			<span class="material-symbols-outlined text-[21px]">{isDarkMode ? 'light_mode' : 'dark_mode'}</span>
+			<span class="flex flex-col">
+				<span class="font-label-md text-label-md font-semibold">テーマ</span>
+				<span class="font-label-sm text-label-sm text-outline">{isDarkMode ? 'ライトモード' : 'ダークモード'}</span>
+			</span>
+		</button>
 		<a
 			href={resolve('/')}
 			onclick={closeMenu}
