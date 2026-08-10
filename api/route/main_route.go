@@ -19,7 +19,7 @@ func NewRouter() http.Handler {
 	r.Use(authmiddleware.JWTToCtx())
 
 	r.Route("/batchjob", func(r chi.Router) {
-		r.Post("/qiita/import", handleFunc(v1.HandleQiitaImportBatchJob))
+		r.Post("/qiita/sync", handleFunc(v1.HandleQiitaBatchJob))
 	})
 
 	r.Route("/api/v1", func(r chi.Router) {

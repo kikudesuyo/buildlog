@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestQiitaClientFetchAllFetchesEveryPage(t *testing.T) {
+func TestQiitaClientGetUserArticlesGetsEveryPage(t *testing.T) {
 	client := NewQiitaClient(&http.Client{Transport: roundTripperFunc(func(r *http.Request) (*http.Response, error) {
 		if r.URL.Path != "/api/v2/users/kikudesuyo/items" {
 			t.Fatalf("unexpected path: %s", r.URL.Path)
@@ -38,9 +38,9 @@ func TestQiitaClientFetchAllFetchesEveryPage(t *testing.T) {
 		}, nil
 	})}, "kikudesuyo")
 	client.BaseURL = "https://qiita.example/api/v2/"
-	items, err := client.FetchAll(context.Background())
+	items, err := client.GetUserArticles(context.Background())
 	if err != nil {
-		t.Fatalf("FetchAll returned error: %v", err)
+		t.Fatalf("GetUserArticles returned error: %v", err)
 	}
 	if len(items) != qiitaPerPage+1 {
 		t.Fatalf("expected %d items, got %d", qiitaPerPage+1, len(items))

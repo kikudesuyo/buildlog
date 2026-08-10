@@ -21,7 +21,7 @@ type OGPMetadata struct {
 var metaTagPattern = regexp.MustCompile(`(?is)<meta\s+[^>]*>`)
 var attributePattern = regexp.MustCompile(`(?i)(property|name|content)=["']([^"']*)["']`)
 
-func (c *QiitaClient) FetchOGP(ctx context.Context, rawURL string) (OGPMetadata, error) {
+func (c *QiitaClient) GetOGP(ctx context.Context, rawURL string) (OGPMetadata, error) {
 	parsed, err := url.Parse(rawURL)
 	if err != nil || parsed.Scheme != "https" || parsed.Host != "qiita.com" {
 		return OGPMetadata{}, fmt.Errorf("unsupported OGP URL")

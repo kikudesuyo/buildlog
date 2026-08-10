@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"sort"
@@ -14,20 +15,23 @@ import (
 	"gorm.io/gorm"
 )
 
-type QiitaItemFetcher interface {
-	FetchAll(context.Context) ([]external.QiitaItem, error)
-}
-
-type QiitaMetadataFetcher interface {
-	FetchOGP(context.Context, string) (external.OGPMetadata, error)
-}
-
 const qiitaUser = "kikudesuyo"
 
-// ImportQiita はアプリケーションで利用するQiitaユーザーの記事を同期します。
-func ImportQiita(ctx context.Context) (int, error) {
+// SyncQiitaArticles はアプリケーションで利用するQiitaユーザーの記事を同期します。
+func SyncQiitaArticles(ctx context.Context) (int, error) {
 	qiitaClient := external.NewQiitaClient(nil, qiitaUser)
-	return ImportQiitaItems(ctx, library.GetDB(ctx), qiitaClient, qiitaClient)
+	items, err := qiitaClient.GetUserArticles(ctx)
+	if err != nil {
+		return 0, err
+	}
+	db := library.GetDB(ctx)
+	for _, item := range items {
+		metadata, _ := qiitaClient.GetOGP(ctx, item.URL)
+		if err := syncQiitaArticle(ctx, db, item, metadata); err != nil {
+			return 0, err
+		}
+	}
+	return len(items), nil
 }
 
 func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int, ipAddress string) ([]entity.TechFeedItem, error) {
@@ -89,46 +93,27 @@ func sortTechFeedItems(items []entity.TechFeedItem) {
 	})
 }
 
-func ImportQiitaItems(ctx context.Context, db *gorm.DB, fetcher QiitaItemFetcher, metadataFetcher QiitaMetadataFetcher) (int, error) {
-	items, err := fetcher.FetchAll(ctx)
-	if err != nil {
-		return 0, err
-	}
-	for _, item := range items {
-		metadata := external.OGPMetadata{}
-		if metadataFetcher != nil {
-			metadata, _ = metadataFetcher.FetchOGP(ctx, item.URL)
-		}
-		if err := upsertQiitaItem(ctx, db, item, metadata); err != nil {
-			return 0, err
-		}
-	}
-	return len(items), nil
-}
-
-func upsertQiitaItem(ctx context.Context, db *gorm.DB, item external.QiitaItem, metadata external.OGPMetadata) error {
+func syncQiitaArticle(ctx context.Context, db *gorm.DB, item external.QiitaItem, metadata external.OGPMetadata) error {
 	return db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var post entity.DBTableExternalPost
-		err := tx.Where("provider = ? AND external_id = ?", external.QiitaProvider, item.ID).First(&post).Error
+		post, err := repository.FindExternalPost(ctx, tx, external.QiitaProvider, item.ID)
 		if err == nil {
 			thumbnailURL := post.ThumbnailURL
 			if metadata.ImageURL != "" {
 				thumbnailURL = metadata.ImageURL
 			}
-			return tx.Model(&post).Updates(map[string]any{
-				"title":         item.Title,
-				"excerpt":       excerptFor(item, metadata),
-				"thumbnail_url": thumbnailURL,
-				"url":           item.URL,
-				"published_at":  item.CreatedAt,
-				"updated_at":    item.UpdatedAt,
-			}).Error
+			post.Title = item.Title
+			post.Excerpt = excerptFor(item, metadata)
+			post.ThumbnailURL = thumbnailURL
+			post.URL = item.URL
+			post.PublishedAt = item.CreatedAt
+			post.UpdatedAt = item.UpdatedAt
+			return repository.UpdateExternalPost(ctx, tx, post)
 		}
-		if err != gorm.ErrRecordNotFound {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
 
-		post = entity.DBTableExternalPost{
+		post = &entity.DBTableExternalPost{
 			Provider:     external.QiitaProvider,
 			ExternalID:   item.ID,
 			URL:          item.URL,
@@ -138,7 +123,7 @@ func upsertQiitaItem(ctx context.Context, db *gorm.DB, item external.QiitaItem, 
 			PublishedAt:  item.CreatedAt,
 			UpdatedAt:    item.UpdatedAt,
 		}
-		return tx.Create(&post).Error
+		return repository.InsertExternalPost(ctx, tx, post)
 	})
 }
 
