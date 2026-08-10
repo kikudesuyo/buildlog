@@ -4,6 +4,7 @@
 	import { deleteDiary, saveCurrentGoals } from '$lib/api/client';
 	import type { GoalPeriod } from '$lib/api/types';
 	import DiaryFeed from '$lib/components/DiaryFeed.svelte';
+	import IconButton from '$lib/components/IconButton.svelte';
 	let { data } = $props();
 	let goals = $state<GoalPeriod>(data.goals);
 	let isGoalDialogOpen = $state(false);
@@ -120,8 +121,8 @@
 								達成
 							</span>
 						{/if}
-						<button type="button" onclick={() => openGoalDialog(goal)} class="min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high hover:text-primary" aria-label={`${goal.title}を編集`}><span class="material-symbols-outlined text-[18px]">edit</span></button>
-						<button type="button" onclick={() => removeGoal(goal)} class="min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-error/10 hover:text-error" aria-label={`${goal.title}を削除`}><span class="material-symbols-outlined text-[18px]">delete</span></button>
+						<IconButton icon="edit" type="button" onclick={() => openGoalDialog(goal)} aria-label={`${goal.title}を編集`} />
+						<IconButton icon="delete" variant="danger" type="button" onclick={() => removeGoal(goal)} aria-label={`${goal.title}を削除`} />
 					</div>
 				</div>
 				<div class="flex flex-col gap-1.5">

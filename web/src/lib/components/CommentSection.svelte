@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { createComment, fetchComments } from '$lib/api/client';
 	import type { CommentEntry } from '$lib/api/types';
+	import Button from './Button.svelte';
 
 	let { postId }: { postId: number } = $props();
 	let commentList = $state<CommentEntry[]>([]);
@@ -90,13 +91,9 @@
 			disabled={isSubmitting}
 		></textarea>
 		<div class="flex justify-end">
-			<button
-				type="submit"
-				class="min-h-11 rounded-lg bg-primary px-5 text-label-md text-on-primary transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50"
-				disabled={isSubmitting || !newCommentContent.trim()}
-			>
+			<Button type="submit" disabled={isSubmitting || !newCommentContent.trim()}>
 				{isSubmitting ? '送信中...' : 'コメントを送信'}
-			</button>
+			</Button>
 		</div>
 	</form>
 </section>
