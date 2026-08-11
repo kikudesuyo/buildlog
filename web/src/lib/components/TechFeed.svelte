@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidateAll, replaceState } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
 	import { fetchTechFeed, type ApiFetch, type TechSortOrder } from '$lib/api/client';
 	import Button from './Button.svelte';
@@ -20,7 +21,7 @@
 	let hasMoreArticles = $state(hasMore);
 	let isLoadingMore = $state(false);
 	let loadMoreError = $state(false);
-	let sortOrder = $state<TechSortOrder>('desc');
+	let sortOrder = $state<TechSortOrder>($page.url.searchParams.get('order') === 'asc' ? 'asc' : 'desc');
 	const storageKey = 'tech-feed-count';
 	let isRestoring = $state(false);
 	let articles = $derived(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles);
@@ -58,6 +59,10 @@
 		if (sortOrder === nextOrder) return;
 
 		sortOrder = nextOrder;
+		const nextUrl = new URL($page.url);
+		if (nextOrder === 'desc') nextUrl.searchParams.delete('order');
+		else nextUrl.searchParams.set('order', nextOrder);
+		await replaceState(resolve(`${nextUrl.pathname}${nextUrl.search}`), {});
 		isLoadingMore = true;
 		loadMoreError = false;
 		try {
