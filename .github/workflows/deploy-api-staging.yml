@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - staging
+  workflow_dispatch:
 
 concurrency:
   group: staging-api-deploy
@@ -20,6 +21,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: staging
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -43,6 +46,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: staging
 
       - name: Authenticate to Google Cloud (WIF)
         uses: google-github-actions/auth@v2
