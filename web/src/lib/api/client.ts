@@ -584,12 +584,14 @@ export async function fetchPostHistory(fetchFn?: ApiFetch): Promise<HistoryItem[
 		type: string;
 		title: string;
 		created_at: string;
+		url?: string;
 	}>>(fetchFn || fetch, '/posts/history');
 
 	return response.data_list.map((item) => ({
 		id: item.id,
 		type: item.type as 'diary' | 'tech',
 		title: item.title,
-		createdAt: item.created_at
+		createdAt: item.created_at,
+		url: item.url
 	}));
 }

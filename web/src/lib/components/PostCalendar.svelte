@@ -54,6 +54,14 @@ import { SvelteMap } from 'svelte/reactivity';
 		isPopoverOpen = false;
 	}
 
+	function postHref(post: HistoryItem) {
+		return post.type === 'tech' ? (post.url ?? resolve('/tech')) : resolve(`/diary/${post.id}?from=calendar`);
+	}
+
+	function isExternalPost(post: HistoryItem) {
+		return post.type === 'tech' && Boolean(post.url);
+	}
+
 	// 月間カレンダーのデータ生成
 	let currentYear = $state(new Date().getFullYear());
 	let currentMonth = $state(new Date().getMonth()); // 0-indexed
@@ -150,10 +158,10 @@ import { SvelteMap } from 'svelte/reactivity';
 	<header class="flex flex-col gap-2">
 		<h2 class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2">
 			<span class="material-symbols-outlined text-2xl">calendar_month</span>
-			投稿履歴とカレンダー
+			投稿履歴
 		</h2>
 		<p class="font-body-sm text-body-sm text-outline">
-			これまでの執筆活動の記録です。投稿のある日をクリックすると、その日の記事にアクセスできます。
+			これまでの執筆活動の記録です。投稿のある日をクリックすると、その記事にアクセスできます。
 		</p>
 	</header>
 
@@ -250,15 +258,19 @@ import { SvelteMap } from 'svelte/reactivity';
 			</button>
 		</header>
 		<ul class="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
-			{#each selectedPosts as post (post.id)}
+			{#each selectedPosts as post (`${post.type}:${post.id}`)}
 				<li class="flex flex-col gap-1 text-body-md">
+					<!-- eslint-disable svelte/no-navigation-without-resolve -->
 					<a
-						href={post.type === 'tech' ? resolve('/tech') : resolve(`/diary/${post.id}?from=calendar`)}
+						href={postHref(post)}
+						target={isExternalPost(post) ? '_blank' : undefined}
+						rel={isExternalPost(post) ? 'noreferrer' : undefined}
 						class="text-on-surface hover:text-primary hover:underline transition-colors font-medium leading-snug"
 						onclick={closePopover}
 					>
 						{post.title}
 					</a>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
 					<div class="flex items-center gap-2">
 						<span
 							class="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider {post.type === 'tech' ? 'bg-primary-fixed text-primary' : 'bg-secondary-fixed text-secondary'}"

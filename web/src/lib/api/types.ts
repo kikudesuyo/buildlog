@@ -104,6 +104,7 @@ export interface HistoryItem {
 	type: 'diary' | 'tech';
 	title: string;
 	createdAt: string;
+	url?: string;
 }
 
 export interface CommentEntry {
