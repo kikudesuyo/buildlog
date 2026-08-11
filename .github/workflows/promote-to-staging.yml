@@ -1,4 +1,4 @@
-name: Promote to Staging
+name: Merge branch to Staging
 
 on:
   workflow_dispatch:
