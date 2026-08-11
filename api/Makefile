@@ -5,6 +5,8 @@ LOAD_ENV=. ./default_env.sh
 APP_BINARY ?= app
 GCP_PROJECT_PROD ?= buildlog-503612
 GCP_PROJECT_STAGING ?= buildlog-dev
+GCP_RUNTIME_SERVICE_ACCOUNT_PROD ?= 328735755994-compute@developer.gserviceaccount.com
+GCP_RUNTIME_SERVICE_ACCOUNT_STAGING ?= buildlog-api-staging@buildlog-dev.iam.gserviceaccount.com
 API_DOMAIN_PROD ?=
 API_DOMAIN_STAGING ?=
 
@@ -36,12 +38,12 @@ ALLOWED_ORIGINS ?=
 
 # 本番環境 Cloud Runへデプロイ
 deploy-prod:
-	make __deploy project=${GCP_PROJECT_PROD} bucketprefix=prod resourceprefix=prod apidomain=${API_DOMAIN_PROD} is_production=true allowed_origins="${ALLOWED_ORIGINS}" database_env=DATABASE_URL database_secret=DATABASE_URL password_env=ADMIN_PASSWORD password_secret=ADMIN_PASSWORD session_secret_env=ADMIN_SESSION_SECRET session_secret=ADMIN_SESSION_SECRET
+	make __deploy project=${GCP_PROJECT_PROD} bucketprefix=prod resourceprefix=prod apidomain=${API_DOMAIN_PROD} is_production=true allowed_origins="${ALLOWED_ORIGINS}" runtime_service_account=${GCP_RUNTIME_SERVICE_ACCOUNT_PROD} database_env=DATABASE_URL database_secret=DATABASE_URL password_env=ADMIN_PASSWORD password_secret=ADMIN_PASSWORD session_secret_env=ADMIN_SESSION_SECRET session_secret=ADMIN_SESSION_SECRET
 
 # Staging環境のCloud Runへデプロイ
 deploy-staging:
 	@test -n "${GCP_PROJECT_STAGING}" || (echo "GCP_PROJECT_STAGING is required" && exit 1)
-	make __deploy project=${GCP_PROJECT_STAGING} bucketprefix=staging resourceprefix=staging apidomain=${API_DOMAIN_STAGING} is_production=false allowed_origins="${ALLOWED_ORIGINS}" database_env=STAGING_DATABASE_URL database_secret=STAGING_DATABASE_URL password_env=STAGING_ADMIN_PASSWORD password_secret=STAGING_ADMIN_PASSWORD session_secret_env=STAGING_ADMIN_SESSION_SECRET session_secret=STAGING_ADMIN_SESSION_SECRET
+	make __deploy project=${GCP_PROJECT_STAGING} bucketprefix=staging resourceprefix=staging apidomain=${API_DOMAIN_STAGING} is_production=false allowed_origins="${ALLOWED_ORIGINS}" runtime_service_account=${GCP_RUNTIME_SERVICE_ACCOUNT_STAGING} database_env=STAGING_DATABASE_URL database_secret=STAGING_DATABASE_URL password_env=STAGING_ADMIN_PASSWORD password_secret=STAGING_ADMIN_PASSWORD session_secret_env=STAGING_ADMIN_SESSION_SECRET session_secret=STAGING_ADMIN_SESSION_SECRET
 
 __deploy:
 	gcloud builds submit \
@@ -49,7 +51,7 @@ __deploy:
 	  --region=asia-northeast1 \
 		--config=_cloudbuild.all.yaml \
 		--project ${project} \
-		--substitutions=_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production},_ALLOWED_ORIGINS="${allowed_origins}",_DATABASE_URL_ENV=${database_env},_DATABASE_URL_SECRET=${database_secret},_ADMIN_PASSWORD_ENV=${password_env},_ADMIN_PASSWORD_SECRET=${password_secret},_ADMIN_SESSION_SECRET_ENV=${session_secret_env},_ADMIN_SESSION_SECRET_SECRET=${session_secret}
+		--substitutions=_RESOURCE_PREFIX=${resourceprefix},_API_DOMAIN=${apidomain},_IS_PRODUCTION=${is_production},_ALLOWED_ORIGINS="${allowed_origins}",_SERVICE_ACCOUNT=${runtime_service_account},_DATABASE_URL_ENV=${database_env},_DATABASE_URL_SECRET=${database_secret},_ADMIN_PASSWORD_ENV=${password_env},_ADMIN_PASSWORD_SECRET=${password_secret},_ADMIN_SESSION_SECRET_ENV=${session_secret_env},_ADMIN_SESSION_SECRET_SECRET=${session_secret}
 
 # チェックサム作成
 migrate_hash:
