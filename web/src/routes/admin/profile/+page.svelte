@@ -201,7 +201,7 @@
 							</div>
 							<div class="flex flex-col gap-1">
 								<label for="hl-desc-{index}" class="font-label-sm text-label-sm text-outline">説明 / Description</label>
-								<textarea id="hl-desc-{index}" bind:value={highlight.description} class="variable-input h-16 min-w-0 resize-none rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-1 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting}></textarea>
+								<textarea id="hl-desc-{index}" bind:value={highlight.description} class="variable-input min-h-[120px] min-w-0 resize-y rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0 md:min-h-[160px]" disabled={isSubmitting}></textarea>
 							</div>
 						</div>
 					</div>
