@@ -48,7 +48,6 @@ export interface AppProject {
 
 export interface ProfileData {
 	name: string;
-	subtitle: string;
 	title: string;
 	quote: string;
 	bio: string[];
@@ -104,6 +103,7 @@ export interface HistoryItem {
 	type: 'diary' | 'tech';
 	title: string;
 	createdAt: string;
+	url?: string;
 }
 
 export interface CommentEntry {
