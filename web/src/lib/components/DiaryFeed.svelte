@@ -3,6 +3,8 @@
 	import type { DiaryEntry } from '$lib/api/types';
 	import { fetchDiaryEntries, type ApiFetch, type DiarySort, type DiarySortOrder } from '$lib/api/client';
 	import { resolve } from '$app/paths';
+	import { replaceState } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { tick } from 'svelte';
 	import LikeButton from './LikeButton.svelte';
 	import Button from './Button.svelte';
@@ -22,8 +24,8 @@
 	let loadError = $state(false);
 	let hasMore = $state(!isAdmin && initialEntries.length === pageSize);
 	const storageKey = `diary-feed-count:${isAdmin ? 'admin' : 'public'}`;
-	let sortBy = $state<DiarySort>('newest');
-	let sortOrder = $state<DiarySortOrder>('desc');
+	let sortBy = $state<DiarySort>($page.url.searchParams.get('sort') === 'likes' ? 'likes' : 'newest');
+	let sortOrder = $state<DiarySortOrder>($page.url.searchParams.get('order') === 'asc' ? 'asc' : 'desc');
 	let statusFilter = $state<'all' | 'draft' | 'published'>('all');
 	let restoreTarget = 0;
 	let displayEntries = $derived(
@@ -76,6 +78,12 @@
 
 		sortBy = nextSortBy;
 		sortOrder = nextSortOrder;
+		const nextUrl = new URL($page.url);
+		if (nextSortBy === 'newest') nextUrl.searchParams.delete('sort');
+		else nextUrl.searchParams.set('sort', nextSortBy);
+		if (nextSortOrder === 'desc') nextUrl.searchParams.delete('order');
+		else nextUrl.searchParams.set('order', nextSortOrder);
+		await replaceState(resolve(`${nextUrl.pathname}${nextUrl.search}`), {});
 		isLoading = true;
 		loadError = false;
 		try {
