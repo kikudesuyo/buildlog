@@ -13,11 +13,35 @@
 	let status = $state(data.diary.status || 'draft');
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
+	let isAutoSaving = $state(false);
+	let autoSaveError = $state(false);
 	let isDirty = $derived(
 		title !== data.diary.title ||
 		content !== data.diary.content ||
 		status !== (data.diary.status || 'draft')
 	);
+
+	async function autoSaveDraft(titleSnapshot: string, contentSnapshot: string, statusSnapshot: 'draft' | 'published') {
+		if (!titleSnapshot.trim() || !contentSnapshot.trim() || isSubmitting || isAutoSaving) return;
+		isAutoSaving = true;
+		autoSaveError = false;
+		try {
+			await updateDiary(data.diary.id, titleSnapshot, contentSnapshot, statusSnapshot);
+		} catch {
+			autoSaveError = true;
+		} finally {
+			isAutoSaving = false;
+		}
+	}
+
+	$effect(() => {
+		const currentTitle = title;
+		const currentContent = content;
+		const currentStatus = status;
+		if (!currentTitle.trim() || !currentContent.trim() || isSubmitting) return;
+		const timer = setTimeout(() => void autoSaveDraft(currentTitle, currentContent, currentStatus), 5000);
+		return () => clearTimeout(timer);
+	});
 
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
@@ -102,6 +126,7 @@
 
 	<main class="flex flex-col gap-6">
 		<div class="hidden items-center justify-end gap-3 border-b border-outline-variant/20 pb-4 md:flex">
+			{#if isAutoSaving}<span class="font-body-sm text-body-sm text-outline">自動保存中…</span>{:else if autoSaveError}<span class="font-body-sm text-body-sm text-error">自動保存に失敗しました</span>{:else if !isDirty}<span class="font-body-sm text-body-sm text-outline">保存済み</span>{/if}
 			<button type="button" onclick={() => handleSave('draft')} disabled={isSubmitting} class="font-label-md text-label-md text-outline hover:text-primary">下書き保存</button>
 			<button type="button" onclick={() => handleSave('published')} disabled={isSubmitting} class="font-label-md text-label-md rounded-lg bg-primary px-5 py-2 text-on-primary disabled:opacity-50">{isSubmitting ? '更新中...' : '更新する'}</button>
 		</div>
