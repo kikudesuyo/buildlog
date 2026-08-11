@@ -92,8 +92,7 @@
 			{#if isAdmin}
 				<p class="font-label-sm text-label-sm mb-stack-sm tracking-[0.2em] text-outline uppercase">Content Manager / Tech</p>
 			{/if}
-			<h1 class="font-display-lg text-display-lg mb-stack-sm text-primary">{isAdmin ? '技術記事一覧' : '技術と美学'}</h1>
-			{#if !isAdmin}<p class="font-body-lg text-body-lg max-w-[600px] text-on-surface-variant">思考の断片を、構造化された知性へ。最新のテクノロジーと設計思想を綴る技術録。</p>{/if}
+			<h1 class="font-display-lg text-display-lg mb-stack-sm text-primary">{isAdmin ? '技術記事一覧' : '技術ブログ'}</h1>
 		</div>
 		<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
 			<span>並び順</span>
