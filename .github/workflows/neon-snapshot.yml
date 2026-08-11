@@ -1,0 +1,66 @@
+name: Update Neon Database Snapshot
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: neon-database-snapshot
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NEON_PROJECT_ID: icy-pond-30220441
+  NEON_API_URL: https://console.neon.tech/api/v2
+
+jobs:
+  update-snapshot:
+    name: Replace the Neon database snapshot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Replace the existing snapshot
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -n "$NEON_API_KEY"
+
+          api() {
+            curl --silent --show-error --fail-with-body --retry 3 --retry-all-errors \
+              --header "Authorization: Bearer $NEON_API_KEY" \
+              --header 'Accept: application/json' \
+              "$@"
+          }
+
+          snapshots_url="$NEON_API_URL/projects/$NEON_PROJECT_ID/snapshots"
+          snapshots="$(api "$snapshots_url")"
+          while IFS= read -r snapshot_id; do
+            test -z "$snapshot_id" && continue
+            api --request DELETE "$snapshots_url/$snapshot_id" >/dev/null
+          done < <(jq -r '.snapshots[]?.id' <<<"$snapshots")
+
+          for attempt in {1..12}; do
+            snapshots="$(api "$snapshots_url")"
+            if [[ "$(jq '.snapshots | length' <<<"$snapshots")" == '0' ]]; then
+              break
+            fi
+            if [[ "$attempt" == '12' ]]; then
+              echo 'The previous Neon snapshot was not deleted in time.' >&2
+              exit 1
+            fi
+            sleep 10
+          done
+
+          branches="$(api "$NEON_API_URL/projects/$NEON_PROJECT_ID/branches?limit=100")"
+          branch_id="$(jq -r '.branches[] | select(.name == "main") | .id' <<<"$branches" | head -n 1)"
+          test -n "$branch_id"
+
+          snapshot_name="buildlog-$(date -u +%Y%m%d)"
+          encoded_name="$(jq -rn --arg name "$snapshot_name" '$name | @uri')"
+          api --request POST \
+            "$NEON_API_URL/projects/$NEON_PROJECT_ID/branches/$branch_id/snapshot?name=$encoded_name"
