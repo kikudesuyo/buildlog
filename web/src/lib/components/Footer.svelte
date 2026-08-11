@@ -47,7 +47,7 @@
 			{/if}
 		</div>
 		<div class="font-label-sm text-label-sm text-on-surface-variant opacity-80">
-			© 2024 Buildlog. Crafted for clarity.
+			© 2026 Buildlog. Crafted for clarity.
 		</div>
 	</div>
 </footer>

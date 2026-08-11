@@ -20,7 +20,7 @@
 	<meta name="description" content={data.diary.content ? data.diary.content.substring(0, 120) + '...' : ''} />
 </svelte:head>
 
-<div class="editorial-container mx-auto max-w-[800px] px-gutter pt-24 pb-20">
+<div class="editorial-container mx-auto max-w-[800px] px-gutter pb-20">
 	<a
 		href={resolve(returnPath)}
 		class="font-label-md text-label-md mb-8 inline-flex items-center gap-2 text-outline transition-colors duration-200 hover:text-primary"

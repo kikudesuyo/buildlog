@@ -49,7 +49,7 @@ func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int,
 		})
 	}
 
-	sortTechFeedItems(items)
+	sortTechFeedItems(items, order)
 	if offset >= len(items) {
 		return []entity.TechFeedItem{}, nil
 	}
@@ -60,10 +60,16 @@ func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int,
 	return items[offset:end], nil
 }
 
-func sortTechFeedItems(items []entity.TechFeedItem) {
+func sortTechFeedItems(items []entity.TechFeedItem, order string) {
 	sort.SliceStable(items, func(i, j int) bool {
 		if items[i].CreatedAt.Equal(items[j].CreatedAt) {
+			if order == "asc" {
+				return items[i].ID < items[j].ID
+			}
 			return items[i].ID > items[j].ID
+		}
+		if order == "asc" {
+			return items[i].CreatedAt.Before(items[j].CreatedAt)
 		}
 		return items[i].CreatedAt.After(items[j].CreatedAt)
 	})

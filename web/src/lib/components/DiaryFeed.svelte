@@ -24,8 +24,11 @@
 	const storageKey = `diary-feed-count:${isAdmin ? 'admin' : 'public'}`;
 	let sortBy = $state<DiarySort>('newest');
 	let sortOrder = $state<DiarySortOrder>('desc');
+	let statusFilter = $state<'all' | 'draft' | 'published'>('all');
 	let restoreTarget = 0;
-	let displayEntries = $derived(entries);
+	let displayEntries = $derived(
+		statusFilter === 'all' ? entries : entries.filter((entry) => entry.status === statusFilter)
+	);
 	let actionRefs = $state<Record<number, HTMLButtonElement | undefined>>({});
 	let headingRef: HTMLHeadingElement;
 	let notification = $state<{ message: string; kind: 'success' | 'error' } | null>(null);
@@ -105,6 +108,20 @@
 			<h1 bind:this={headingRef} tabindex="-1" class="font-display-lg text-display-lg text-primary">{isAdmin ? 'つぶやき管理' : '日々のつぶやき'}</h1>
 		</div>
 		<div class="flex flex-wrap items-center justify-end gap-2">
+			{#if isAdmin}
+				<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
+					<span>状態</span>
+					<select
+						bind:value={statusFilter}
+						class="font-label-sm text-label-sm min-h-11 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2 text-primary"
+						aria-label="つぶやきの状態"
+					>
+						<option value="all">すべて</option>
+						<option value="draft">下書き</option>
+						<option value="published">公開</option>
+					</select>
+				</label>
+			{/if}
 			<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
 				<span>並び順</span>
 				<select
