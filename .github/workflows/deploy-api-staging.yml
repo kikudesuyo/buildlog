@@ -18,8 +18,6 @@ env:
   GCP_PROJECT_STAGING: buildlog-dev
   GCP_WIF_PROVIDER_STAGING: projects/328735755994/locations/global/workloadIdentityPools/buildlog-pool/providers/github-provider
   GCP_SERVICE_ACCOUNT_STAGING: github-actions-deployer@buildlog-dev.iam.gserviceaccount.com
-  API_DOMAIN_STAGING: ${{ vars.API_DOMAIN_STAGING }}
-  ALLOWED_ORIGINS_STAGING: ${{ vars.ALLOWED_ORIGINS_STAGING }}
 
 jobs:
   test-api:
@@ -56,7 +54,6 @@ jobs:
         run: |
           test -n "$GCP_WIF_PROVIDER_STAGING"
           test -n "$GCP_SERVICE_ACCOUNT_STAGING"
-          test -n "$API_DOMAIN_STAGING"
 
       - name: Authenticate to Google Cloud (WIF)
         uses: google-github-actions/auth@v2
@@ -71,6 +68,4 @@ jobs:
         working-directory: api
         env:
           GCP_PROJECT_STAGING: ${{ env.GCP_PROJECT_STAGING }}
-          API_DOMAIN_STAGING: ${{ env.API_DOMAIN_STAGING }}
-          ALLOWED_ORIGINS_STAGING: ${{ env.ALLOWED_ORIGINS_STAGING }}
-        run: make deploy-staging GCP_PROJECT_STAGING="$GCP_PROJECT_STAGING" API_DOMAIN_STAGING="$API_DOMAIN_STAGING" ALLOWED_ORIGINS="$ALLOWED_ORIGINS_STAGING"
+        run: make deploy-staging GCP_PROJECT_STAGING="$GCP_PROJECT_STAGING" ALLOWED_ORIGINS=""
