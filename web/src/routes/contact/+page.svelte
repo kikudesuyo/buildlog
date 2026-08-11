@@ -19,7 +19,7 @@
 </svelte:head>
 
 <div class="mx-auto max-w-container-max px-gutter">
-	<section class="max-w-2xl border-t border-outline-variant/30 pt-section-gap">
+	<section class="max-w-2xl">
 		<p class="font-label-md text-label-md mb-stack-md tracking-widest text-outline uppercase">Contact</p>
 		<h1 class="font-display-lg text-display-lg text-primary">お問い合わせ</h1>
 		<p class="font-body-lg text-body-lg mt-stack-md leading-relaxed text-on-surface-variant">
