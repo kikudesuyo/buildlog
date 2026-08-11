@@ -12,7 +12,7 @@
 	<title>Buildlog — Profile</title>
 </svelte:head>
 
-<div class="mx-auto max-w-container-max px-gutter">
+<div class="mx-auto w-full max-w-5xl px-gutter">
 	<!-- Hero Section -->
 	<section class="mb-section-gap flex flex-col gap-stack-lg">
 		<div class="flex items-center gap-stack-md">
@@ -40,8 +40,8 @@
 				</span>
 			</div>
 		</div>
-		<div class="mt-stack-md max-w-[500px]">
-			<p class="font-body-lg text-body-lg leading-relaxed text-primary italic">
+		<div class="mt-stack-md w-full max-w-3xl">
+			<p class="font-body-lg text-body-lg break-words leading-relaxed text-primary italic">
 				{data.profileData.quote}
 			</p>
 		</div>
@@ -52,7 +52,7 @@
 		<h2 class="font-label-md text-label-md mb-stack-md tracking-widest text-outline uppercase">
 			自己紹介 / self-introduction
 		</h2>
-		<div class="space-y-stack-md text-on-surface">
+		<div class="max-w-3xl space-y-stack-md text-on-surface">
 			{#each data.profileData.bio as paragraph (paragraph)}
 				<p class="font-body-md text-body-md leading-relaxed text-on-surface-variant">
 					{paragraph}
