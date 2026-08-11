@@ -27,10 +27,9 @@ Staging DBへmigrationを適用する場合は、GitHub Actionsの `Migrate Stag
 
 ## GitHub Repository Variables
 
-- `GCP_PROJECT_STAGING`（任意。既定値: `buildlog-dev`）
-- `GCP_WIF_PROVIDER_STAGING`
-- `GCP_SERVICE_ACCOUNT_STAGING`
 - `API_DOMAIN_STAGING`
 - `ALLOWED_ORIGINS_STAGING`
+
+`GCP_PROJECT_STAGING`、`GCP_WIF_PROVIDER_STAGING`、`GCP_SERVICE_ACCOUNT_STAGING` はStaging用Workflowに固定値として定義しています。これらは秘密情報ではなく、GitHub ActionsはWIF経由でGCPへ認証します。
 
 `develop` ブランチへpushすると `Deploy API Staging` が実行されます。手動確認時はActionsからworkflow_dispatchで実行できます。

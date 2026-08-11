@@ -12,9 +12,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  GCP_PROJECT_STAGING: ${{ vars.GCP_PROJECT_STAGING || 'buildlog-dev' }}
-  GCP_WIF_PROVIDER_STAGING: ${{ vars.GCP_WIF_PROVIDER_STAGING }}
-  GCP_SERVICE_ACCOUNT_STAGING: ${{ vars.GCP_SERVICE_ACCOUNT_STAGING }}
+  GCP_PROJECT_STAGING: buildlog-dev
+  GCP_WIF_PROVIDER_STAGING: projects/328735755994/locations/global/workloadIdentityPools/buildlog-pool/providers/github-provider
+  GCP_SERVICE_ACCOUNT_STAGING: github-actions-deployer@buildlog-dev.iam.gserviceaccount.com
 
 jobs:
   migrate:
