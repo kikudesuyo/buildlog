@@ -38,18 +38,17 @@
 					/>
 				{/if}
 			</div>
-			<div class="h-px flex-grow bg-outline-variant/30"></div>
-		</div>
-		<div class="flex flex-col gap-stack-sm">
-			<span
-				class="font-label-md text-label-md flex items-center tracking-[0.2em] text-on-surface-variant uppercase"
-			>
-				<span class="mr-3 inline-block h-px w-10 bg-current"></span>{data.profileData.title}
-			</span>
-			<h1 class="font-display-lg text-display-lg mt-2 leading-tight text-primary">
-				{data.profileData.name}
-			</h1>
-			<p class="font-label-sm text-label-sm text-outline italic">{data.profileData.subtitle}</p>
+			<div class="flex min-w-0 flex-col gap-stack-xs">
+				<h1 class="font-display-lg text-display-lg leading-tight text-primary">
+					{data.profileData.name}
+				</h1>
+				<span
+					class="font-label-md text-label-md flex items-center tracking-[0.2em] text-on-surface-variant uppercase"
+				>
+					<span class="mr-3 inline-block h-px w-10 shrink-0 bg-current"></span>{data.profileData.title}
+				</span>
+				<p class="font-label-sm text-label-sm text-outline italic">{data.profileData.subtitle}</p>
+			</div>
 		</div>
 		<div class="mt-stack-md max-w-[500px]">
 			<p class="font-body-lg text-body-lg leading-relaxed text-primary italic">
