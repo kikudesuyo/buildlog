@@ -1,10 +1,7 @@
 name: Deploy API Staging
 
 on:
-  push:
-    branches:
-      - staging
-  workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group: staging-api-deploy

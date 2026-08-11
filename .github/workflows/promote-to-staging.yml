@@ -1,0 +1,44 @@
+name: Promote to Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'staging へマージするブランチ'
+        required: true
+        type: string
+      deploy:
+        description: 'マージ後に staging へデプロイする'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  merge-to-staging:
+    name: Merge source branch to staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge to staging
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_BRANCH: ${{ inputs.source_branch }}
+        run: |
+          test "$SOURCE_BRANCH" != "staging"
+          gh api --method POST \
+            "/repos/${GITHUB_REPOSITORY}/merges" \
+            -f base=staging \
+            -f head="$SOURCE_BRANCH" \
+            -f commit_message="Merge $SOURCE_BRANCH into staging"
+
+  deploy-staging:
+    name: Deploy merged staging branch
+    if: ${{ inputs.deploy }}
+    needs: merge-to-staging
+    uses: ./.github/workflows/deploy-api-staging.yml
+    permissions:
+      contents: read
+      id-token: write
