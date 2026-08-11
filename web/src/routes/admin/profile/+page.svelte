@@ -10,7 +10,6 @@
 
 	let name = $state(data.profileData.name);
 	let title = $state(data.profileData.title);
-	let subtitle = $state(data.profileData.subtitle);
 	let quote = $state(data.profileData.quote);
 	
 	// bio は配列なので、改行で繋げてテキストエリアで編集
@@ -34,7 +33,6 @@
 	let isDirty = $derived(
 		name !== savedProfile.name ||
 		title !== savedProfile.title ||
-		subtitle !== savedProfile.subtitle ||
 		quote !== savedProfile.quote ||
 		bioText !== savedProfile.bio.join('\n\n') ||
 		JSON.stringify(highlights) !== JSON.stringify(savedProfile.highlights) ||
@@ -69,7 +67,6 @@
 			const updatedProfile = await updateProfile({
 				name,
 				title,
-				subtitle,
 				quote,
 				bio,
 				highlights,
@@ -142,11 +139,6 @@
 				<div class="flex flex-col gap-1.5">
 					<label for="title" class="font-label-md text-label-md font-bold text-on-surface">肩書き / Title</label>
 					<input id="title" type="text" bind:value={title} class="variable-input min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
-				</div>
-
-				<div class="flex flex-col gap-1.5 md:col-span-2">
-					<label for="subtitle" class="font-label-md text-label-md font-bold text-on-surface">サブタイトル / Subtitle</label>
-					<input id="subtitle" type="text" bind:value={subtitle} class="variable-input min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 				</div>
 
 				<div class="flex md:col-span-2">

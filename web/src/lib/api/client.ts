@@ -459,7 +459,6 @@ export async function fetchProfile(fetchFn: ApiFetch): Promise<ProfileData> {
 	const response = await get<ApiObjectResponse<{
 		id: number;
 		name: string;
-		subtitle: string;
 		title: string;
 		quote: string;
 		bio: string[];
@@ -472,7 +471,6 @@ export async function fetchProfile(fetchFn: ApiFetch): Promise<ProfileData> {
 
 	return {
 		name: response.data.name,
-		subtitle: response.data.subtitle,
 		title: response.data.title,
 		quote: response.data.quote,
 		bio: response.data.bio,
@@ -488,7 +486,6 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 	const response = await sendRequest<ApiObjectResponse<{
 		id: number;
 		name: string;
-		subtitle: string;
 		title: string;
 		quote: string;
 		bio: string[];
@@ -499,7 +496,6 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 		final_quote: string;
 	}>>('PUT', '/profile', {
 		name: profile.name,
-		subtitle: profile.subtitle,
 		title: profile.title,
 		quote: profile.quote,
 		bio: profile.bio,
@@ -512,7 +508,6 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 
 	return {
 		name: response.data.name,
-		subtitle: response.data.subtitle,
 		title: response.data.title,
 		quote: response.data.quote,
 		bio: response.data.bio,

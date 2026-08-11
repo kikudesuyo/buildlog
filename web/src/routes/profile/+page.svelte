@@ -38,7 +38,6 @@
 				>
 					<span class="mr-3 inline-block h-px w-10 shrink-0 bg-current"></span>{data.profileData.title}
 				</span>
-				<p class="font-label-sm text-label-sm text-outline italic">{data.profileData.subtitle}</p>
 			</div>
 		</div>
 		<div class="mt-stack-md max-w-[500px]">

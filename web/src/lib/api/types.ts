@@ -48,7 +48,6 @@ export interface AppProject {
 
 export interface ProfileData {
 	name: string;
-	subtitle: string;
 	title: string;
 	quote: string;
 	bio: string[];
