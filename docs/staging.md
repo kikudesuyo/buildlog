@@ -29,4 +29,4 @@ Staging DBへmigrationを適用する場合は、GitHub Actionsの `Migrate Stag
 
 Staging用のGCPプロジェクト、WIF Provider、サービスアカウントはWorkflowに固定値として定義しています。これらは秘密情報ではなく、GitHub ActionsはWIF経由でGCPへ認証します。追加のRepository Variablesは不要です。
 
-`develop` ブランチへpushすると `Deploy API Staging` が実行されます。手動確認時はActionsからworkflow_dispatchで実行できます。
+作業ブランチを `staging` ブランチへマージすると、`staging` へのpushを契機に `Deploy API Staging` が実行されます。作業ブランチを直接デプロイする手動実行は行いません。
