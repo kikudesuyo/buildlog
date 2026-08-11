@@ -8,6 +8,11 @@ variable "prod_database_url" {
   default = getenv("PROD_DATABASE_URL")
 }
 
+variable "staging_database_url" {
+	type    = string
+	default = getenv("STAGING_DATABASE_URL")
+}
+
 env "local" {
   url     = var.database_url
   dev     = "docker://postgres/18/dev?search_path=public"
@@ -26,4 +31,14 @@ env "prod" {
   migration {
     dir = "file://migrations"
   }
+}
+
+env "staging" {
+	url     = "${var.staging_database_url}&search_path=public"
+	dev     = "docker://postgres/18/dev?search_path=public"
+	schemas = ["public"]
+
+	migration {
+		dir = "file://migrations"
+	}
 }
