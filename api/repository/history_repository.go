@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// ListPostHistory は削除されていない投稿履歴を取得します。
-func ListPostHistory(ctx context.Context, db *gorm.DB) ([]entity.HistoryItem, error) {
+// GetPostHistory_List は削除されていない投稿履歴を取得します。
+func GetPostHistory_List(ctx context.Context, db *gorm.DB) ([]entity.HistoryItem, error) {
 	itemList := make([]entity.HistoryItem, 0)
 	err := db.WithContext(ctx).
 		Raw(`

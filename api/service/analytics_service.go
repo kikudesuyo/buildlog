@@ -24,7 +24,7 @@ func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
 	}
 
 	var totalViews, diaryCount, techCount int64
-	items := make([]entity.AnalyticsArticleItem, len(data.Posts))
+	item_List := make([]entity.AnalyticsArticleItem, len(data.Posts))
 	for i, post := range data.Posts {
 		views := post.Views
 		totalViews += views
@@ -34,46 +34,46 @@ func GetAnalytics(ctx context.Context) (entity.AnalyticsResponse, error) {
 		case "tech":
 			techCount++
 		}
-		items[i] = entity.AnalyticsArticleItem{ID: post.ID, Type: post.Type, Title: post.Title, Views: views, Likes: data.LikeCounts[post.ID]}
+		item_List[i] = entity.AnalyticsArticleItem{ID: post.ID, Type: post.Type, Title: post.Title, Views: views, Likes: data.LikeCounts[post.ID]}
 	}
-	viewsRanking := append([]entity.AnalyticsArticleItem(nil), items...)
-	sort.Slice(viewsRanking, func(i, j int) bool {
-		if viewsRanking[i].Views == viewsRanking[j].Views {
-			return viewsRanking[i].ID > viewsRanking[j].ID
+	viewRanking_List := append([]entity.AnalyticsArticleItem(nil), item_List...)
+	sort.Slice(viewRanking_List, func(i, j int) bool {
+		if viewRanking_List[i].Views == viewRanking_List[j].Views {
+			return viewRanking_List[i].ID > viewRanking_List[j].ID
 		}
-		return viewsRanking[i].Views > viewsRanking[j].Views
+		return viewRanking_List[i].Views > viewRanking_List[j].Views
 	})
-	if len(viewsRanking) > 5 {
-		viewsRanking = viewsRanking[:5]
+	if len(viewRanking_List) > 5 {
+		viewRanking_List = viewRanking_List[:5]
 	}
-	likesRanking := append([]entity.AnalyticsArticleItem(nil), items...)
-	sort.Slice(likesRanking, func(i, j int) bool {
-		if likesRanking[i].Likes == likesRanking[j].Likes {
-			return likesRanking[i].ID > likesRanking[j].ID
+	likeRanking_List := append([]entity.AnalyticsArticleItem(nil), item_List...)
+	sort.Slice(likeRanking_List, func(i, j int) bool {
+		if likeRanking_List[i].Likes == likeRanking_List[j].Likes {
+			return likeRanking_List[i].ID > likeRanking_List[j].ID
 		}
-		return likesRanking[i].Likes > likesRanking[j].Likes
+		return likeRanking_List[i].Likes > likeRanking_List[j].Likes
 	})
-	if len(likesRanking) > 5 {
-		likesRanking = likesRanking[:5]
+	if len(likeRanking_List) > 5 {
+		likeRanking_List = likeRanking_List[:5]
 	}
 
 	now := time.Now()
-	months := make([]string, 12)
-	counts := make(map[string]int64)
+	month_List := make([]string, 12)
+	count_List := make(map[string]int64)
 	for i := 11; i >= 0; i-- {
 		month := now.AddDate(0, -i, 0).Format("2006-01")
-		months[11-i] = month
-		counts[month] = 0
+		month_List[11-i] = month
+		count_List[month] = 0
 	}
 	for _, post := range data.Posts {
 		month := post.CreatedAt.Format("2006-01")
-		if _, ok := counts[month]; ok {
-			counts[month]++
+		if _, ok := count_List[month]; ok {
+			count_List[month]++
 		}
 	}
-	activities := make([]entity.MonthlyActivityItem, 12)
-	for i, month := range months {
-		activities[i] = entity.MonthlyActivityItem{Month: month, Count: counts[month]}
+	activity_List := make([]entity.MonthlyActivityItem, 12)
+	for i, month := range month_List {
+		activity_List[i] = entity.MonthlyActivityItem{Month: month, Count: count_List[month]}
 	}
-	return entity.AnalyticsResponse{TotalViews: totalViews, TotalLikes: data.TotalLikes, TotalPosts: int64(len(data.Posts)), DiaryCount: diaryCount, TechCount: techCount, TopViewsArticles: viewsRanking, TopLikesArticles: likesRanking, MonthlyActivities: activities}, nil
+	return entity.AnalyticsResponse{TotalViews: totalViews, TotalLikes: data.TotalLikes, TotalPosts: int64(len(data.Posts)), DiaryCount: diaryCount, TechCount: techCount, TopViewsArticles: viewRanking_List, TopLikesArticles: likeRanking_List, MonthlyActivities: activity_List}, nil
 }

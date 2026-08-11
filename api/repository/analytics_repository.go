@@ -29,15 +29,15 @@ func GetAnalyticsData(ctx context.Context, db *gorm.DB) (AnalyticsData, error) {
 		PostID int64
 		Count  int64
 	}
-	var counts []count
+	var count_List []count
 	if err := db.WithContext(ctx).
 		Model(&entity.DBTableLike{}).
 		Select("post_id, COUNT(*) AS count").
 		Group("post_id").
-		Find(&counts).Error; err != nil {
+		Find(&count_List).Error; err != nil {
 		return AnalyticsData{}, fmt.Errorf("list analytics like counts: %w", err)
 	}
-	for _, item := range counts {
+	for _, item := range count_List {
 		data.LikeCounts[item.PostID] = item.Count
 		data.TotalLikes += item.Count
 	}

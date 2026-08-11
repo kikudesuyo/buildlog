@@ -9,28 +9,28 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
-// ListDiaries は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
-func ListDiaries(ctx context.Context, all bool, offset int, limit int, sortBy string, sortOrder string, ipAddress string) ([]entity.DBTablePost, error) {
+// GetDiary_List は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
+func GetDiary_List(ctx context.Context, all bool, offset int, limit int, sortBy string, sortOrder string, ipAddress string) ([]entity.DBTablePost, error) {
 	db := library.GetDB(ctx)
-	diaryList, err := repository.ListDiaries(ctx, db, all, offset, limit, sortBy, sortOrder)
+	diary_List, err := repository.GetDiary_List(ctx, db, all, offset, limit, sortBy, sortOrder)
 	if err != nil {
 		return nil, err
 	}
-	postIDs := make([]int64, len(diaryList))
-	for i := range diaryList {
-		postIDs[i] = diaryList[i].ID
+	postID_List := make([]int64, len(diary_List))
+	for i := range diary_List {
+		postID_List[i] = diary_List[i].ID
 	}
-	engagements, err := repository.GetPostEngagements(ctx, db, postIDs, ipAddress)
+	engagement_List, err := repository.GetPostEngagement_List(ctx, db, postID_List, ipAddress)
 	if err != nil {
 		return nil, err
 	}
-	for i := range diaryList {
-		engagement := engagements[diaryList[i].ID]
-		diaryList[i].LikesCount = engagement.LikesCount
-		diaryList[i].CommentsCount = engagement.CommentsCount
-		diaryList[i].HasLiked = engagement.HasLiked
+	for i := range diary_List {
+		engagement := engagement_List[diary_List[i].ID]
+		diary_List[i].LikesCount = engagement.LikesCount
+		diary_List[i].CommentsCount = engagement.CommentsCount
+		diary_List[i].HasLiked = engagement.HasLiked
 	}
-	return diaryList, nil
+	return diary_List, nil
 }
 
 // GetDiaryByID はデータを取得します。
@@ -40,11 +40,11 @@ func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTa
 	if err != nil {
 		return nil, err
 	}
-	engagements, err := repository.GetPostEngagements(ctx, db, []int64{diary.ID}, ipAddress)
+	engagement_List, err := repository.GetPostEngagement_List(ctx, db, []int64{diary.ID}, ipAddress)
 	if err != nil {
 		return nil, err
 	}
-	engagement := engagements[diary.ID]
+	engagement := engagement_List[diary.ID]
 	diary.LikesCount = engagement.LikesCount
 	diary.CommentsCount = engagement.CommentsCount
 	diary.HasLiked = engagement.HasLiked

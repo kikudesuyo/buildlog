@@ -41,13 +41,13 @@ func SaveCurrentGoals(ctx context.Context, req entity.SaveGoalsRequest) (*entity
 
 	startsAt := currentMonthStart()
 	endsAt := startsAt.AddDate(0, 1, -1)
-	goalList := make([]entity.DBTableGoal, 0, len(req.Goals))
+	goal_List := make([]entity.DBTableGoal, 0, len(req.Goals))
 	for _, goal := range req.Goals {
 		title := strings.TrimSpace(goal.Title)
 		if title == "" || goal.TargetValue <= 0 || goal.ProgressValue < 0 || goal.ProgressValue > goal.TargetValue {
 			return nil, xerror.ClientValidationErr(errors.New("invalid goal values"))
 		}
-		goalList = append(goalList, entity.DBTableGoal{Title: title, TargetValue: goal.TargetValue, ProgressValue: goal.ProgressValue})
+		goal_List = append(goal_List, entity.DBTableGoal{Title: title, TargetValue: goal.TargetValue, ProgressValue: goal.ProgressValue})
 	}
 	period, err := repository.GetGoalPeriod(ctx, db, monthlyGoalPeriod, startsAt)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -56,7 +56,7 @@ func SaveCurrentGoals(ctx context.Context, req entity.SaveGoalsRequest) (*entity
 		return nil, xerror.UnknownServerErr(err)
 	}
 	period.EndsAt = endsAt
-	period.Goals = goalList
+	period.Goals = goal_List
 	if err := repository.SaveGoalPeriod(ctx, db, period); err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
@@ -70,9 +70,9 @@ func currentMonthStart() time.Time {
 }
 
 // newGoalPeriodResponse はこの処理に必要な内部処理を実行します。
-func newGoalPeriodResponse(periodType string, startsAt, endsAt time.Time, goalList []entity.DBTableGoal) *entity.GoalPeriodResponse {
-	goals := make([]entity.GoalResponse, 0, len(goalList))
-	for _, goal := range goalList {
+func newGoalPeriodResponse(periodType string, startsAt, endsAt time.Time, goal_List []entity.DBTableGoal) *entity.GoalPeriodResponse {
+	goals := make([]entity.GoalResponse, 0, len(goal_List))
+	for _, goal := range goal_List {
 		goals = append(goals, entity.GoalResponse{ID: goal.ID, Title: goal.Title, TargetValue: goal.TargetValue, ProgressValue: goal.ProgressValue})
 	}
 	return &entity.GoalPeriodResponse{PeriodType: periodType, StartsAt: startsAt.Format("2006-01-02"), EndsAt: endsAt.Format("2006-01-02"), Goals: goals}

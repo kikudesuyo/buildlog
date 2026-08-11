@@ -7,11 +7,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// ListApps は一覧を取得します。
-func ListApps(ctx context.Context, db *gorm.DB) ([]entity.DBTableApp, error) {
-	appList := make([]entity.DBTableApp, 0)
-	err := db.WithContext(ctx).Order("id ASC").Find(&appList).Error
-	return appList, err
+// GetApp_List は一覧を取得します。
+func GetApp_List(ctx context.Context, db *gorm.DB) ([]entity.DBTableApp, error) {
+	app_List := make([]entity.DBTableApp, 0)
+	err := db.WithContext(ctx).Order("id ASC").Find(&app_List).Error
+	return app_List, err
 }
 
 // GetAppByID はデータを取得します。

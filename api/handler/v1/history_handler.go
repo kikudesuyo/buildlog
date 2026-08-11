@@ -13,9 +13,9 @@ func HandleGetPostHistory(r *http.Request, requestData map[string]interface{}) (
 	if err := handler.ValidateRequestWithAuth(r); err != nil {
 		return nil, err
 	}
-	itemList, err := service.ListPostHistory(r.Context())
+	itemList, err := service.GetPostHistory_List(r.Context())
 	if err != nil {
 		return nil, err
 	}
-	return entity.NewListResponse(itemList), nil
+	return entity.New_ListResponse(itemList), nil
 }

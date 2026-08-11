@@ -31,24 +31,24 @@ func mapToAppResponse(dbApp *entity.DBTableApp) (*entity.AppResponse, error) {
 	}, nil
 }
 
-// ListApps は一覧を取得します。
-func ListApps(ctx context.Context) ([]entity.AppResponse, error) {
+// GetApp_List は一覧を取得します。
+func GetApp_List(ctx context.Context) ([]entity.AppResponse, error) {
 	db := library.GetDB(ctx)
-	dbApps, err := repository.ListApps(ctx, db)
+	dbApp_List, err := repository.GetApp_List(ctx, db)
 	if err != nil {
 		return nil, err
 	}
 
-	appList := make([]entity.AppResponse, 0, len(dbApps))
-	for _, dbApp := range dbApps {
+	app_List := make([]entity.AppResponse, 0, len(dbApp_List))
+	for _, dbApp := range dbApp_List {
 		app, err := mapToAppResponse(&dbApp)
 		if err != nil {
 			return nil, err
 		}
-		appList = append(appList, *app)
+		app_List = append(app_List, *app)
 	}
 
-	return appList, nil
+	return app_List, nil
 }
 
 // GetAppByID はデータを取得します。
