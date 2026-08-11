@@ -138,15 +138,16 @@
 		</nav>
 		<!-- タイトル -->
 		<div class="border-b border-outline-variant/10 pb-4 mb-4">
-			<input
-				type="text"
+			<textarea
+				use:autogrow
 				bind:value={title}
 				maxlength={MAX_TITLE_LENGTH}
+				rows="2"
 				aria-describedby="title-count"
 				placeholder="タイトルを入力..."
-				class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-[clamp(2rem,8vw,2.25rem)] md:text-[36px] font-bold tracking-tight border-none placeholder:text-outline-variant/50"
+				class="min-h-20 w-full resize-none overflow-hidden bg-transparent px-0 py-1 text-[clamp(1.5rem,6vw,2rem)] font-bold leading-tight tracking-tight text-on-surface focus:outline-none md:text-[28px]"
 				disabled={isSubmitting}
-			/>
+			></textarea>
 			<p id="title-count" class="text-right text-body-sm text-outline">{title.length}/{MAX_TITLE_LENGTH}</p>
 		</div>
 
@@ -157,7 +158,7 @@
 			bind:this={contentElement}
 			bind:value={content}
 			placeholder="物語を書き始めましょう..."
-			class="w-full bg-transparent px-0 py-1 text-on-surface focus:outline-none text-body-lg leading-relaxed border-none resize-none min-h-[300px] placeholder:text-outline-variant/50"
+			class="min-h-[300px] w-full resize-none border-none bg-transparent px-0 py-1 text-body-md leading-relaxed text-on-surface focus:outline-none placeholder:text-outline-variant/50"
 			disabled={isSubmitting}
 		></textarea>
 		</div>
