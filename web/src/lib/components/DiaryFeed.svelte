@@ -83,7 +83,8 @@
 		else nextUrl.searchParams.set('sort', nextSortBy);
 		if (nextSortOrder === 'desc') nextUrl.searchParams.delete('order');
 		else nextUrl.searchParams.set('order', nextSortOrder);
-		await replaceState(resolve(`${nextUrl.pathname}${nextUrl.search}`), {});
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
+		await replaceState(`${resolve('/diary')}${nextUrl.search}`, {});
 		isLoading = true;
 		loadError = false;
 		try {
