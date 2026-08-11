@@ -28,6 +28,8 @@ steps:
       - 'asia-northeast1'
       - '--platform'
       - 'managed'
+      - '--service-account'
+      - '$_SERVICE_ACCOUNT'
       - '--allow-unauthenticated'
       - '--port'
       - '8081'
@@ -52,6 +54,7 @@ images:
 
 substitutions:
   _COMMIT_SHA: 'latest'
+  _SERVICE_ACCOUNT: '328735755994-compute@developer.gserviceaccount.com'
   _ALLOWED_ORIGINS: ''
   _DATABASE_URL_ENV: 'DATABASE_URL'
   _DATABASE_URL_SECRET: 'DATABASE_URL'
