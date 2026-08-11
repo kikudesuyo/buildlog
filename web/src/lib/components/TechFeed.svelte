@@ -22,6 +22,10 @@
 	let isLoadingMore = $state(false);
 	let loadMoreError = $state(false);
 	let sortOrder = $state<TechSortOrder>($page.url.searchParams.get('order') === 'asc' ? 'asc' : 'desc');
+	let isDesktop = $state(false);
+	const desktopInitialLimit = 8;
+	const mobileLoadMoreLimit = 3;
+	const desktopLoadMoreLimit = 6;
 	const storageKey = 'tech-feed-count';
 	let isRestoring = $state(false);
 	let articles = $derived(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles);
@@ -44,10 +48,27 @@
 		loadMoreError = false;
 		try {
 			const offset = (loadedFeaturedArticle?.title ? 1 : 0) + loadedTechArticles.length;
-			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, 3, sortOrder);
+			const limit = isDesktop ? desktopLoadMoreLimit : mobileLoadMoreLimit;
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, limit, sortOrder);
 			loadedTechArticles = [...loadedTechArticles, ...next.techArticles];
 			hasMoreArticles = next.hasMore;
 			if (!isAdmin) sessionStorage.setItem(storageKey, String(articles.length));
+		} catch {
+			loadMoreError = true;
+		} finally {
+			isLoadingMore = false;
+		}
+	}
+
+	async function loadDesktopInitial() {
+		if (!isDesktop || !hasMoreArticles) return;
+		isLoadingMore = true;
+		loadMoreError = false;
+		try {
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, desktopInitialLimit, sortOrder);
+			loadedFeaturedArticle = next.featuredArticle;
+			loadedTechArticles = next.techArticles;
+			hasMoreArticles = next.hasMore;
 		} catch {
 			loadMoreError = true;
 		} finally {
@@ -62,11 +83,13 @@
 		const nextUrl = new URL($page.url);
 		if (nextOrder === 'desc') nextUrl.searchParams.delete('order');
 		else nextUrl.searchParams.set('order', nextOrder);
-		await replaceState(resolve(`${nextUrl.pathname}${nextUrl.search}`), {});
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
+		await replaceState(`${resolve('/tech')}${nextUrl.search}`, {});
 		isLoadingMore = true;
 		loadMoreError = false;
 		try {
-			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, 3, nextOrder);
+			const limit = isDesktop ? desktopInitialLimit : mobileLoadMoreLimit;
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, limit, nextOrder);
 			loadedFeaturedArticle = next.featuredArticle;
 			loadedTechArticles = next.techArticles;
 			hasMoreArticles = next.hasMore;
@@ -80,6 +103,8 @@
 
 	onMount(() => {
 		void (async () => {
+			isDesktop = window.matchMedia('(min-width: 768px)').matches;
+			await loadDesktopInitial();
 			const savedCount = Number(sessionStorage.getItem(storageKey));
 			if (!isAdmin && savedCount > articles.length) {
 				isRestoring = true;
@@ -146,7 +171,7 @@
 		</article>
 	{/if}
 
-	<div class="space-y-6 md:space-y-12">
+	<div class="grid gap-6 md:grid-cols-2 md:gap-8">
 		{#each filteredArticles as article (article.key)}
 			<article class="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 				<div class="flex items-center justify-between">
@@ -158,7 +183,7 @@
 					</div>
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span></div>
 				</div>
-				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-headline-lg">
+				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-[20px]">
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined}>{article.title}</a>
 				</h3>
