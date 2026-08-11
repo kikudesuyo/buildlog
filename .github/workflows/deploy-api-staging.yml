@@ -14,11 +14,6 @@ permissions:
   contents: read
   id-token: write
 
-env:
-  GCP_PROJECT_STAGING: buildlog-dev
-  GCP_WIF_PROVIDER_STAGING: projects/328735755994/locations/global/workloadIdentityPools/buildlog-pool/providers/github-provider
-  GCP_SERVICE_ACCOUNT_STAGING: github-actions-deployer@buildlog-dev.iam.gserviceaccount.com
-
 jobs:
   test-api:
     name: Test and Build Go API
@@ -50,22 +45,15 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Validate staging configuration
-        run: |
-          test -n "$GCP_WIF_PROVIDER_STAGING"
-          test -n "$GCP_SERVICE_ACCOUNT_STAGING"
-
       - name: Authenticate to Google Cloud (WIF)
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER_STAGING }}
-          service_account: ${{ env.GCP_SERVICE_ACCOUNT_STAGING }}
+          workload_identity_provider: 'projects/328735755994/locations/global/workloadIdentityPools/buildlog-pool/providers/github-provider'
+          service_account: 'github-actions-deployer@buildlog-dev.iam.gserviceaccount.com'
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Deploy to Cloud Run (via Cloud Build)
         working-directory: api
-        env:
-          GCP_PROJECT_STAGING: ${{ env.GCP_PROJECT_STAGING }}
-        run: make deploy-staging GCP_PROJECT_STAGING="$GCP_PROJECT_STAGING" ALLOWED_ORIGINS=""
+        run: make deploy-staging
