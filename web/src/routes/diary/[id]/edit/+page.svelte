@@ -13,11 +13,35 @@
 	let status = $state(data.diary.status || 'draft');
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
+	let isAutoSaving = $state(false);
+	let autoSaveError = $state(false);
 	let isDirty = $derived(
 		title !== data.diary.title ||
 		content !== data.diary.content ||
 		status !== (data.diary.status || 'draft')
 	);
+
+	async function autoSaveDraft(titleSnapshot: string, contentSnapshot: string, statusSnapshot: 'draft' | 'published') {
+		if (!titleSnapshot.trim() || !contentSnapshot.trim() || isSubmitting || isAutoSaving) return;
+		isAutoSaving = true;
+		autoSaveError = false;
+		try {
+			await updateDiary(data.diary.id, titleSnapshot, contentSnapshot, statusSnapshot);
+		} catch {
+			autoSaveError = true;
+		} finally {
+			isAutoSaving = false;
+		}
+	}
+
+	$effect(() => {
+		const currentTitle = title;
+		const currentContent = content;
+		const currentStatus = status;
+		if (!currentTitle.trim() || !currentContent.trim() || isSubmitting) return;
+		const timer = setTimeout(() => void autoSaveDraft(currentTitle, currentContent, currentStatus), 5000);
+		return () => clearTimeout(timer);
+	});
 
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
@@ -90,6 +114,12 @@
 	<div class="hidden items-center gap-6 md:flex">
 		{#if errorMessage}
 			<span class="text-error font-body-sm text-body-sm">{errorMessage}</span>
+		{:else if isAutoSaving}
+			<span class="text-outline font-body-sm text-body-sm">自動保存中…</span>
+		{:else if autoSaveError}
+			<span class="text-error font-body-sm text-body-sm">自動保存に失敗しました</span>
+		{:else if !isDirty}
+			<span class="text-outline font-body-sm text-body-sm">保存済み</span>
 		{/if}
 		<button
 			type="button"

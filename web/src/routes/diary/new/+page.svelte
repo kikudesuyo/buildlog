@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { createDiary } from '$lib/api/client';
+	import { createDiary, updateDiary } from '$lib/api/client';
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
 	let title = $state('');
@@ -11,6 +11,33 @@
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
 	let isDirty = $derived(title.trim().length > 0 || content.trim().length > 0);
+	let savedDiaryId = $state<number | null>(null);
+	let isAutoSaving = $state(false);
+	let autoSaveError = $state(false);
+
+	async function autoSaveDraft(titleSnapshot: string, contentSnapshot: string) {
+		if (!titleSnapshot.trim() || !contentSnapshot.trim() || isSubmitting || isAutoSaving) return;
+		isAutoSaving = true;
+		autoSaveError = false;
+		try {
+			const diary = savedDiaryId === null
+				? await createDiary(titleSnapshot, contentSnapshot, 'draft')
+				: await updateDiary(savedDiaryId, titleSnapshot, contentSnapshot, 'draft');
+			savedDiaryId = diary.id;
+		} catch {
+			autoSaveError = true;
+		} finally {
+			isAutoSaving = false;
+		}
+	}
+
+	$effect(() => {
+		const currentTitle = title;
+		const currentContent = content;
+		if (!currentTitle.trim() || !currentContent.trim() || isSubmitting) return;
+		const timer = setTimeout(() => void autoSaveDraft(currentTitle, currentContent), 5000);
+		return () => clearTimeout(timer);
+	});
 
 	// オートリサイズ用のアクション
 	function autogrow(node: HTMLTextAreaElement) {
@@ -38,7 +65,12 @@
 		isSubmitting = true;
 		errorMessage = '';
 		try {
-			await createDiary(title, content, status);
+			if (savedDiaryId === null) {
+				const diary = await createDiary(title, content, status);
+				savedDiaryId = diary.id;
+			} else {
+				await updateDiary(savedDiaryId, title, content, status);
+			}
 			goto(resolve('/admin'));
 		} catch {
 			errorMessage = 'つぶやきの保存に失敗しました。';
@@ -83,6 +115,12 @@
 	<div class="hidden items-center gap-6 md:flex">
 		{#if errorMessage}
 			<span class="text-error font-body-sm text-body-sm">{errorMessage}</span>
+		{:else if isAutoSaving}
+			<span class="text-outline font-body-sm text-body-sm">自動保存中…</span>
+		{:else if autoSaveError}
+			<span class="text-error font-body-sm text-body-sm">自動保存に失敗しました</span>
+		{:else if savedDiaryId !== null}
+			<span class="text-outline font-body-sm text-body-sm">自動保存済み</span>
 		{/if}
 		<button
 			type="button"
