@@ -16,9 +16,10 @@
 	};
 
 	let { featuredArticle = null, techArticles = [], hasMore = false, loadError = false, isAdmin = false }: Props = $props();
-	let loadedTechArticles = $state(techArticles);
-	let loadedFeaturedArticle = $state(featuredArticle);
-	let hasMoreArticles = $state(hasMore);
+	const initialState = { featuredArticle, techArticles, hasMore };
+	let loadedTechArticles = $state(initialState.techArticles);
+	let loadedFeaturedArticle = $state(initialState.featuredArticle);
+	let hasMoreArticles = $state(initialState.hasMore);
 	let isLoadingMore = $state(false);
 	let loadMoreError = $state(false);
 	let sortOrder = $state<TechSortOrder>($page.url.searchParams.get('order') === 'asc' ? 'asc' : 'desc');

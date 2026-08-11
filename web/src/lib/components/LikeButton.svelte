@@ -9,9 +9,10 @@
 	}
 
 	let { postId, initialLikesCount, initialHasLiked = false }: Props = $props();
+	const initialState = { likesCount: initialLikesCount, hasLiked: initialHasLiked };
 
-	let likesCount = $state(initialLikesCount);
-	let hasLiked = $state(initialHasLiked);
+	let likesCount = $state(initialState.likesCount);
+	let hasLiked = $state(initialState.hasLiked);
 	let isAnimating = $state(false);
 
 	const STORAGE_KEY = 'buildlog_liked_posts';
