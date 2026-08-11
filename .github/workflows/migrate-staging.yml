@@ -1,0 +1,55 @@
+name: Migrate Staging Database
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: staging-database-migration
+  cancel-in-progress: false
+
+env:
+  GCP_PROJECT_STAGING: ${{ vars.GCP_PROJECT_STAGING || 'buildlog-dev' }}
+  GCP_WIF_PROVIDER_STAGING: ${{ vars.GCP_WIF_PROVIDER_STAGING }}
+  GCP_SERVICE_ACCOUNT_STAGING: ${{ vars.GCP_SERVICE_ACCOUNT_STAGING }}
+
+jobs:
+  migrate:
+    name: Apply Atlas migrations to Staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER_STAGING }}
+          service_account: ${{ env.GCP_SERVICE_ACCOUNT_STAGING }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Load staging database URL from Secret Manager
+        env:
+          GCP_PROJECT_STAGING: ${{ env.GCP_PROJECT_STAGING }}
+        run: |
+          STAGING_DATABASE_URL="$(gcloud secrets versions access latest \
+            --secret=STAGING_DATABASE_URL \
+            --project="$GCP_PROJECT_STAGING")"
+          test -n "$STAGING_DATABASE_URL"
+          printf 'STAGING_DATABASE_URL=%s\n' "$STAGING_DATABASE_URL" >> "$GITHUB_ENV"
+
+      - name: Set up Atlas CLI
+        uses: ariga/setup-atlas@v0
+
+      - name: Validate migration directory
+        working-directory: sql
+        run: atlas migrate validate --dir "file://migrations"
+
+      - name: Apply pending migrations
+        working-directory: sql
+        run: atlas migrate apply --env staging

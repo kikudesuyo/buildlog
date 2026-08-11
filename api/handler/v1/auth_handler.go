@@ -3,19 +3,19 @@ package v1
 import (
 	"crypto/subtle"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
+	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/service"
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
 func HandleAuthLogin(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	password, ok := requestData["password"].(string)
-	configuredPassword := os.Getenv("ADMIN_PASSWORD")
-	configuredSecret := os.Getenv("ADMIN_SESSION_SECRET")
+	configuredPassword := library.Env("ADMIN_PASSWORD")
+	configuredSecret := library.Env("ADMIN_SESSION_SECRET")
 	if !ok || configuredPassword == "" || configuredSecret == "" || subtle.ConstantTimeCompare([]byte(password), []byte(configuredPassword)) != 1 {
 		return nil, xerror.AuthJWTInvalidTokenErr(nil)
 	}

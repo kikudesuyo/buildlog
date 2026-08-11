@@ -13,7 +13,7 @@ import (
 var db *gorm.DB
 
 func InitDB() error {
-	dsn := os.Getenv("DATABASE_URL")
+	dsn := Env("DATABASE_URL")
 	if dsn == "" {
 		return errors.New("DATABASE_URL is not set")
 	}
@@ -35,6 +35,15 @@ func InitDB() error {
 	db = gormDB
 
 	return nil
+}
+
+// Env はProductionでは既存の環境変数を、StagingではSTAGING_ prefix付きの
+// 環境変数を返します。ローカル開発は既存の環境変数を利用します。
+func Env(name string) string {
+	if os.Getenv("IS_PRODUCTION") == "false" {
+		return os.Getenv("STAGING_" + name)
+	}
+	return os.Getenv(name)
 }
 
 func GetDB(ctx context.Context) *gorm.DB {

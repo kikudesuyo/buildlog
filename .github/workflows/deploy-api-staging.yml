@@ -1,0 +1,76 @@
+name: Deploy API Staging
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+concurrency:
+  group: staging-api-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  GCP_PROJECT_STAGING: ${{ vars.GCP_PROJECT_STAGING || 'buildlog-dev' }}
+  GCP_WIF_PROVIDER_STAGING: ${{ vars.GCP_WIF_PROVIDER_STAGING }}
+  GCP_SERVICE_ACCOUNT_STAGING: ${{ vars.GCP_SERVICE_ACCOUNT_STAGING }}
+  API_DOMAIN_STAGING: ${{ vars.API_DOMAIN_STAGING }}
+  ALLOWED_ORIGINS_STAGING: ${{ vars.ALLOWED_ORIGINS_STAGING }}
+
+jobs:
+  test-api:
+    name: Test and Build Go API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.5'
+          cache: true
+          cache-dependency-path: api/go.sum
+
+      - name: Test Go API
+        working-directory: api
+        run: go test ./...
+
+      - name: Build Go API
+        working-directory: api
+        run: go build -o ./app .
+
+  deploy-api:
+    name: Deploy Go API to Cloud Run Staging
+    runs-on: ubuntu-latest
+    needs: test-api
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Validate staging configuration
+        run: |
+          test -n "$GCP_WIF_PROVIDER_STAGING"
+          test -n "$GCP_SERVICE_ACCOUNT_STAGING"
+          test -n "$API_DOMAIN_STAGING"
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER_STAGING }}
+          service_account: ${{ env.GCP_SERVICE_ACCOUNT_STAGING }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run (via Cloud Build)
+        working-directory: api
+        env:
+          GCP_PROJECT_STAGING: ${{ env.GCP_PROJECT_STAGING }}
+          API_DOMAIN_STAGING: ${{ env.API_DOMAIN_STAGING }}
+          ALLOWED_ORIGINS_STAGING: ${{ env.ALLOWED_ORIGINS_STAGING }}
+        run: make deploy-staging GCP_PROJECT_STAGING="$GCP_PROJECT_STAGING" API_DOMAIN_STAGING="$API_DOMAIN_STAGING" ALLOWED_ORIGINS="$ALLOWED_ORIGINS_STAGING"
