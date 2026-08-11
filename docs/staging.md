@@ -29,4 +29,4 @@ Staging DBへmigrationを適用する場合は、GitHub Actionsの `Migrate Stag
 
 Staging用のGCPプロジェクト、WIF Provider、サービスアカウントはWorkflowに固定値として定義しています。これらは秘密情報ではなく、GitHub ActionsはWIF経由でGCPへ認証します。追加のRepository Variablesは不要です。
 
-Actions の `Merge branch to Staging` を手動実行し、`source_branch` と `deploy` を選択します。Workflow が選択したブランチを `staging` へマージし、`deploy=true` の場合だけ、マージ後の `staging` ブランチをデプロイします。`staging` へのpushだけではデプロイしません。
+Actions の `Merge branch to Staging` を手動実行し、workflow のブランチ選択でマージ元を選び、`deploy` を選択します。選択したブランチを `staging` へマージし、`deploy=true` の場合だけ、マージ後の `staging` ブランチをデプロイします。`staging` へのpushだけではデプロイしません。

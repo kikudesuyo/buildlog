@@ -3,10 +3,6 @@ name: Merge branch to Staging
 on:
   workflow_dispatch:
     inputs:
-      source_branch:
-        description: 'staging へマージするブランチ'
-        required: true
-        type: string
       deploy:
         description: 'マージ後に staging へデプロイする'
         required: true
@@ -25,7 +21,7 @@ jobs:
       - name: Merge to staging
         env:
           GH_TOKEN: ${{ github.token }}
-          SOURCE_BRANCH: ${{ inputs.source_branch }}
+          SOURCE_BRANCH: ${{ github.ref_name }}
         run: |
           test "$SOURCE_BRANCH" != "staging"
           gh api --method POST \
