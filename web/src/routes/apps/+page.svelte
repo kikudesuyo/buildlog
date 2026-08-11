@@ -29,10 +29,7 @@
 <div class="editorial-container mx-auto px-gutter">
 	<!-- Page Header -->
 	<header class="mb-section-gap">
-		<h1 class="font-display-lg text-display-lg mb-stack-sm text-primary">プロダクトと実験</h1>
-		<p class="font-body-lg text-body-lg max-w-[580px] text-on-surface-variant">
-			静かな美学に基づき設計されたアプリ、ツール、デジタル・プロトタイプの一覧。
-		</p>
+		<h1 class="font-display-lg text-display-lg mb-stack-sm text-primary">アプリ一覧</h1>
 	</header>
 
 	<!-- Project List -->
