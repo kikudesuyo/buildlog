@@ -27,6 +27,8 @@ func expectGoalPeriodLookup(mock sqlmock.Sqlmock) *sqlmock.ExpectedQuery {
 		WithArgs(monthlyGoalPeriod, sqlmock.AnyArg(), 1)
 }
 
+// TestGetCurrentGoalsReturnsEmptyCurrentMonthWhenNoPeriodExists は、当月の目標期間がない場合に
+// 空の月次期間を返す境界値を検証します。
 func TestGetCurrentGoalsReturnsEmptyCurrentMonthWhenNoPeriodExists(t *testing.T) {
 	mock := withGoalTestDB(t)
 	expectGoalPeriodLookup(mock).WillReturnError(gorm.ErrRecordNotFound)
@@ -43,6 +45,8 @@ func TestGetCurrentGoalsReturnsEmptyCurrentMonthWhenNoPeriodExists(t *testing.T)
 	}
 }
 
+// TestGetCurrentGoalsWrapsRepositoryError は、目標期間取得時のDBエラーをカスタムエラーへ変換する
+// ことを検証します。
 func TestGetCurrentGoalsWrapsRepositoryError(t *testing.T) {
 	mock := withGoalTestDB(t)
 	expectGoalPeriodLookup(mock).WillReturnError(errors.New("database unavailable"))
@@ -53,6 +57,7 @@ func TestGetCurrentGoalsWrapsRepositoryError(t *testing.T) {
 	}
 }
 
+// TestSaveCurrentGoalsRejectsUnsupportedPeriod は、月次以外の期間指定を拒否する入力エラーを検証します。
 func TestSaveCurrentGoalsRejectsUnsupportedPeriod(t *testing.T) {
 	withGoalTestDB(t)
 	result, err := SaveCurrentGoals(context.Background(), entity.SaveGoalsRequest{PeriodType: "weekly", Goals: []entity.SaveGoalRequest{{Title: "goal", TargetValue: 1}}})
@@ -61,6 +66,7 @@ func TestSaveCurrentGoalsRejectsUnsupportedPeriod(t *testing.T) {
 	}
 }
 
+// TestSaveCurrentGoalsRejectsInvalidGoalValues は、タイトルや目標値が不正な目標を拒否する入力エラーを検証します。
 func TestSaveCurrentGoalsRejectsInvalidGoalValues(t *testing.T) {
 	withGoalTestDB(t)
 	result, err := SaveCurrentGoals(context.Background(), entity.SaveGoalsRequest{Goals: []entity.SaveGoalRequest{{Title: " ", TargetValue: 0, ProgressValue: 1}}})

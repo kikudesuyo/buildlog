@@ -21,6 +21,8 @@ func withQiitaTestDB(t *testing.T) sqlmock.Sqlmock {
 	return mock
 }
 
+// TestSortTechFeedItems は、Techフィードを昇順・降順に並べ替え、同じ日時ではIDで
+// 安定して並ぶことを検証します。
 func TestSortTechFeedItems(t *testing.T) {
 	items := []entity.TechFeedItem{
 		{ID: 1, CreatedAt: time.Date(2026, 1, 2, 0, 0, 0, 0, time.UTC)},
@@ -38,6 +40,8 @@ func TestSortTechFeedItems(t *testing.T) {
 	}
 }
 
+// TestListTechFeedMapsExternalPostsAndPaginates は、外部記事をフィード項目へ変換し、
+// offsetとlimitでページングする通常系を検証します。
 func TestListTechFeedMapsExternalPostsAndPaginates(t *testing.T) {
 	mock := withQiitaTestDB(t)
 	now := time.Now().UTC()
@@ -55,6 +59,7 @@ func TestListTechFeedMapsExternalPostsAndPaginates(t *testing.T) {
 	}
 }
 
+// TestListTechFeedReturnsRepositoryError は、外部記事取得時のDBエラーを検証します。
 func TestListTechFeedReturnsRepositoryError(t *testing.T) {
 	mock := withQiitaTestDB(t)
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "external_posts" ORDER BY published_at ASC,id ASC`)).
@@ -66,6 +71,8 @@ func TestListTechFeedReturnsRepositoryError(t *testing.T) {
 	}
 }
 
+// TestExcerptForPrefersMetadataAndNormalizesMarkdown は、OGP説明を優先し、説明がない場合は
+// 本文の空白を正規化して抜粋を作ることを検証します。
 func TestExcerptForPrefersMetadataAndNormalizesMarkdown(t *testing.T) {
 	item := external.QiitaItem{Body: " first\n\n second "}
 	if got := excerptFor(item, external.OGPMetadata{Description: "metadata"}); got != "metadata" {
@@ -76,6 +83,8 @@ func TestExcerptForPrefersMetadataAndNormalizesMarkdown(t *testing.T) {
 	}
 }
 
+// TestSyncQiitaArticlesReturnsContextErrorWithoutExternalCall は、キャンセル済みContextでは
+// 外部同期を実行せずエラーを返すことを検証します。
 func TestSyncQiitaArticlesReturnsContextErrorWithoutExternalCall(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()

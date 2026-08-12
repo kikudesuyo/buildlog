@@ -24,6 +24,8 @@ func profileQuery(mock sqlmock.Sqlmock) *sqlmock.ExpectedQuery {
 	return mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "profiles" WHERE "profiles"."id" = $1 ORDER BY "profiles"."id" LIMIT $2`)).WithArgs(1, 1)
 }
 
+// TestGetProfileDecodesJSONFieldsAndAssetURL は、プロフィールのJSON列をレスポンス型へ
+// 変換する通常系を検証します。
 func TestGetProfileDecodesJSONFieldsAndAssetURL(t *testing.T) {
 	mock := withProfileTestDB(t)
 	profileQuery(mock).WillReturnRows(sqlmock.NewRows([]string{"id", "name", "title", "quote", "bio", "highlights", "award", "expertise", "contact_email", "final_quote"}).
@@ -41,6 +43,7 @@ func TestGetProfileDecodesJSONFieldsAndAssetURL(t *testing.T) {
 	}
 }
 
+// TestGetProfileReturnsJSONDecodeError は、プロフィールのJSON列が不正な場合を検証します。
 func TestGetProfileReturnsJSONDecodeError(t *testing.T) {
 	mock := withProfileTestDB(t)
 	profileQuery(mock).WillReturnRows(sqlmock.NewRows([]string{"id", "bio"}).AddRow(1, "not-json"))
@@ -51,6 +54,8 @@ func TestGetProfileReturnsJSONDecodeError(t *testing.T) {
 	}
 }
 
+// TestUpdateProfileReturnsLookupErrorBeforeSaving は、更新前のプロフィール取得に失敗した場合に
+// 保存処理へ進まないことを検証します。
 func TestUpdateProfileReturnsLookupErrorBeforeSaving(t *testing.T) {
 	mock := withProfileTestDB(t)
 	profileQuery(mock).WillReturnError(errors.New("profile unavailable"))

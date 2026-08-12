@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+// TestNewMockDBUsesGORMAndSQLMock は、GORMとSQL mockを組み合わせたテストDBで
+// 期待したSQLを実行できることを確認します。
 func TestNewMockDBUsesGORMAndSQLMock(t *testing.T) {
 	db, mock := NewMockDB(t)
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT 1`)).WillReturnRows(mock.NewRows([]string{"?column?"}).AddRow(1))

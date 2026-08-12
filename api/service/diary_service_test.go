@@ -20,6 +20,8 @@ func withDiaryTestDB(t *testing.T) sqlmock.Sqlmock {
 	return mock
 }
 
+// TestListDiariesReturnsEmptySliceForNoPublishedPosts は、公開済みの日記がない場合に
+// 非nilの空スライスが返る境界値を検証します。
 func TestListDiariesReturnsEmptySliceForNoPublishedPosts(t *testing.T) {
 	mock := withDiaryTestDB(t)
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "posts" WHERE type = $1 AND status = $2 AND "posts"."deleted_at" IS NULL ORDER BY created_at DESC,id DESC LIMIT $3`)).
@@ -35,6 +37,7 @@ func TestListDiariesReturnsEmptySliceForNoPublishedPosts(t *testing.T) {
 	}
 }
 
+// TestListDiariesReturnsRepositoryError は、日記一覧取得時のDBエラーを検証します。
 func TestListDiariesReturnsRepositoryError(t *testing.T) {
 	mock := withDiaryTestDB(t)
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "posts" WHERE type = $1 AND status = $2 AND "posts"."deleted_at" IS NULL ORDER BY created_at DESC,id DESC LIMIT $3`)).
@@ -47,6 +50,7 @@ func TestListDiariesReturnsRepositoryError(t *testing.T) {
 	}
 }
 
+// TestGetDiaryByIDReturnsRepositoryError は、日記詳細取得時のDBエラーを検証します。
 func TestGetDiaryByIDReturnsRepositoryError(t *testing.T) {
 	mock := withDiaryTestDB(t)
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "posts" WHERE type = $1 AND "posts"."id" = $2 AND "posts"."deleted_at" IS NULL ORDER BY "posts"."id" LIMIT $3`)).
@@ -59,6 +63,8 @@ func TestGetDiaryByIDReturnsRepositoryError(t *testing.T) {
 	}
 }
 
+// TestIncrementDiaryViewsUpdatesDiaryOnly は、日記の閲覧数を1件だけ更新する通常系を
+// 検証します。
 func TestIncrementDiaryViewsUpdatesDiaryOnly(t *testing.T) {
 	mock := withDiaryTestDB(t)
 	mock.ExpectBegin()
@@ -75,6 +81,8 @@ func TestIncrementDiaryViewsUpdatesDiaryOnly(t *testing.T) {
 	}
 }
 
+// TestCreateDiaryUsesDraftAsDefaultStatus は、ステータス未指定時にdraftで保存する通常系を
+// 検証します。
 func TestCreateDiaryUsesDraftAsDefaultStatus(t *testing.T) {
 	mock := withDiaryTestDB(t)
 	mock.ExpectBegin()
@@ -92,6 +100,7 @@ func TestCreateDiaryUsesDraftAsDefaultStatus(t *testing.T) {
 	}
 }
 
+// TestUpdateDiaryReturnsLookupError は、更新対象の日記取得に失敗した場合を検証します。
 func TestUpdateDiaryReturnsLookupError(t *testing.T) {
 	mock := withDiaryTestDB(t)
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "posts" WHERE type = $1 AND "posts"."id" = $2 AND "posts"."deleted_at" IS NULL ORDER BY "posts"."id" LIMIT $3`)).
@@ -104,6 +113,7 @@ func TestUpdateDiaryReturnsLookupError(t *testing.T) {
 	}
 }
 
+// TestDeleteDiaryDeletesByIDAndType は、日記のIDと種別を条件に削除する通常系を検証します。
 func TestDeleteDiaryDeletesByIDAndType(t *testing.T) {
 	mock := withDiaryTestDB(t)
 	mock.ExpectBegin()

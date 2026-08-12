@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// NewMockDB creates a GORM database backed by sqlmock. It never connects to
-// an external database and closes the underlying sql.DB at test cleanup.
+// NewMockDB はsqlmockを使用したGORMのテスト用DBを生成します。
+// 外部DBへ接続せず、テスト終了時に内部のsql.DBを解放します。
 func NewMockDB(t testing.TB) (*gorm.DB, sqlmock.Sqlmock) {
 	t.Helper()
 
