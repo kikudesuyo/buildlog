@@ -84,7 +84,6 @@
 		const end = contentElement.selectionEnd;
 		content = `${content.slice(0, start)}${prefix}${content.slice(start, end)}${suffix}${content.slice(end)}`;
 		requestAnimationFrame(() => {
-			contentElement?.focus();
 			contentElement?.setSelectionRange(start + prefix.length, end + prefix.length);
 		});
 	}
