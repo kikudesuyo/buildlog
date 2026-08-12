@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// ListExternalPosts は外部記事を公開日時順で取得します。
-func ListExternalPosts(ctx context.Context, db *gorm.DB, order string) ([]entity.DBTableExternalPost, error) {
+// GetExternalPostList は外部記事を公開日時順で取得します。
+func GetExternalPostList(ctx context.Context, db *gorm.DB, order string) ([]entity.DBTableExternalPost, error) {
 	orderBy := "DESC"
 	if order == "asc" {
 		orderBy = "ASC"

@@ -40,7 +40,7 @@ func NewQiitaClient(httpClient *http.Client, user string) *QiitaClient {
 	return &QiitaClient{BaseURL: qiitaBaseURL, User: user, HTTPClient: httpClient}
 }
 
-func (c *QiitaClient) GetUserArticles(ctx context.Context) ([]QiitaItem, error) {
+func (c *QiitaClient) GetUserArticleList(ctx context.Context) ([]QiitaItem, error) {
 	items := make([]QiitaItem, 0)
 	for page := 1; page <= 100; page++ {
 		pageItems, err := c.fetchPage(ctx, page)

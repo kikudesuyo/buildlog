@@ -40,7 +40,7 @@ func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (htt
 	if order != "asc" {
 		order = "desc"
 	}
-	techList, err := service.ListTechs(r.Context(), false, offset, limit, order, getClientIP(r))
+	techList, err := service.GetTechList(r.Context(), false, offset, limit, order, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}

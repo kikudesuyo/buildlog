@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// ListCommentsByPostID は一覧を取得します。
-func ListCommentsByPostID(ctx context.Context, db *gorm.DB, postID int64) ([]entity.DBTableComment, error) {
+// GetCommentListByPostID は一覧を取得します。
+func GetCommentListByPostID(ctx context.Context, db *gorm.DB, postID int64) ([]entity.DBTableComment, error) {
 	commentList := make([]entity.DBTableComment, 0)
 	err := db.WithContext(ctx).
 		Where("post_id = ?", postID).

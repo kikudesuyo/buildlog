@@ -10,7 +10,7 @@ import (
 
 // HandleGetAppList はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleGetAppList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	appList, err := service.ListApps(r.Context())
+	appList, err := service.GetAppList(r.Context())
 	if err != nil {
 		return nil, err
 	}
