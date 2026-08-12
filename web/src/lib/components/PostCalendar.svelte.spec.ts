@@ -15,7 +15,7 @@ describe('PostCalendar.svelte', () => {
 	it('カレンダーと投稿履歴を表示する', async () => {
 		render(PostCalendar, { history });
 
-		await expect.element(page.getByRole('heading', { name: '投稿履歴とカレンダー' })).toBeInTheDocument();
+		await expect.element(page.getByRole('heading', { name: '投稿履歴' })).toBeInTheDocument();
 		await expect.element(page.getByText(date.getFullYear() + '年 ' + (date.getMonth() + 1) + '月')).toBeInTheDocument();
 	});
 
