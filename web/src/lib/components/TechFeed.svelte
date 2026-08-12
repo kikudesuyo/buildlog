@@ -4,7 +4,7 @@
 	import { invalidateAll, replaceState } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
-	import { fetchTechFeed, type ApiFetch, type TechSortOrder } from '$lib/api/client';
+	import { fetchTechFeed, type ApiFetch, type TechSort, type TechSortOrder } from '$lib/api/client';
 	import Button from './Button.svelte';
 
 	type Props = {
@@ -20,6 +20,7 @@
 	let hasMoreArticles = $state(initialState.hasMore);
 	let isLoadingMore = $state(false);
 	let loadMoreError = $state(false);
+	let sort = $state<TechSort>($page.url.searchParams.get('sort') === 'likes' ? 'likes' : 'newest');
 	let sortOrder = $state<TechSortOrder>($page.url.searchParams.get('order') === 'asc' ? 'asc' : 'desc');
 	let isDesktop = $state(false);
 	const desktopInitialLimit = 8;
@@ -46,7 +47,7 @@
 		try {
 			const offset = loadedTechArticles.length;
 			const limit = isDesktop ? desktopLoadMoreLimit : mobileLoadMoreLimit;
-			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, limit, sortOrder);
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, limit, sortOrder, sort);
 			loadedTechArticles = [...loadedTechArticles, ...next.techArticles];
 			hasMoreArticles = next.hasMore;
 			if (!isAdmin) sessionStorage.setItem(storageKey, String(articles.length));
@@ -62,7 +63,7 @@
 		isLoadingMore = true;
 		loadMoreError = false;
 		try {
-			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, desktopInitialLimit, sortOrder);
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, desktopInitialLimit, sortOrder, sort);
 			loadedTechArticles = next.techArticles;
 			hasMoreArticles = next.hasMore;
 		} catch {
@@ -72,11 +73,16 @@
 		}
 	}
 
-	async function handleSortChange(nextOrder: TechSortOrder) {
-		if (sortOrder === nextOrder) return;
+	async function handleSortChange(value: string) {
+		const nextSort: TechSort = value === 'likes' ? 'likes' : 'newest';
+		const nextOrder: TechSortOrder = value === 'oldest' ? 'asc' : 'desc';
+		if (sort === nextSort && sortOrder === nextOrder) return;
 
+		sort = nextSort;
 		sortOrder = nextOrder;
 		const nextUrl = new URL($page.url);
+		if (nextSort === 'newest') nextUrl.searchParams.delete('sort');
+		else nextUrl.searchParams.set('sort', nextSort);
 		if (nextOrder === 'desc') nextUrl.searchParams.delete('order');
 		else nextUrl.searchParams.set('order', nextOrder);
 		// eslint-disable-next-line svelte/no-navigation-without-resolve
@@ -85,7 +91,7 @@
 		loadMoreError = false;
 		try {
 			const limit = isDesktop ? desktopInitialLimit : mobileLoadMoreLimit;
-			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, limit, nextOrder);
+			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, limit, nextOrder, nextSort);
 			loadedTechArticles = next.techArticles;
 			hasMoreArticles = next.hasMore;
 			if (!isAdmin) sessionStorage.setItem(storageKey, String(articles.length));
@@ -122,13 +128,14 @@
 		<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
 			<span>並び順</span>
 			<select
-				value={sortOrder}
-				onchange={(event) => handleSortChange(event.currentTarget.value as TechSortOrder)}
+				value={sort === 'likes' ? 'likes' : sortOrder === 'asc' ? 'oldest' : 'newest'}
+				onchange={(event) => handleSortChange(event.currentTarget.value)}
 				class="font-label-sm text-label-sm min-h-11 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2 text-primary"
 				aria-label="技術記事の並び順"
 			>
-				<option value="desc">新しい順</option>
-				<option value="asc">古い順</option>
+				<option value="newest">新しい順</option>
+				<option value="oldest">古い順</option>
+				<option value="likes">いいね順</option>
 			</select>
 		</label>
 	</section>

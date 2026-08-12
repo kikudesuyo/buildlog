@@ -45,7 +45,8 @@ describe('TechFeed.svelte', () => {
 		await expect.element(page.getByRole('heading', { name: '技術ブログ' })).toBeInTheDocument();
 		await expect.element(page.getByRole('heading', { name: '注目の記事' })).toBeInTheDocument();
 		await expect.element(page.getByRole('heading', { name: '一覧の記事' })).toBeInTheDocument();
-		await expect.element(page.getByRole('combobox', { name: '技術記事の並び順' })).toHaveValue('desc');
+		await expect.element(page.getByRole('combobox', { name: '技術記事の並び順' })).toHaveValue('newest');
+		await expect.element(page.getByRole('option', { name: 'いいね順' })).toBeInTheDocument();
 	});
 
 	it('記事がない場合は空状態を表示する', async () => {
