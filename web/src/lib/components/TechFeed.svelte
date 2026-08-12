@@ -171,7 +171,7 @@
 			<a href={featured.external ? articleHref(featured) : resolve('/tech')} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 			{#if featured.external}
 				<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant" aria-label={`Qiitaのいいね数: ${featured.likesCount}件`}>
-					<span class="material-symbols-outlined text-[16px] text-error" aria-hidden="true">favorite</span>
+					<span class="material-symbols-outlined fill-1 text-[16px] text-error" aria-hidden="true">favorite</span>
 					Qiita いいね {featured.likesCount}
 				</span>
 			{/if}
@@ -203,7 +203,7 @@
 				<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
 				{#if article.external}
 					<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant" aria-label={`Qiitaのいいね数: ${article.likesCount}件`}>
-						<span class="material-symbols-outlined text-[16px] text-error" aria-hidden="true">favorite</span>
+						<span class="material-symbols-outlined fill-1 text-[16px] text-error" aria-hidden="true">favorite</span>
 						Qiita いいね {article.likesCount}
 					</span>
 				{/if}
