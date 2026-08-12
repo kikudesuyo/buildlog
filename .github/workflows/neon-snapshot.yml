@@ -2,7 +2,7 @@ name: Update Neon Database Snapshot
 
 on:
   schedule:
-    - cron: '0 0 * * 1,4'
+    - cron: "0 0 * * 1"
   workflow_dispatch:
 
 concurrency:
@@ -16,6 +16,7 @@ permissions:
 env:
   NEON_PROJECT_ID: icy-pond-30220441
   NEON_API_URL: https://console.neon.tech/api/v2
+  NEON_PRODUCTION_BRANCH: main
   GCP_PROJECT_PROD: buildlog-503612
   GCP_WIF_PROVIDER_PROD: projects/328735755994/locations/global/workloadIdentityPools/buildlog-pool/providers/github-provider
   GCP_SERVICE_ACCOUNT_PROD: github-actions-neon-snapshot@buildlog-503612.iam.gserviceaccount.com
@@ -106,19 +107,19 @@ jobs:
             sleep 10
           done
 
-          # Snapshots can only be created from the root branch.
+          # Snapshots must be created from the production branch, not staging.
           branches="$(api_get "$NEON_API_URL/projects/$NEON_PROJECT_ID/branches?limit=100")"
 
           branch_id="$(
             jq -r '
               .branches[]
-              | select(.parent_id == null)
+              | select(.name == env.NEON_PRODUCTION_BRANCH)
               | .id
             ' <<<"$branches" | head -n 1
           )"
 
           if [[ -z "$branch_id" || "$branch_id" == "null" ]]; then
-            echo 'Could not find the Neon root branch.' >&2
+            echo "Could not find the Neon production branch: $NEON_PRODUCTION_BRANCH" >&2
             exit 1
           fi
 
