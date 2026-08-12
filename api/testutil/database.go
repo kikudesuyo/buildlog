@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// NewTestDB creates a GORM database backed by a sqlmock connection.
-// The connection and outstanding expectations are checked when the test ends.
+// NewTestDB はsqlmock接続を使用したGORMのテスト用DBを生成します。
+// 接続と未処理の期待値はテスト終了時に確認します。
 func NewTestDB(t testing.TB) (*gorm.DB, sqlmock.Sqlmock) {
 	t.Helper()
 
