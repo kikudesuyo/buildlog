@@ -1,7 +1,7 @@
 import { page } from 'vitest/browser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
+import type { TechArticle } from '$lib/api/types';
 import TechFeed from './TechFeed.svelte';
 
 const { fetchTechFeed } = vi.hoisted(() => ({ fetchTechFeed: vi.fn() }));
@@ -34,13 +34,13 @@ describe('TechFeed.svelte', () => {
 	});
 
 	it('記事と並び順を表示する', async () => {
-		const featuredArticle: FeaturedTechArticle = makeArticle({
+		const firstArticle: TechArticle = makeArticle({
 			key: 'featured-article',
 			title: '注目の記事'
 		});
 		const article = makeArticle({ key: 'article-2', id: 2, title: '一覧の記事' });
 
-		render(TechFeed, { featuredArticle, techArticles: [article] });
+		render(TechFeed, { techArticles: [firstArticle, article] });
 
 		await expect.element(page.getByRole('heading', { name: '技術ブログ' })).toBeInTheDocument();
 		await expect.element(page.getByRole('heading', { name: '注目の記事' })).toBeInTheDocument();
@@ -49,7 +49,7 @@ describe('TechFeed.svelte', () => {
 	});
 
 	it('記事がない場合は空状態を表示する', async () => {
-		render(TechFeed, { featuredArticle: null, techArticles: [], isAdmin: true });
+		render(TechFeed, { techArticles: [], isAdmin: true });
 
 		await expect.element(page.getByRole('heading', { name: '技術記事はまだありません' })).toBeInTheDocument();
 		await expect.element(page.getByText('新しい記事が公開されるまでお待ちください。')).toBeInTheDocument();
