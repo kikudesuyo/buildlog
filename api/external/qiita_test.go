@@ -47,7 +47,7 @@ func TestQiitaClientGetUserArticleListGetsEveryPage(t *testing.T) {
 	}
 }
 
-func TestQiitaClientGetUserArticleListIncludesLikesCount(t *testing.T) {
+func TestGetUserArticleListLikesCount(t *testing.T) {
 	client := NewQiitaClient(&http.Client{Transport: roundTripperFunc(func(r *http.Request) (*http.Response, error) {
 		body := `[{"id":"article-1","likes_count":42}]`
 		return &http.Response{
