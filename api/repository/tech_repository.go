@@ -8,17 +8,29 @@ import (
 )
 
 // GetExternalPostList は外部記事を公開日時順で取得します。
-func GetExternalPostList(ctx context.Context, db *gorm.DB, order string) ([]entity.DBTableExternalPost, error) {
+func GetExternalPostList(ctx context.Context, db *gorm.DB, order string, offset, limit int) ([]entity.DBTableExternalPost, error) {
 	orderBy := "DESC"
 	if order == "asc" {
 		orderBy = "ASC"
 	}
 	var postList []entity.DBTableExternalPost
-	err := db.WithContext(ctx).
+	query := db.WithContext(ctx).
 		Order("published_at " + orderBy).
-		Order("id " + orderBy).
-		Find(&postList).Error
-	return postList, err
+		Order("id " + orderBy)
+	if offset > 0 {
+		query = query.Offset(offset)
+	}
+	if limit > 0 {
+		query = query.Limit(limit)
+	}
+	return postList, query.Find(&postList).Error
+}
+
+// CountExternalPosts は外部記事の総件数を取得します。
+func CountExternalPosts(ctx context.Context, db *gorm.DB) (int64, error) {
+	var count int64
+	err := db.WithContext(ctx).Model(&entity.DBTableExternalPost{}).Count(&count).Error
+	return count, err
 }
 
 // FindExternalPost は外部記事をプロバイダーと外部IDで取得します。

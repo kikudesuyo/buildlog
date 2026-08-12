@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"sort"
 	"strings"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
@@ -34,10 +33,18 @@ func SyncQiitaArticleList(ctx context.Context) (int, error) {
 	return len(itemList), nil
 }
 
-func GetTechFeedList(ctx context.Context, db *gorm.DB, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, error) {
-	externalPostList, err := repository.GetExternalPostList(ctx, db, order)
+func GetTechFeedList(ctx context.Context, db *gorm.DB, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, bool, error) {
+	externalPostList, err := repository.GetExternalPostList(ctx, db, order, offset, limit)
 	if err != nil {
-		return nil, err
+		return nil, false, err
+	}
+	hasMore := false
+	if limit > 0 {
+		count, err := repository.CountExternalPosts(ctx, db)
+		if err != nil {
+			return nil, false, err
+		}
+		hasMore = int64(offset+len(externalPostList)) < count
 	}
 
 	itemList := make([]entity.TechFeedItem, 0, len(externalPostList))
@@ -50,30 +57,7 @@ func GetTechFeedList(ctx context.Context, db *gorm.DB, all bool, offset, limit i
 		})
 	}
 
-	sortTechFeedList(itemList, order)
-	if offset >= len(itemList) {
-		return []entity.TechFeedItem{}, nil
-	}
-	end := len(itemList)
-	if limit > 0 && offset+limit < end {
-		end = offset + limit
-	}
-	return itemList[offset:end], nil
-}
-
-func sortTechFeedList(itemList []entity.TechFeedItem, order string) {
-	sort.SliceStable(itemList, func(i, j int) bool {
-		if itemList[i].CreatedAt.Equal(itemList[j].CreatedAt) {
-			if order == "asc" {
-				return itemList[i].ID < itemList[j].ID
-			}
-			return itemList[i].ID > itemList[j].ID
-		}
-		if order == "asc" {
-			return itemList[i].CreatedAt.Before(itemList[j].CreatedAt)
-		}
-		return itemList[i].CreatedAt.After(itemList[j].CreatedAt)
-	})
+	return itemList, hasMore, nil
 }
 
 func syncQiitaArticle(ctx context.Context, db *gorm.DB, item external.QiitaItem, metadata external.OGPMetadata) error {

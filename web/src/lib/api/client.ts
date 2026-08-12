@@ -15,6 +15,7 @@ export type ApiFetch = LoadEvent['fetch'];
 
 type ApiListResponse<T> = {
 	data_list: T[];
+	has_more?: boolean;
 };
 
 type ApiObjectResponse<T> = {
@@ -102,8 +103,8 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 	const query = params.toString();
 	const url = query ? `/techs?${query}` : '/techs';
 	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);
-	const hasMore = !all && !!limit && response.data_list.length > limit;
-	const page = limit && limit > 0 ? response.data_list.slice(0, limit) : response.data_list;
+	const hasMore = !all && response.has_more === true;
+	const page = response.data_list;
 	
 	const allArticles: TechArticle[] = page.map((post) => ({
 		key: post.key ?? `post:${post.id}`,

@@ -85,7 +85,7 @@ describe('fetchDiaryEntries', () => {
 
 describe('fetchTechFeed', () => {
 	it('returns all articles in the same list and reports an additional page', async () => {
-		const fetchFn = apiFetch({ data_list: [techPost, { ...techPost, id: 3, key: undefined }] });
+		const fetchFn = apiFetch({ data_list: [techPost], has_more: true });
 
 		const result = await fetchTechFeed(fetchFn, false, 0, 1);
 

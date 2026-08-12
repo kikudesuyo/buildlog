@@ -8,6 +8,6 @@ import (
 )
 
 // GetTechList は外部記事の一覧を取得します。
-func GetTechList(ctx context.Context, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, error) {
+func GetTechList(ctx context.Context, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, bool, error) {
 	return GetTechFeedList(ctx, library.GetDB(ctx), all, offset, limit, order, ipAddress)
 }

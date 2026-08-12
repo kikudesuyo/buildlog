@@ -15,6 +15,7 @@ type BaseResponse struct {
 	DataType string         `json:"data_type"`
 	Data     any            `json:"data,omitempty"`
 	DataList any            `json:"data_list,omitempty"`
+	HasMore  *bool          `json:"has_more,omitempty"`
 }
 
 type ResponseMeta struct {
@@ -35,6 +36,11 @@ func NewObjectResponse(data any) BaseResponse {
 // NewListResponse は値を生成します。
 func NewListResponse(data any) BaseResponse {
 	return BaseResponse{Meta: ResponseMeta{StatusCode: http.StatusOK, Success: true}, DataType: "list", DataList: data}
+}
+
+// NewListResponseWithHasMore はページング情報付きの一覧レスポンスを生成します。
+func NewListResponseWithHasMore(data any, hasMore bool) BaseResponse {
+	return BaseResponse{Meta: ResponseMeta{StatusCode: http.StatusOK, Success: true}, DataType: "list", DataList: data, HasMore: &hasMore}
 }
 
 // NewErrorResponse は値を生成します。

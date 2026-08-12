@@ -33,17 +33,13 @@ func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (htt
 	if err != nil {
 		return nil, err
 	}
-	if limit > 0 {
-		// 追加読み込みの有無を判定するため、ページ末尾の1件を先読みします。
-		limit++
-	}
 	order := query.Get("order")
 	if order != "asc" {
 		order = "desc"
 	}
-	techList, err := service.GetTechList(r.Context(), false, offset, limit, order, getClientIP(r))
+	techList, hasMore, err := service.GetTechList(r.Context(), false, offset, limit, order, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
-	return entity.NewListResponse(techList), nil
+	return entity.NewListResponseWithHasMore(techList, hasMore), nil
 }
