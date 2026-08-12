@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { FeaturedTechArticle, TechArticle } from '$lib/api/types';
+	import type { TechArticle } from '$lib/api/types';
 	import { invalidateAll, replaceState } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
@@ -8,17 +8,16 @@
 	import Button from './Button.svelte';
 
 	type Props = {
-		featuredArticle?: FeaturedTechArticle | null;
 		techArticles?: TechArticle[];
 		hasMore?: boolean;
 		loadError?: boolean;
 		isAdmin?: boolean;
 	};
 
-	let { featuredArticle = null, techArticles = [], hasMore = false, loadError = false, isAdmin = false }: Props = $props();
-	let loadedTechArticles = $state(techArticles);
-	let loadedFeaturedArticle = $state(featuredArticle);
-	let hasMoreArticles = $state(hasMore);
+	let { techArticles = [], hasMore = false, loadError = false, isAdmin = false }: Props = $props();
+	const initialState = { techArticles, hasMore };
+	let loadedTechArticles = $state(initialState.techArticles);
+	let hasMoreArticles = $state(initialState.hasMore);
 	let isLoadingMore = $state(false);
 	let loadMoreError = $state(false);
 	let sortOrder = $state<TechSortOrder>($page.url.searchParams.get('order') === 'asc' ? 'asc' : 'desc');
@@ -28,9 +27,7 @@
 	const desktopLoadMoreLimit = 6;
 	const storageKey = 'tech-feed-count';
 	let isRestoring = $state(false);
-	let articles = $derived(loadedFeaturedArticle?.title ? [loadedFeaturedArticle, ...loadedTechArticles] : loadedTechArticles);
-	let featured = $derived(articles.length > 0 ? articles[0] : null);
-	let filteredArticles = $derived(articles.slice(1));
+	let articles = $derived(loadedTechArticles);
 
 	function formatDate(dateStr: string) {
 		if (!dateStr) return '';
@@ -47,7 +44,7 @@
 		isLoadingMore = true;
 		loadMoreError = false;
 		try {
-			const offset = (loadedFeaturedArticle?.title ? 1 : 0) + loadedTechArticles.length;
+			const offset = loadedTechArticles.length;
 			const limit = isDesktop ? desktopLoadMoreLimit : mobileLoadMoreLimit;
 			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, offset, limit, sortOrder);
 			loadedTechArticles = [...loadedTechArticles, ...next.techArticles];
@@ -66,7 +63,6 @@
 		loadMoreError = false;
 		try {
 			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, desktopInitialLimit, sortOrder);
-			loadedFeaturedArticle = next.featuredArticle;
 			loadedTechArticles = next.techArticles;
 			hasMoreArticles = next.hasMore;
 		} catch {
@@ -90,7 +86,6 @@
 		try {
 			const limit = isDesktop ? desktopInitialLimit : mobileLoadMoreLimit;
 			const next = await fetchTechFeed(window.fetch.bind(window) as ApiFetch, false, 0, limit, nextOrder);
-			loadedFeaturedArticle = next.featuredArticle;
 			loadedTechArticles = next.techArticles;
 			hasMoreArticles = next.hasMore;
 			if (!isAdmin) sessionStorage.setItem(storageKey, String(articles.length));
@@ -116,7 +111,7 @@
 	});
 </script>
 
-<div class="editorial-container mx-auto flex flex-col gap-8 px-gutter">
+<div class="editorial-container mx-auto flex flex-col gap-8 px-gutter md:!max-w-6xl">
 	<section class="flex flex-wrap items-start justify-between gap-4">
 		<div>
 			{#if isAdmin}
@@ -151,28 +146,8 @@
 		</section>
 	{/if}
 
-	{#if featured}
-		<article aria-label="Featured article" class="group relative rounded-xl border border-outline-variant/40 bg-surface-container-low p-4 shadow-xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
-			<div class="mb-stack-sm flex flex-wrap items-center gap-stack-sm">
-				{#if featured.external}<span class="font-label-sm text-label-sm rounded bg-secondary-container px-2 py-0.5 text-on-secondary-container">{featured.external.provider}</span>{:else}<span class="font-label-sm text-label-sm text-on-surface-variant">Featured</span>{/if}
-				{#if featured.status === 'draft'}
-					<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-outline-variant/40 text-on-surface-variant">下書き</span>
-				{/if}
-			</div>
-			{#if featured.external?.thumbnailUrl}<img src={featured.external.thumbnailUrl} alt="" class="mb-4 aspect-[2/1] w-full rounded-lg object-cover md:mb-6" loading="lazy" />{/if}
-			<h2 class="font-display-lg mb-stack-md text-[22px] leading-tight text-primary transition-colors group-hover:text-primary/80 md:text-[28px]">
-				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<a href={featured.external ? articleHref(featured) : resolve('/tech')} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="hover:underline">{featured.title}</a>
-			</h2>
-			<p class="font-body-md text-body-md mb-4 text-on-surface-variant line-clamp-2 md:mb-6 md:line-clamp-3">{featured.content}</p>
-		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-		<a href={featured.external ? articleHref(featured) : resolve('/tech')} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
-			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
-		</article>
-	{/if}
-
 	<div class="grid gap-6 md:grid-cols-2 md:gap-8">
-		{#each filteredArticles as article (article.key)}
+		{#each articles as article (article.key)}
 			<article class="group relative flex flex-col gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-2xs transition-all duration-300 hover:shadow-md hover:border-primary/20 md:p-6">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-stack-sm">
@@ -183,14 +158,22 @@
 					</div>
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span></div>
 				</div>
-				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-[20px]">
+				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline max-[640px]:!text-[20px] md:!text-[20px]">
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined}>{article.title}</a>
 				</h3>
-				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
+				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant max-[640px]:!text-[14px]">{article.content}</p>
 				{#if article.external?.thumbnailUrl}<img src={article.external.thumbnailUrl} alt="" class="aspect-[2/1] w-full rounded-lg object-cover" loading="lazy" />{/if}
-			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-			<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+			<div class="flex flex-wrap items-center justify-between gap-3">
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+				{#if article.external}
+					<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant" aria-label={`Qiitaのいいね数: ${article.likesCount}件`}>
+						<span class="material-symbols-outlined fill-1 text-[16px] text-error" aria-hidden="true">favorite</span>
+						Qiita いいね {article.likesCount}
+					</span>
+				{/if}
+			</div>
 			</article>
 		{/each}
 	</div>

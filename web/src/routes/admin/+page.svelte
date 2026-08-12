@@ -6,7 +6,8 @@
 	import DiaryFeed from '$lib/components/DiaryFeed.svelte';
 	import IconButton from '$lib/components/IconButton.svelte';
 	let { data } = $props();
-	let goals = $state<GoalPeriod>(data.goals);
+	const initialData = data;
+	let goals = $state<GoalPeriod>(initialData.goals);
 	let isGoalDialogOpen = $state(false);
 	let isSavingGoals = $state(false);
 	let goalError = $state('');
@@ -151,7 +152,7 @@
 
 {#if isGoalDialogOpen}
 	<div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-primary/20 px-4 py-24 backdrop-blur-xs" role="presentation">
-		<section role="dialog" aria-modal="true" aria-labelledby="goal-dialog-title" class="w-full max-w-2xl rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xl">
+		<div role="dialog" aria-modal="true" aria-labelledby="goal-dialog-title" class="w-full max-w-2xl rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xl">
 			<div class="mb-6 flex items-start justify-between gap-4">
 				<div>
 					<h2 id="goal-dialog-title" class="font-headline-lg text-headline-lg text-primary">{isAddingGoal ? '目標を追加' : '目標を編集'}</h2>
@@ -173,7 +174,7 @@
 			<div class="mt-6 flex flex-wrap justify-between gap-3">
 				<div class="flex w-full justify-end gap-3"><button type="button" onclick={closeGoalDialog} class="font-label-md text-label-md min-h-11 rounded-lg px-4 py-2 text-on-surface-variant" disabled={isSavingGoals}>キャンセル</button><button type="button" onclick={submitGoal} class="font-label-md text-label-md min-h-11 rounded-lg bg-primary px-5 py-2 text-on-primary" disabled={isSavingGoals}>{isSavingGoals ? '保存中…' : '保存する'}</button></div>
 			</div>
-		</section>
+		</div>
 	</div>
 {/if}
 

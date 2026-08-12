@@ -38,7 +38,6 @@
 	{#if syncError}<p class="font-body-sm text-body-sm rounded-lg border border-error/30 bg-error-container/30 px-4 py-3 text-error" role="alert">{syncError}</p>{/if}
 	{#key feedVersion}
 		<TechFeed
-			featuredArticle={data.featuredArticle}
 			techArticles={data.techArticles}
 			isAdmin
 		/>

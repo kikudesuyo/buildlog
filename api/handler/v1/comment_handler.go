@@ -20,7 +20,7 @@ func HandleGetCommentList(r *http.Request, requestData map[string]interface{}) (
 		return nil, xerror.ClientValidationErr(err)
 	}
 
-	commentList, err := service.ListCommentsByPostID(r.Context(), postID)
+	commentList, err := service.GetCommentListByPostID(r.Context(), postID)
 	if err != nil {
 		return nil, err
 	}
