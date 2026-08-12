@@ -8,10 +8,10 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
-// ListDeletedPosts は一覧を取得します。
-func ListDeletedPosts(ctx context.Context) ([]entity.DBTablePost, error) {
+// GetDeletedPostList は一覧を取得します。
+func GetDeletedPostList(ctx context.Context) ([]entity.DBTablePost, error) {
 	db := library.GetDB(ctx)
-	return repository.ListDeletedPosts(ctx, db)
+	return repository.GetDeletedPostList(ctx, db)
 }
 
 // RestorePost は削除済みデータを復元します。

@@ -30,6 +30,10 @@ jobs:
         working-directory: api
         run: go build -o ./app .
 
+      - name: Test Go API
+        working-directory: api
+        run: go test ./...
+
   deploy-api:
     name: Deploy Go API to Cloud Run
     runs-on: ubuntu-latest

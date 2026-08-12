@@ -2,7 +2,8 @@
 	import { restoreEntry } from '$lib/api/client';
 
 	let { data } = $props();
-	let trashEntries = $state(data.trashEntries);
+	const initialData = data;
+	let trashEntries = $state(initialData.trashEntries);
 
 	function formatDate(dateStr: string) {
 		if (!dateStr) return '';
