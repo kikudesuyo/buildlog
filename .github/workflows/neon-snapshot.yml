@@ -14,9 +14,9 @@ permissions:
   id-token: write
 
 env:
-  NEON_PROJECT_ID: icy-pond-30220441
+  NEON_PROJECT_ID: broad-bonus-64140437
   NEON_API_URL: https://console.neon.tech/api/v2
-  NEON_PRODUCTION_BRANCH: main
+  NEON_PRODUCTION_BRANCH: production
   GCP_PROJECT_PROD: buildlog-503612
   GCP_WIF_PROVIDER_PROD: projects/328735755994/locations/global/workloadIdentityPools/buildlog-pool/providers/github-provider
   GCP_SERVICE_ACCOUNT_PROD: github-actions-neon-snapshot@buildlog-503612.iam.gserviceaccount.com
@@ -107,19 +107,22 @@ jobs:
             sleep 10
           done
 
-          # Snapshots must be created from the production branch, not staging.
+          # Use the production root branch, not the staging child branch.
           branches="$(api_get "$NEON_API_URL/projects/$NEON_PROJECT_ID/branches?limit=100")"
 
           branch_id="$(
-            jq -r '
+            jq -r --arg production_branch_name "$NEON_PRODUCTION_BRANCH" '
               .branches[]
-              | select(.name == env.NEON_PRODUCTION_BRANCH)
+              | select(
+                  .name == $production_branch_name
+                  and .parent_id == null
+                )
               | .id
             ' <<<"$branches" | head -n 1
           )"
 
           if [[ -z "$branch_id" || "$branch_id" == "null" ]]; then
-            echo "Could not find the Neon production branch: $NEON_PRODUCTION_BRANCH" >&2
+            echo "Could not find the Neon production root branch: $NEON_PRODUCTION_BRANCH" >&2
             exit 1
           fi
 
