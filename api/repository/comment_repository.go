@@ -9,13 +9,13 @@ import (
 
 // GetComment_ListByPostID は一覧を取得します。
 func GetComment_ListByPostID(ctx context.Context, db *gorm.DB, postID int64) ([]entity.DBTableComment, error) {
-	comment_List := make([]entity.DBTableComment, 0)
+	commentList := make([]entity.DBTableComment, 0)
 	err := db.WithContext(ctx).
 		Where("post_id = ?", postID).
 		Order("created_at ASC").
 		Order("id ASC").
-		Find(&comment_List).Error
-	return comment_List, err
+		Find(&commentList).Error
+	return commentList, err
 }
 
 // CreateComment はデータを作成します。

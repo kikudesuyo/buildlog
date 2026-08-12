@@ -12,25 +12,25 @@ import (
 // GetDiary_List は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
 func GetDiary_List(ctx context.Context, all bool, offset int, limit int, sortBy string, sortOrder string, ipAddress string) ([]entity.DBTablePost, error) {
 	db := library.GetDB(ctx)
-	diary_List, err := repository.GetDiary_List(ctx, db, all, offset, limit, sortBy, sortOrder)
+	diaryList, err := repository.GetDiary_List(ctx, db, all, offset, limit, sortBy, sortOrder)
 	if err != nil {
 		return nil, err
 	}
-	postID_List := make([]int64, len(diary_List))
-	for i := range diary_List {
-		postID_List[i] = diary_List[i].ID
+	postIDList := make([]int64, len(diaryList))
+	for i := range diaryList {
+		postIDList[i] = diaryList[i].ID
 	}
-	engagement_List, err := repository.GetPostEngagement_List(ctx, db, postID_List, ipAddress)
+	engagementList, err := repository.GetPostEngagement_List(ctx, db, postIDList, ipAddress)
 	if err != nil {
 		return nil, err
 	}
-	for i := range diary_List {
-		engagement := engagement_List[diary_List[i].ID]
-		diary_List[i].LikesCount = engagement.LikesCount
-		diary_List[i].CommentsCount = engagement.CommentsCount
-		diary_List[i].HasLiked = engagement.HasLiked
+	for i := range diaryList {
+		engagement := engagementList[diaryList[i].ID]
+		diaryList[i].LikesCount = engagement.LikesCount
+		diaryList[i].CommentsCount = engagement.CommentsCount
+		diaryList[i].HasLiked = engagement.HasLiked
 	}
-	return diary_List, nil
+	return diaryList, nil
 }
 
 // GetDiaryByID はデータを取得します。
@@ -40,11 +40,11 @@ func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTa
 	if err != nil {
 		return nil, err
 	}
-	engagement_List, err := repository.GetPostEngagement_List(ctx, db, []int64{diary.ID}, ipAddress)
+	engagementList, err := repository.GetPostEngagement_List(ctx, db, []int64{diary.ID}, ipAddress)
 	if err != nil {
 		return nil, err
 	}
-	engagement := engagement_List[diary.ID]
+	engagement := engagementList[diary.ID]
 	diary.LikesCount = engagement.LikesCount
 	diary.CommentsCount = engagement.CommentsCount
 	diary.HasLiked = engagement.HasLiked

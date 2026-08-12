@@ -20,29 +20,29 @@ const qiitaUser = "kikudesuyo"
 // SyncQiitaArticle_List はアプリケーションで利用するQiitaユーザーの記事を同期します。
 func SyncQiitaArticle_List(ctx context.Context) (int, error) {
 	qiitaClient := external.NewQiitaClient(nil, qiitaUser)
-	item_List, err := qiitaClient.GetUserArticle_List(ctx)
+	itemList, err := qiitaClient.GetUserArticle_List(ctx)
 	if err != nil {
 		return 0, err
 	}
 	db := library.GetDB(ctx)
-	for _, item := range item_List {
+	for _, item := range itemList {
 		metadata, _ := qiitaClient.GetOGP(ctx, item.URL)
 		if err := syncQiitaArticle(ctx, db, item, metadata); err != nil {
 			return 0, err
 		}
 	}
-	return len(item_List), nil
+	return len(itemList), nil
 }
 
 func GetTechFeed_List(ctx context.Context, db *gorm.DB, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, error) {
-	externalPost_List, err := repository.GetExternalPost_List(ctx, db, order)
+	externalPostList, err := repository.GetExternalPost_List(ctx, db, order)
 	if err != nil {
 		return nil, err
 	}
 
-	item_List := make([]entity.TechFeedItem, 0, len(externalPost_List))
-	for _, post := range externalPost_List {
-		item_List = append(item_List, entity.TechFeedItem{
+	itemList := make([]entity.TechFeedItem, 0, len(externalPostList))
+	for _, post := range externalPostList {
+		itemList = append(itemList, entity.TechFeedItem{
 			Key: fmt.Sprintf("external:%d", post.ID), ID: post.ID, Type: "external", Title: post.Title, Content: post.Excerpt,
 			Status: "published", CreatedAt: post.PublishedAt, UpdatedAt: post.UpdatedAt,
 			LikesCount: post.LikesCount,
@@ -50,29 +50,29 @@ func GetTechFeed_List(ctx context.Context, db *gorm.DB, all bool, offset, limit 
 		})
 	}
 
-	sortTechFeed_List(item_List, order)
-	if offset >= len(item_List) {
+	sortTechFeed_List(itemList, order)
+	if offset >= len(itemList) {
 		return []entity.TechFeedItem{}, nil
 	}
-	end := len(item_List)
+	end := len(itemList)
 	if limit > 0 && offset+limit < end {
 		end = offset + limit
 	}
-	return item_List[offset:end], nil
+	return itemList[offset:end], nil
 }
 
-func sortTechFeed_List(item_List []entity.TechFeedItem, order string) {
-	sort.SliceStable(item_List, func(i, j int) bool {
-		if item_List[i].CreatedAt.Equal(item_List[j].CreatedAt) {
+func sortTechFeed_List(itemList []entity.TechFeedItem, order string) {
+	sort.SliceStable(itemList, func(i, j int) bool {
+		if itemList[i].CreatedAt.Equal(itemList[j].CreatedAt) {
 			if order == "asc" {
-				return item_List[i].ID < item_List[j].ID
+				return itemList[i].ID < itemList[j].ID
 			}
-			return item_List[i].ID > item_List[j].ID
+			return itemList[i].ID > itemList[j].ID
 		}
 		if order == "asc" {
-			return item_List[i].CreatedAt.Before(item_List[j].CreatedAt)
+			return itemList[i].CreatedAt.Before(itemList[j].CreatedAt)
 		}
-		return item_List[i].CreatedAt.After(item_List[j].CreatedAt)
+		return itemList[i].CreatedAt.After(itemList[j].CreatedAt)
 	})
 }
 

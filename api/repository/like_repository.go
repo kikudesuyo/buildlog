@@ -17,63 +17,64 @@ type PostEngagement struct {
 }
 
 // GetPostEngagement_List は複数記事の反応情報を一括取得します。
-func GetPostEngagement_List(ctx context.Context, db *gorm.DB, postID_List []int64, ipAddress string) (map[int64]PostEngagement, error) {
-	engagement_List := make(map[int64]PostEngagement, len(postID_List))
-	if len(postID_List) == 0 {
-		return engagement_List, nil
+
+func GetPostEngagement_List(ctx context.Context, db *gorm.DB, postIDList []int64, ipAddress string) (map[int64]PostEngagement, error) {
+	engagementList := make(map[int64]PostEngagement, len(postIDList))
+	if len(postIDList) == 0 {
+		return engagementList, nil
 	}
-	for _, postID := range postID_List {
-		engagement_List[postID] = PostEngagement{}
+	for _, postID := range postIDList {
+		engagementList[postID] = PostEngagement{}
 	}
 
 	type count struct {
 		PostID int64
 		Count  int64
 	}
-	var likeCount_List []count
+	var likeCountList []count
 	if err := db.WithContext(ctx).
 		Model(&entity.DBTableLike{}).
 		Select("post_id, COUNT(*) AS count").
-		Where("post_id IN ?", postID_List).
+		Where("post_id IN ?", postIDList).
 		Group("post_id").
-		Find(&likeCount_List).Error; err != nil {
+		Find(&likeCountList).Error; err != nil {
 		return nil, fmt.Errorf("list like counts: %w", err)
 	}
-	for _, item := range likeCount_List {
-		value := engagement_List[item.PostID]
+	for _, item := range likeCountList {
+		value := engagementList[item.PostID]
 		value.LikesCount = item.Count
-		engagement_List[item.PostID] = value
+		engagementList[item.PostID] = value
 	}
 
-	var commentCount_List []count
+	var commentCountList []count
 	if err := db.WithContext(ctx).
 		Model(&entity.DBTableComment{}).
 		Select("post_id, COUNT(*) AS count").
-		Where("post_id IN ?", postID_List).
+		Where("post_id IN ?", postIDList).
 		Group("post_id").
-		Find(&commentCount_List).Error; err != nil {
+		Find(&commentCountList).Error; err != nil {
 		return nil, fmt.Errorf("list comment counts: %w", err)
 	}
-	for _, item := range commentCount_List {
-		value := engagement_List[item.PostID]
+	for _, item := range commentCountList {
+		value := engagementList[item.PostID]
 		value.CommentsCount = item.Count
-		engagement_List[item.PostID] = value
+		engagementList[item.PostID] = value
 	}
 
-	var likedPostID_List []int64
+	var likedPostIDList []int64
 	if err := db.WithContext(ctx).
 		Model(&entity.DBTableLike{}).
-		Where("post_id IN ? AND ip_address = ?", postID_List, ipAddress).
-		Pluck("post_id", &likedPostID_List).Error; err != nil {
+		Where("post_id IN ? AND ip_address = ?", postIDList, ipAddress).
+		Pluck("post_id", &likedPostIDList).Error; err != nil {
 		return nil, fmt.Errorf("list liked posts: %w", err)
 	}
-	for _, postID := range likedPostID_List {
-		value := engagement_List[postID]
+	for _, postID := range likedPostIDList {
+		value := engagementList[postID]
 		value.HasLiked = true
-		engagement_List[postID] = value
+		engagementList[postID] = value
 	}
 
-	return engagement_List, nil
+	return engagementList, nil
 }
 
 // CreateLike はデータを作成します。

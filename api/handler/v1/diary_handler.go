@@ -33,11 +33,11 @@ func HandleGetDiary_List(r *http.Request, requestData map[string]interface{}) (h
 	if limit < 0 {
 		limit = 0
 	}
-	diary_List, err := service.GetDiary_List(r.Context(), all, offset, limit, sortBy, sortOrder, getClientIP(r))
+	diaryList, err := service.GetDiary_List(r.Context(), all, offset, limit, sortBy, sortOrder, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
-	return entity.New_ListResponse(diary_List), nil
+	return entity.New_ListResponse(diaryList), nil
 }
 
 // HandleGetDiary はHTTPリクエストを受け取り、対応する処理結果を返します。

@@ -15,11 +15,11 @@ func HandleGetDeletedPost_List(r *http.Request, requestData map[string]interface
 	if err := handler.ValidateRequestWithAuth(r); err != nil {
 		return nil, err
 	}
-	post_List, err := service.GetDeletedPost_List(r.Context())
+	postList, err := service.GetDeletedPost_List(r.Context())
 	if err != nil {
 		return nil, err
 	}
-	return entity.New_ListResponse(post_List), nil
+	return entity.New_ListResponse(postList), nil
 }
 
 // HandleRestorePost はHTTPリクエストを受け取り、対応する処理結果を返します。

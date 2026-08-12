@@ -20,11 +20,11 @@ func HandleGetComment_List(r *http.Request, requestData map[string]interface{}) 
 		return nil, xerror.ClientValidationErr(err)
 	}
 
-	comment_List, err := service.GetComment_ListByPostID(r.Context(), postID)
+	commentList, err := service.GetComment_ListByPostID(r.Context(), postID)
 	if err != nil {
 		return nil, err
 	}
-	return entity.New_ListResponse(comment_List), nil
+	return entity.New_ListResponse(commentList), nil
 }
 
 // HandleCreateComment はHTTPリクエストを受け取り、対応する処理結果を返します。

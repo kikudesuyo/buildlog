@@ -12,11 +12,11 @@ import (
 // GetComment_ListByPostID は一覧を取得します。
 func GetComment_ListByPostID(ctx context.Context, postID int64) ([]entity.DBTableComment, error) {
 	db := library.GetDB(ctx)
-	comment_List, err := repository.GetComment_ListByPostID(ctx, db, postID)
+	commentList, err := repository.GetComment_ListByPostID(ctx, db, postID)
 	if err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
-	return comment_List, nil
+	return commentList, nil
 }
 
 // CreateComment はデータを作成します。

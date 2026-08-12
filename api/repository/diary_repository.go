@@ -9,7 +9,7 @@ import (
 
 // GetDiary_List は日記一覧を取得し、公開一覧ではページ単位で絞り込みます。
 func GetDiary_List(ctx context.Context, db *gorm.DB, all bool, offset int, limit int, sortBy string, sortOrder string) ([]entity.DBTablePost, error) {
-	diary_List := make([]entity.DBTablePost, 0)
+	diaryList := make([]entity.DBTablePost, 0)
 	query := db.WithContext(ctx).Where("type = ?", "diary")
 	if !all {
 		query = query.Where("status = ?", "published")
@@ -25,8 +25,8 @@ func GetDiary_List(ctx context.Context, db *gorm.DB, all bool, offset int, limit
 			query = query.Limit(limit)
 		}
 	}
-	err := query.Find(&diary_List).Error
-	return diary_List, err
+	err := query.Find(&diaryList).Error
+	return diaryList, err
 }
 
 // GetDiaryByID はデータを取得します。
