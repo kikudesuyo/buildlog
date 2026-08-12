@@ -1,0 +1,135 @@
+name: Update Neon Database Snapshot
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: neon-database-snapshot
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  NEON_PROJECT_ID: icy-pond-30220441
+  NEON_API_URL: https://console.neon.tech/api/v2
+  NEON_PRODUCTION_BRANCH: main
+  GCP_PROJECT_PROD: buildlog-503612
+  GCP_WIF_PROVIDER_PROD: projects/328735755994/locations/global/workloadIdentityPools/buildlog-pool/providers/github-provider
+  GCP_SERVICE_ACCOUNT_PROD: github-actions-neon-snapshot@buildlog-503612.iam.gserviceaccount.com
+
+jobs:
+  update-snapshot:
+    name: Replace the Neon database snapshot
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER_PROD }}
+          service_account: ${{ env.GCP_SERVICE_ACCOUNT_PROD }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Load Neon API key from Secret Manager
+        run: |
+          set -euo pipefail
+
+          NEON_API_KEY="$(gcloud secrets versions access latest \
+            --secret=NEON_API_KEY \
+            --project="$GCP_PROJECT_PROD")"
+          test -n "$NEON_API_KEY"
+          echo "::add-mask::$NEON_API_KEY"
+          printf 'NEON_API_KEY=%s\n' "$NEON_API_KEY" >> "$GITHUB_ENV"
+
+      - name: Replace the existing snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -n "$NEON_API_KEY"
+
+          api() {
+            curl \
+              --silent \
+              --show-error \
+              --fail-with-body \
+              --header "Authorization: Bearer $NEON_API_KEY" \
+              --header 'Accept: application/json' \
+              "$@"
+          }
+
+          api_get() {
+            curl \
+              --silent \
+              --show-error \
+              --fail-with-body \
+              --retry 3 \
+              --retry-all-errors \
+              --header "Authorization: Bearer $NEON_API_KEY" \
+              --header 'Accept: application/json' \
+              "$@"
+          }
+
+          snapshots_url="$NEON_API_URL/projects/$NEON_PROJECT_ID/snapshots"
+
+          # Free plan allows one manual snapshot, so delete it first.
+          snapshots="$(api_get "$snapshots_url")"
+
+          while IFS= read -r snapshot_id; do
+            test -z "$snapshot_id" && continue
+
+            echo "Deleting snapshot: $snapshot_id"
+            api \
+              --request DELETE \
+              "$snapshots_url/$snapshot_id" \
+              >/dev/null
+          done < <(jq -r '.snapshots[]?.id' <<<"$snapshots")
+
+          # Snapshot deletion is asynchronous.
+          for attempt in {1..30}; do
+            snapshots="$(api_get "$snapshots_url")"
+
+            if [[ "$(jq '.snapshots | length' <<<"$snapshots")" == '0' ]]; then
+              break
+            fi
+
+            if [[ "$attempt" == '30' ]]; then
+              echo 'The previous Neon snapshot was not deleted in time.' >&2
+              exit 1
+            fi
+
+            sleep 10
+          done
+
+          # Snapshots must be created from the production branch, not staging.
+          branches="$(api_get "$NEON_API_URL/projects/$NEON_PROJECT_ID/branches?limit=100")"
+
+          branch_id="$(
+            jq -r '
+              .branches[]
+              | select(.name == env.NEON_PRODUCTION_BRANCH)
+              | .id
+            ' <<<"$branches" | head -n 1
+          )"
+
+          if [[ -z "$branch_id" || "$branch_id" == "null" ]]; then
+            echo "Could not find the Neon production branch: $NEON_PRODUCTION_BRANCH" >&2
+            exit 1
+          fi
+
+          snapshot_name="buildlog-$(date -u +%Y%m%d)"
+          encoded_name="$(jq -rn --arg name "$snapshot_name" '$name | @uri')"
+
+          echo "Creating snapshot: $snapshot_name"
+
+          api \
+            --request POST \
+            "$NEON_API_URL/projects/$NEON_PROJECT_ID/branches/$branch_id/snapshot?name=$encoded_name"
+
+          echo 'Snapshot created successfully.'
