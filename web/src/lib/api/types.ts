@@ -31,8 +31,6 @@ export interface TechArticle {
 	external?: ExternalPost;
 }
 
-export type FeaturedTechArticle = TechArticle;
-
 export interface AppProject {
 	id: string;
 	slug?: string;

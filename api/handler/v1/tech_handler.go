@@ -33,9 +33,6 @@ func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (htt
 	if err != nil {
 		return nil, err
 	}
-	if limit > 0 {
-		limit++
-	}
 	order := query.Get("order")
 	if order != "asc" {
 		order = "desc"
