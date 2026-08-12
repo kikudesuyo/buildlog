@@ -34,6 +34,7 @@ func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (htt
 		return nil, err
 	}
 	if limit > 0 {
+		// 追加読み込みの有無を判定するため、ページ末尾の1件を先読みします。
 		limit++
 	}
 	order := query.Get("order")

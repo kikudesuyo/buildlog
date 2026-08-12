@@ -84,21 +84,19 @@ describe('fetchDiaryEntries', () => {
 });
 
 describe('fetchTechFeed', () => {
-	it('separates the featured article and reports an additional page', async () => {
+	it('returns all articles in the same list and reports an additional page', async () => {
 		const fetchFn = apiFetch({ data_list: [techPost, { ...techPost, id: 3, key: undefined }] });
 
 		const result = await fetchTechFeed(fetchFn, false, 0, 1);
 
-		expect(result.featuredArticle?.key).toBe('tech-2');
-		expect(result.techArticles).toHaveLength(0);
+		expect(result.techArticles.map((article) => article.key)).toEqual(['tech-2']);
 		expect(result.hasMore).toBe(true);
 		expect(fetchFn).toHaveBeenCalledWith('/api/v1/techs?limit=1');
 	});
 
-	it('uses the fallback featured article when there are no posts', async () => {
+	it('returns an empty list when there are no posts', async () => {
 		const result = await fetchTechFeed(apiFetch({ data_list: [] }));
 
-		expect(result.featuredArticle).toMatchObject({ key: 'fallback', id: 0 });
 		expect(result.techArticles).toEqual([]);
 		expect(result.hasMore).toBe(false);
 	});
