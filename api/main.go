@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/route"
@@ -26,8 +27,12 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%s", port),
-		Handler: route.NewRouter(),
+		Addr:              fmt.Sprintf(":%s", port),
+		Handler:           route.NewRouter(),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       60 * time.Second,
 	}
 
 	log.Printf("API server is running on port %s", port)
