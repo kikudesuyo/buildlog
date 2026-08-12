@@ -22,6 +22,8 @@ func withCommentTestDB(t *testing.T) sqlmock.Sqlmock {
 	return mock
 }
 
+// TestListCommentsByPostIDReturnsCommentsOrderedByCreation は、同じ投稿のコメントが
+// 作成日時順に返る通常系を検証します。
 func TestListCommentsByPostIDReturnsCommentsOrderedByCreation(t *testing.T) {
 	mock := withCommentTestDB(t)
 	createdAt := time.Date(2026, 8, 12, 9, 0, 0, 0, time.UTC)
@@ -43,6 +45,8 @@ func TestListCommentsByPostIDReturnsCommentsOrderedByCreation(t *testing.T) {
 	}
 }
 
+// TestListCommentsByPostIDReturnsEmptySliceWhenNoCommentsExist は、コメントがない
+// 投稿に対して非nilの空スライスが返る境界値を検証します。
 func TestListCommentsByPostIDReturnsEmptySliceWhenNoCommentsExist(t *testing.T) {
 	mock := withCommentTestDB(t)
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "comments" WHERE post_id = $1 ORDER BY created_at ASC,id ASC`)).
@@ -61,6 +65,8 @@ func TestListCommentsByPostIDReturnsEmptySliceWhenNoCommentsExist(t *testing.T) 
 	}
 }
 
+// TestListCommentsByPostIDWrapsRepositoryError は、コメント一覧取得時のDBエラーが
+// カスタムエラーへ変換されることを検証します。
 func TestListCommentsByPostIDWrapsRepositoryError(t *testing.T) {
 	mock := withCommentTestDB(t)
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "comments" WHERE post_id = $1 ORDER BY created_at ASC,id ASC`)).
@@ -76,6 +82,8 @@ func TestListCommentsByPostIDWrapsRepositoryError(t *testing.T) {
 	}
 }
 
+// TestCreateCommentPersistsContentAndReturnsComment は、投稿IDと本文を保存し、
+// 保存されたコメントを返す通常系を検証します。
 func TestCreateCommentPersistsContentAndReturnsComment(t *testing.T) {
 	mock := withCommentTestDB(t)
 	mock.ExpectBegin()
@@ -96,6 +104,8 @@ func TestCreateCommentPersistsContentAndReturnsComment(t *testing.T) {
 	}
 }
 
+// TestCreateCommentWrapsRepositoryError は、コメント作成時のDBエラーが
+// カスタムエラーへ変換されることを検証します。
 func TestCreateCommentWrapsRepositoryError(t *testing.T) {
 	mock := withCommentTestDB(t)
 	mock.ExpectBegin()
