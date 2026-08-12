@@ -30,7 +30,7 @@ func TestListDeletedPostsReturnsPostsOrderedByDeletedAt(t *testing.T) {
 			AddRow(2, "diary", "newer", deletedAt).
 			AddRow(1, "tech", "older", deletedAt.Add(-time.Hour)))
 
-	posts, err := ListDeletedPosts(context.Background())
+	posts, err := GetDeletedPostList(context.Background())
 	if err != nil {
 		t.Fatalf("ListDeletedPosts() error = %v", err)
 	}
@@ -46,7 +46,7 @@ func TestListDeletedPostsReturnsEmptySliceWhenNoDeletedPostsExist(t *testing.T) 
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "posts" WHERE deleted_at IS NOT NULL ORDER BY deleted_at DESC`)).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "type", "title", "deleted_at"}))
 
-	posts, err := ListDeletedPosts(context.Background())
+	posts, err := GetDeletedPostList(context.Background())
 	if err != nil {
 		t.Fatalf("ListDeletedPosts() error = %v", err)
 	}
@@ -63,7 +63,7 @@ func TestListDeletedPostsReturnsDatabaseError(t *testing.T) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "posts" WHERE deleted_at IS NOT NULL ORDER BY deleted_at DESC`)).
 		WillReturnError(databaseError)
 
-	posts, err := ListDeletedPosts(context.Background())
+	posts, err := GetDeletedPostList(context.Background())
 	if posts != nil || !errors.Is(err, databaseError) {
 		t.Fatalf("ListDeletedPosts() = %#v, %v, want database error", posts, err)
 	}
