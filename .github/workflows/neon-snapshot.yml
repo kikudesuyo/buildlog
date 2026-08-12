@@ -35,6 +35,11 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Load Neon API key from Secret Manager
         run: |
           set -euo pipefail
@@ -47,88 +52,4 @@ jobs:
           printf 'NEON_API_KEY=%s\n' "$NEON_API_KEY" >> "$GITHUB_ENV"
 
       - name: Replace the existing snapshot
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          test -n "$NEON_API_KEY"
-
-          api() {
-            curl \
-              --silent \
-              --show-error \
-              --fail-with-body \
-              --header "Authorization: Bearer $NEON_API_KEY" \
-              --header 'Accept: application/json' \
-              "$@"
-          }
-
-          api_get() {
-            curl \
-              --silent \
-              --show-error \
-              --fail-with-body \
-              --retry 3 \
-              --retry-all-errors \
-              --header "Authorization: Bearer $NEON_API_KEY" \
-              --header 'Accept: application/json' \
-              "$@"
-          }
-
-          snapshots_url="$NEON_API_URL/projects/$NEON_PROJECT_ID/snapshots"
-
-          # Free plan allows one manual snapshot, so delete it first.
-          snapshots="$(api_get "$snapshots_url")"
-
-          while IFS= read -r snapshot_id; do
-            test -z "$snapshot_id" && continue
-
-            echo "Deleting snapshot: $snapshot_id"
-            api \
-              --request DELETE \
-              "$snapshots_url/$snapshot_id" \
-              >/dev/null
-          done < <(jq -r '.snapshots[]?.id' <<<"$snapshots")
-
-          # Snapshot deletion is asynchronous.
-          for attempt in {1..12}; do
-            snapshots="$(api_get "$snapshots_url")"
-
-            if [[ "$(jq '.snapshots | length' <<<"$snapshots")" == '0' ]]; then
-              break
-            fi
-
-            if [[ "$attempt" == '12' ]]; then
-              echo 'The previous Neon snapshot was not deleted in time.' >&2
-              exit 1
-            fi
-
-            sleep 10
-          done
-
-          # Snapshots can only be created from the root branch.
-          branches="$(api_get "$NEON_API_URL/projects/$NEON_PROJECT_ID/branches?limit=100")"
-
-          branch_id="$(
-            jq -r '
-              .branches[]
-              | select(.parent_id == null)
-              | .id
-            ' <<<"$branches" | head -n 1
-          )"
-
-          if [[ -z "$branch_id" || "$branch_id" == "null" ]]; then
-            echo 'Could not find the Neon root branch.' >&2
-            exit 1
-          fi
-
-          snapshot_name="buildlog-$(date -u +%Y%m%d)"
-          encoded_name="$(jq -rn --arg name "$snapshot_name" '$name | @uri')"
-
-          echo "Creating snapshot: $snapshot_name"
-
-          api \
-            --request POST \
-            "$NEON_API_URL/projects/$NEON_PROJECT_ID/branches/$branch_id/snapshot?name=$encoded_name"
-
-          echo 'Snapshot created successfully.'
+        run: python .github/scripts/update_neon_snapshot.py
