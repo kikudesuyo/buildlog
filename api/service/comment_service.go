@@ -9,10 +9,10 @@ import (
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
-// ListCommentsByPostID は一覧を取得します。
-func ListCommentsByPostID(ctx context.Context, postID int64) ([]entity.DBTableComment, error) {
+// GetCommentListByPostID は一覧を取得します。
+func GetCommentListByPostID(ctx context.Context, postID int64) ([]entity.DBTableComment, error) {
 	db := library.GetDB(ctx)
-	commentList, err := repository.ListCommentsByPostID(ctx, db, postID)
+	commentList, err := repository.GetCommentListByPostID(ctx, db, postID)
 	if err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}

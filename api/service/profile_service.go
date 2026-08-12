@@ -40,7 +40,6 @@ func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
 
 	return &entity.ProfileResponse{
 		Name:         dbProfile.Name,
-		Subtitle:     dbProfile.Subtitle,
 		Title:        dbProfile.Title,
 		Quote:        dbProfile.Quote,
 		Bio:          bio,
@@ -72,7 +71,6 @@ func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entit
 	dbProfile := entity.DBTableProfile{
 		ID:           1,
 		Name:         req.Name,
-		Subtitle:     req.Subtitle,
 		Title:        req.Title,
 		Quote:        req.Quote,
 		Bio:          string(bioJSON),
@@ -90,7 +88,6 @@ func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entit
 
 	return &entity.ProfileResponse{
 		Name:         dbProfile.Name,
-		Subtitle:     dbProfile.Subtitle,
 		Title:        dbProfile.Title,
 		Quote:        dbProfile.Quote,
 		Bio:          req.Bio,

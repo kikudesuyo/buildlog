@@ -12,6 +12,15 @@ import (
 
 var db *gorm.DB
 
+// SetDBForTest はテスト中だけ利用するDBを設定し、終了時に元のDBへ戻す関数を返します。
+func SetDBForTest(testDB *gorm.DB) func() {
+	previous := db
+	db = testDB
+	return func() {
+		db = previous
+	}
+}
+
 func InitDB() error {
 	dsn := Env("DATABASE_URL")
 	if dsn == "" {
