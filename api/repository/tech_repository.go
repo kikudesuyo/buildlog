@@ -26,13 +26,6 @@ func GetExternalPostList(ctx context.Context, db *gorm.DB, order string, offset,
 	return postList, query.Find(&postList).Error
 }
 
-// CountExternalPosts は外部記事の総件数を取得します。
-func CountExternalPosts(ctx context.Context, db *gorm.DB) (int64, error) {
-	var count int64
-	err := db.WithContext(ctx).Model(&entity.DBTableExternalPost{}).Count(&count).Error
-	return count, err
-}
-
 // FindExternalPost は外部記事をプロバイダーと外部IDで取得します。
 func FindExternalPost(ctx context.Context, db *gorm.DB, provider, externalID string) (*entity.DBTableExternalPost, error) {
 	var post entity.DBTableExternalPost
