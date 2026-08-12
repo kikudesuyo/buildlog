@@ -36,7 +36,7 @@ func (c *QiitaClient) GetOGP(ctx context.Context, rawURL string) (OGPMetadata, e
 	if err != nil {
 		return OGPMetadata{}, err
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusMultipleChoices {
 		return OGPMetadata{}, fmt.Errorf("OGP page returned status %s", res.Status)
 	}

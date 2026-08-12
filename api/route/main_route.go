@@ -28,12 +28,12 @@ func NewRouter() http.Handler {
 		r.Delete("/diaries/{id}", handleFunc(v1.HandleDeleteDiary))
 
 		r.Get("/techs", handleFunc(v1.HandleGetTechList))
-		r.Post("/admin/tech/qiita/sync", handleFunc(v1.HandleSyncQiitaArticles))
+		r.Post("/admin/tech/qiita/sync", handleFunc(v1.HandleSyncQiitaArticleList))
 
 		r.Post("/posts/{id}/like", handleFunc(v1.HandlePostLike))
 		r.Delete("/posts/{id}/like", handleFunc(v1.HandleDeleteLike))
 		r.Get("/posts/{id}/like", handleFunc(v1.HandleGetLikeStatus))
-		r.Get("/trash", handleFunc(v1.HandleGetDeletedPosts))
+		r.Get("/trash", handleFunc(v1.HandleGetDeletedPostList))
 		r.Put("/trash/{id}/restore", handleFunc(v1.HandleRestorePost))
 		r.Get("/apps", handleFunc(v1.HandleGetAppList))
 		r.Get("/apps/{id}", handleFunc(v1.HandleGetApp))

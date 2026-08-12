@@ -9,23 +9,23 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
-// ListDiaries は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
-func ListDiaries(ctx context.Context, all bool, offset int, limit int, sortBy string, sortOrder string, ipAddress string) ([]entity.DBTablePost, error) {
+// GetDiaryList は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
+func GetDiaryList(ctx context.Context, all bool, offset int, limit int, sortBy string, sortOrder string, ipAddress string) ([]entity.DBTablePost, error) {
 	db := library.GetDB(ctx)
-	diaryList, err := repository.ListDiaries(ctx, db, all, offset, limit, sortBy, sortOrder)
+	diaryList, err := repository.GetDiaryList(ctx, db, all, offset, limit, sortBy, sortOrder)
 	if err != nil {
 		return nil, err
 	}
-	postIDs := make([]int64, len(diaryList))
+	postIDList := make([]int64, len(diaryList))
 	for i := range diaryList {
-		postIDs[i] = diaryList[i].ID
+		postIDList[i] = diaryList[i].ID
 	}
-	engagements, err := repository.GetPostEngagements(ctx, db, postIDs, ipAddress)
+	engagementList, err := repository.GetPostEngagementList(ctx, db, postIDList, ipAddress)
 	if err != nil {
 		return nil, err
 	}
 	for i := range diaryList {
-		engagement := engagements[diaryList[i].ID]
+		engagement := engagementList[diaryList[i].ID]
 		diaryList[i].LikesCount = engagement.LikesCount
 		diaryList[i].CommentsCount = engagement.CommentsCount
 		diaryList[i].HasLiked = engagement.HasLiked
@@ -40,11 +40,11 @@ func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTa
 	if err != nil {
 		return nil, err
 	}
-	engagements, err := repository.GetPostEngagements(ctx, db, []int64{diary.ID}, ipAddress)
+	engagementList, err := repository.GetPostEngagementList(ctx, db, []int64{diary.ID}, ipAddress)
 	if err != nil {
 		return nil, err
 	}
-	engagement := engagements[diary.ID]
+	engagement := engagementList[diary.ID]
 	diary.LikesCount = engagement.LikesCount
 	diary.CommentsCount = engagement.CommentsCount
 	diary.HasLiked = engagement.HasLiked

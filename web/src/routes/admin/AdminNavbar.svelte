@@ -83,7 +83,7 @@
 	></button>
 {/if}
 
-<aside aria-label="管理メニュー" aria-modal={isOpen ? 'true' : undefined} class="fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-outline-variant/20 bg-surface-container-lowest {isOpen ? 'flex' : 'hidden'} md:flex">
+<aside aria-label="管理メニュー" class="fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-outline-variant/20 bg-surface-container-lowest {isOpen ? 'flex' : 'hidden'} md:flex">
 	<div class="flex h-20 items-center border-b border-outline-variant/20 px-6">
 		<a href={resolve('/admin')} class="flex items-center gap-3 text-primary transition-opacity hover:opacity-80">
 			<span class="material-symbols-outlined text-2xl">dashboard_customize</span>

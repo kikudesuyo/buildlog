@@ -18,12 +18,13 @@
 	};
 
 	let { entries: initialEntries, isAdmin = false, onEdit, onDelete }: Props = $props();
-	let entries = $state(initialEntries);
+	const initialState = { entries: initialEntries, isAdmin };
+	let entries = $state(initialState.entries);
 	const pageSize = 3;
 	let isLoading = $state(false);
 	let loadError = $state(false);
-	let hasMore = $state(!isAdmin && initialEntries.length === pageSize);
-	const storageKey = `diary-feed-count:${isAdmin ? 'admin' : 'public'}`;
+	let hasMore = $state(!initialState.isAdmin && initialState.entries.length === pageSize);
+	const storageKey = `diary-feed-count:${initialState.isAdmin ? 'admin' : 'public'}`;
 	let sortBy = $state<DiarySort>($page.url.searchParams.get('sort') === 'likes' ? 'likes' : 'newest');
 	let sortOrder = $state<DiarySortOrder>($page.url.searchParams.get('order') === 'asc' ? 'asc' : 'desc');
 	let statusFilter = $state<'all' | 'draft' | 'published'>('all');

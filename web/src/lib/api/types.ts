@@ -31,8 +31,6 @@ export interface TechArticle {
 	external?: ExternalPost;
 }
 
-export type FeaturedTechArticle = TechArticle;
-
 export interface AppProject {
 	id: string;
 	slug?: string;
@@ -48,7 +46,6 @@ export interface AppProject {
 
 export interface ProfileData {
 	name: string;
-	subtitle: string;
 	title: string;
 	quote: string;
 	bio: string[];
@@ -104,6 +101,7 @@ export interface HistoryItem {
 	type: 'diary' | 'tech';
 	title: string;
 	createdAt: string;
+	url?: string;
 }
 
 export interface CommentEntry {

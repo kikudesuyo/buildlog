@@ -16,9 +16,12 @@ import (
 // リクエストを処理し、レスポンスデータを返却する関数
 type ProcessFunc func(r *http.Request, requestData map[string]interface{}) (http.Handler, error)
 
+const maxRequestBodyBytes = 1 << 20
+
 // HandleRequestAndResponse handles a request and response.
 // リクエストとレスポンスを処理する.
 func HandleRequestAndResponse(r *http.Request, w http.ResponseWriter, processFn ProcessFunc) {
+	r.Body = http.MaxBytesReader(w, r.Body, maxRequestBodyBytes)
 	respData, err := handleRequest(r, processFn)
 	if err != nil {
 		entity.NewErrorResponse(err).ServeHTTP(w, r)
