@@ -27,6 +27,8 @@ func expectAnalyticsQueries(mock sqlmock.Sqlmock, posts *sqlmock.Rows, likes *sq
 		WillReturnRows(likes)
 }
 
+// TestGetAnalyticsAggregatesCountsAndLimitsRankings は、投稿・いいねの集計と
+// 上位5件へのランキング制限を検証します。
 func TestGetAnalyticsAggregatesCountsAndLimitsRankings(t *testing.T) {
 	mock := withAnalyticsTestDB(t)
 	now := time.Now()
@@ -71,6 +73,8 @@ func TestGetAnalyticsAggregatesCountsAndLimitsRankings(t *testing.T) {
 	}
 }
 
+// TestGetAnalyticsReturnsZeroValuesForEmptyData は、データがない場合に集計値が
+// 0となり、月次活動だけが12か月分返る境界値を検証します。
 func TestGetAnalyticsReturnsZeroValuesForEmptyData(t *testing.T) {
 	mock := withAnalyticsTestDB(t)
 	expectAnalyticsQueries(
@@ -94,6 +98,8 @@ func TestGetAnalyticsReturnsZeroValuesForEmptyData(t *testing.T) {
 	}
 }
 
+// TestGetAnalyticsReturnsRepositoryError は、投稿取得時のDBエラーが呼び出し元へ
+// 返ることを検証します。
 func TestGetAnalyticsReturnsRepositoryError(t *testing.T) {
 	mock := withAnalyticsTestDB(t)
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "posts" WHERE deleted_at IS NULL`)).
