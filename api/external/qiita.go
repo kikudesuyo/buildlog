@@ -75,9 +75,9 @@ func (c *QiitaClient) fetchPage(ctx context.Context, page int) ([]QiitaItem, err
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Qiita API returned status %s", res.Status)
+		return nil, fmt.Errorf("qiita API returned status %s", res.Status)
 	}
 
 	var items []QiitaItem
