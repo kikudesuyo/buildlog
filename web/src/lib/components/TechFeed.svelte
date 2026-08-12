@@ -158,7 +158,7 @@
 					</div>
 					<div class="flex items-center gap-4"><span class="font-label-sm text-label-sm text-on-surface-variant">{formatDate(article.createdAt)}</span></div>
 				</div>
-				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-[20px]">
+				<h3 class="font-headline-lg text-[20px] leading-tight text-primary decoration-outline-variant decoration-1 underline-offset-4 transition-all group-hover:underline md:text-headline-lg">
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined}>{article.title}</a>
 				</h3>
