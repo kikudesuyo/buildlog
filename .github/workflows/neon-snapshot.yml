@@ -113,7 +113,10 @@ jobs:
           branch_id="$(
             jq -r '
               .branches[]
-              | select(.name == env.NEON_PRODUCTION_BRANCH)
+              | select(
+                  .name == env.NEON_PRODUCTION_BRANCH
+                  and .parent_id == null
+                )
               | .id
             ' <<<"$branches" | head -n 1
           )"
