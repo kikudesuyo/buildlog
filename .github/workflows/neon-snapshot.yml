@@ -92,14 +92,14 @@ jobs:
           done < <(jq -r '.snapshots[]?.id' <<<"$snapshots")
 
           # Snapshot deletion is asynchronous.
-          for attempt in {1..12}; do
+          for attempt in {1..30}; do
             snapshots="$(api_get "$snapshots_url")"
 
             if [[ "$(jq '.snapshots | length' <<<"$snapshots")" == '0' ]]; then
               break
             fi
 
-            if [[ "$attempt" == '12' ]]; then
+            if [[ "$attempt" == '30' ]]; then
               echo 'The previous Neon snapshot was not deleted in time.' >&2
               exit 1
             fi
