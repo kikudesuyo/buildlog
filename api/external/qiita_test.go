@@ -47,6 +47,28 @@ func TestQiitaClientGetUserArticlesGetsEveryPage(t *testing.T) {
 	}
 }
 
+func TestQiitaClientGetUserArticlesIncludesLikesCount(t *testing.T) {
+	client := NewQiitaClient(&http.Client{Transport: roundTripperFunc(func(r *http.Request) (*http.Response, error) {
+		body := `[{"id":"article-1","likes_count":42}]`
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Status:     "200 OK",
+			Body:       io.NopCloser(strings.NewReader(body)),
+			Header:     make(http.Header),
+			Request:    r,
+		}, nil
+	})}, "kikudesuyo")
+	client.BaseURL = "https://qiita.example/api/v2/"
+
+	items, err := client.GetUserArticles(context.Background())
+	if err != nil {
+		t.Fatalf("GetUserArticles returned error: %v", err)
+	}
+	if len(items) != 1 || items[0].LikesCount != 42 {
+		t.Fatalf("likes_count = %d, want 42", items[0].LikesCount)
+	}
+}
+
 type roundTripperFunc func(*http.Request) (*http.Response, error)
 
 func (f roundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }

@@ -45,7 +45,8 @@ func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int,
 		items = append(items, entity.TechFeedItem{
 			Key: fmt.Sprintf("external:%d", post.ID), ID: post.ID, Type: "external", Title: post.Title, Content: post.Excerpt,
 			Status: "published", CreatedAt: post.PublishedAt, UpdatedAt: post.UpdatedAt,
-			External: &entity.ExternalPost{Provider: post.Provider, URL: post.URL, ThumbnailURL: post.ThumbnailURL},
+			LikesCount: post.LikesCount,
+			External:   &entity.ExternalPost{Provider: post.Provider, URL: post.URL, ThumbnailURL: post.ThumbnailURL},
 		})
 	}
 
@@ -86,6 +87,7 @@ func syncQiitaArticle(ctx context.Context, db *gorm.DB, item external.QiitaItem,
 			post.Title = item.Title
 			post.Excerpt = excerptFor(item, metadata)
 			post.ThumbnailURL = thumbnailURL
+			post.LikesCount = item.LikesCount
 			post.URL = item.URL
 			post.PublishedAt = item.CreatedAt
 			post.UpdatedAt = item.UpdatedAt
@@ -102,6 +104,7 @@ func syncQiitaArticle(ctx context.Context, db *gorm.DB, item external.QiitaItem,
 			Title:        item.Title,
 			Excerpt:      excerptFor(item, metadata),
 			ThumbnailURL: metadata.ImageURL,
+			LikesCount:   item.LikesCount,
 			PublishedAt:  item.CreatedAt,
 			UpdatedAt:    item.UpdatedAt,
 		}

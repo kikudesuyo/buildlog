@@ -7,5 +7,5 @@ type HistoryItem struct {
 	Type      string    `json:"type"`
 	Title     string    `json:"title"`
 	CreatedAt time.Time `json:"created_at"`
+	URL       string    `json:"url,omitempty"`
 }
-

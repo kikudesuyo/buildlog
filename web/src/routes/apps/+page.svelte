@@ -26,7 +26,7 @@
 	<title>Buildlog — Apps Showcase</title>
 </svelte:head>
 
-<div class="editorial-container mx-auto px-gutter">
+<div class="mx-auto w-full max-w-6xl px-gutter">
 	<!-- Page Header -->
 	<header class="mb-section-gap">
 		<h1 class="font-display-lg text-display-lg mb-stack-sm text-primary">アプリ一覧</h1>
@@ -43,14 +43,14 @@
 			</button>
 		</section>
 	{:else}
-	<div class="flex flex-col gap-16" aria-busy={retrying}>
-		{#each data.appProjects as project, index (project.id)}
-			<article class="group flex flex-col items-start gap-8 md:flex-row">
+	<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3" aria-busy={retrying}>
+		{#each data.appProjects as project (project.id)}
+			<article class="group flex min-w-0 flex-col items-start gap-5 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-6 shadow-sm transition-shadow hover:shadow-md">
 				<a
 					href={project.codeUrl || project.demoUrl}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-outline-variant/30 bg-surface-container-low p-1.5 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-md cursor-pointer"
+				class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-outline-variant/30 bg-surface-container-low p-1.5 transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-md cursor-pointer"
 					aria-label={`${project.name}の${project.codeUrl ? 'コード' : 'デモ'}を開く（外部サイト）`}
 				>
 					{#if project.iconUrl && !failedImages[project.id]}
@@ -72,7 +72,7 @@
 						</span>
 					{/if}
 				</a>
-				<div class="flex flex-1 flex-col gap-stack-sm">
+				<div class="flex w-full min-w-0 flex-1 flex-col gap-stack-sm">
 					<div class="flex flex-wrap items-start justify-between gap-4">
 						<div>
 							<h2 class="font-headline-md text-headline-md text-primary">
@@ -137,9 +137,6 @@
 				</div>
 			</article>
 
-			{#if index < data.appProjects.length - 1}
-				<hr class="border-outline-variant/20" />
-			{/if}
 		{/each}
 	</div>
 	{/if}

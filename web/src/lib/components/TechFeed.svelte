@@ -166,8 +166,16 @@
 				<a href={featured.external ? articleHref(featured) : resolve('/tech')} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="hover:underline">{featured.title}</a>
 			</h2>
 			<p class="font-body-md text-body-md mb-4 text-on-surface-variant line-clamp-2 md:mb-6 md:line-clamp-3">{featured.content}</p>
-		<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-		<a href={featured.external ? articleHref(featured) : resolve('/tech')} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+			<a href={featured.external ? articleHref(featured) : resolve('/tech')} target={featured.external ? '_blank' : undefined} rel={featured.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+			{#if featured.external}
+				<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant" aria-label={`Qiitaのいいね数: ${featured.likesCount}件`}>
+					<span class="material-symbols-outlined text-[16px] text-error" aria-hidden="true">favorite</span>
+					Qiita いいね {featured.likesCount}
+				</span>
+			{/if}
+		</div>
 			<div class="relative h-1 w-full overflow-hidden rounded-full bg-surface-container-high"><div class="absolute top-0 left-0 h-full w-1/4 bg-primary/20"></div></div>
 		</article>
 	{/if}
@@ -190,8 +198,16 @@
 				</h3>
 				<p class="font-body-md text-body-md line-clamp-2 max-w-[640px] text-on-surface-variant">{article.content}</p>
 				{#if article.external?.thumbnailUrl}<img src={article.external.thumbnailUrl} alt="" class="aspect-[2/1] w-full rounded-lg object-cover" loading="lazy" />{/if}
-			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-			<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+			<div class="flex flex-wrap items-center justify-between gap-3">
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+				<a href={article.external ? articleHref(article) : resolve('/tech')} target={article.external ? '_blank' : undefined} rel={article.external ? 'noreferrer' : undefined} class="font-label-md text-label-md text-primary hover:underline">続きを読む</a>
+				{#if article.external}
+					<span class="font-label-sm text-label-sm flex items-center gap-1 text-on-surface-variant" aria-label={`Qiitaのいいね数: ${article.likesCount}件`}>
+						<span class="material-symbols-outlined text-[16px] text-error" aria-hidden="true">favorite</span>
+						Qiita いいね {article.likesCount}
+					</span>
+				{/if}
+			</div>
 			</article>
 		{/each}
 	</div>
