@@ -8,13 +8,13 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
-// HandleGetApp_List はHTTPリクエストを受け取り、対応する処理結果を返します。
-func HandleGetApp_List(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
-	appList, err := service.GetApp_List(r.Context())
+// HandleGetAppList はHTTPリクエストを受け取り、対応する処理結果を返します。
+func HandleGetAppList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	appList, err := service.GetAppList(r.Context())
 	if err != nil {
 		return nil, err
 	}
-	return entity.New_ListResponse(appList), nil
+	return entity.NewListResponse(appList), nil
 }
 
 // HandleGetApp はHTTPリクエストを受け取り、対応する処理結果を返します。

@@ -16,9 +16,9 @@ type PostEngagement struct {
 	HasLiked      bool
 }
 
-// GetPostEngagement_List は複数記事の反応情報を一括取得します。
+// GetPostEngagementList は複数記事の反応情報を一括取得します。
 
-func GetPostEngagement_List(ctx context.Context, db *gorm.DB, postIDList []int64, ipAddress string) (map[int64]PostEngagement, error) {
+func GetPostEngagementList(ctx context.Context, db *gorm.DB, postIDList []int64, ipAddress string) (map[int64]PostEngagement, error) {
 	engagementList := make(map[int64]PostEngagement, len(postIDList))
 	if len(postIDList) == 0 {
 		return engagementList, nil

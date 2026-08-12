@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// GetApp_List は一覧を取得します。
-func GetApp_List(ctx context.Context, db *gorm.DB) ([]entity.DBTableApp, error) {
+// GetAppList は一覧を取得します。
+func GetAppList(ctx context.Context, db *gorm.DB) ([]entity.DBTableApp, error) {
 	appList := make([]entity.DBTableApp, 0)
 	err := db.WithContext(ctx).Order("id ASC").Find(&appList).Error
 	return appList, err

@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// GetDiary_List は日記一覧を取得し、公開一覧ではページ単位で絞り込みます。
-func GetDiary_List(ctx context.Context, db *gorm.DB, all bool, offset int, limit int, sortBy string, sortOrder string) ([]entity.DBTablePost, error) {
+// GetDiaryList は日記一覧を取得し、公開一覧ではページ単位で絞り込みます。
+func GetDiaryList(ctx context.Context, db *gorm.DB, all bool, offset int, limit int, sortBy string, sortOrder string) ([]entity.DBTablePost, error) {
 	diaryList := make([]entity.DBTablePost, 0)
 	query := db.WithContext(ctx).Where("type = ?", "diary")
 	if !all {

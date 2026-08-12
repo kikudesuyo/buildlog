@@ -13,18 +13,18 @@ import (
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
-// HandleGetComment_List はHTTPリクエストを受け取り、対応する処理結果を返します。
-func HandleGetComment_List(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+// HandleGetCommentList はHTTPリクエストを受け取り、対応する処理結果を返します。
+func HandleGetCommentList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	postID, err := parseCommentPostID(r)
 	if err != nil {
 		return nil, xerror.ClientValidationErr(err)
 	}
 
-	commentList, err := service.GetComment_ListByPostID(r.Context(), postID)
+	commentList, err := service.GetCommentListByPostID(r.Context(), postID)
 	if err != nil {
 		return nil, err
 	}
-	return entity.New_ListResponse(commentList), nil
+	return entity.NewListResponse(commentList), nil
 }
 
 // HandleCreateComment はHTTPリクエストを受け取り、対応する処理結果を返します。

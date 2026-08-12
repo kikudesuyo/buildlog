@@ -32,8 +32,8 @@ func NewObjectResponse(data any) BaseResponse {
 	return BaseResponse{Meta: ResponseMeta{StatusCode: http.StatusOK, Success: true}, DataType: "object", Data: data}
 }
 
-// New_ListResponse は値を生成します。
-func New_ListResponse(data any) BaseResponse {
+// NewListResponse は値を生成します。
+func NewListResponse(data any) BaseResponse {
 	return BaseResponse{Meta: ResponseMeta{StatusCode: http.StatusOK, Success: true}, DataType: "list", DataList: data}
 }
 

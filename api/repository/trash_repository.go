@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// GetDeletedPost_List は一覧を取得します。
-func GetDeletedPost_List(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
+// GetDeletedPostList は一覧を取得します。
+func GetDeletedPostList(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
 	var postList []entity.DBTablePost
 	err := db.WithContext(ctx).
 		Unscoped().

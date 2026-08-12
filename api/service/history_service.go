@@ -8,7 +8,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
-// GetPostHistory_List は削除されていない投稿履歴を取得します。
-func GetPostHistory_List(ctx context.Context) ([]entity.HistoryItem, error) {
-	return repository.GetPostHistory_List(ctx, library.GetDB(ctx))
+// GetPostHistoryList は削除されていない投稿履歴を取得します。
+func GetPostHistoryList(ctx context.Context) ([]entity.HistoryItem, error) {
+	return repository.GetPostHistoryList(ctx, library.GetDB(ctx))
 }

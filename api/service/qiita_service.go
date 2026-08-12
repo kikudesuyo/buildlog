@@ -17,10 +17,10 @@ import (
 
 const qiitaUser = "kikudesuyo"
 
-// SyncQiitaArticle_List はアプリケーションで利用するQiitaユーザーの記事を同期します。
-func SyncQiitaArticle_List(ctx context.Context) (int, error) {
+// SyncQiitaArticleList はアプリケーションで利用するQiitaユーザーの記事を同期します。
+func SyncQiitaArticleList(ctx context.Context) (int, error) {
 	qiitaClient := external.NewQiitaClient(nil, qiitaUser)
-	itemList, err := qiitaClient.GetUserArticle_List(ctx)
+	itemList, err := qiitaClient.GetUserArticleList(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -34,8 +34,8 @@ func SyncQiitaArticle_List(ctx context.Context) (int, error) {
 	return len(itemList), nil
 }
 
-func GetTechFeed_List(ctx context.Context, db *gorm.DB, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, error) {
-	externalPostList, err := repository.GetExternalPost_List(ctx, db, order)
+func GetTechFeedList(ctx context.Context, db *gorm.DB, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, error) {
+	externalPostList, err := repository.GetExternalPostList(ctx, db, order)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func GetTechFeed_List(ctx context.Context, db *gorm.DB, all bool, offset, limit 
 		})
 	}
 
-	sortTechFeed_List(itemList, order)
+	sortTechFeedList(itemList, order)
 	if offset >= len(itemList) {
 		return []entity.TechFeedItem{}, nil
 	}
@@ -61,7 +61,7 @@ func GetTechFeed_List(ctx context.Context, db *gorm.DB, all bool, offset, limit 
 	return itemList[offset:end], nil
 }
 
-func sortTechFeed_List(itemList []entity.TechFeedItem, order string) {
+func sortTechFeedList(itemList []entity.TechFeedItem, order string) {
 	sort.SliceStable(itemList, func(i, j int) bool {
 		if itemList[i].CreatedAt.Equal(itemList[j].CreatedAt) {
 			if order == "asc" {

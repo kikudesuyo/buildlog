@@ -9,8 +9,8 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
-// HandleGetDiary_List はHTTPリクエストを受け取り、対応する処理結果を返します。
-func HandleGetDiary_List(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+// HandleGetDiaryList はHTTPリクエストを受け取り、対応する処理結果を返します。
+func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	all := r.URL.Query().Get("all") == "true"
 	if all {
 		if err := handler.ValidateRequestWithAuth(r); err != nil {
@@ -33,11 +33,11 @@ func HandleGetDiary_List(r *http.Request, requestData map[string]interface{}) (h
 	if limit < 0 {
 		limit = 0
 	}
-	diaryList, err := service.GetDiary_List(r.Context(), all, offset, limit, sortBy, sortOrder, getClientIP(r))
+	diaryList, err := service.GetDiaryList(r.Context(), all, offset, limit, sortBy, sortOrder, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
-	return entity.New_ListResponse(diaryList), nil
+	return entity.NewListResponse(diaryList), nil
 }
 
 // HandleGetDiary はHTTPリクエストを受け取り、対応する処理結果を返します。

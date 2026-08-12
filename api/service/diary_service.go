@@ -9,10 +9,10 @@ import (
 	"github.com/kikudesuyo/buildlog/api/repository"
 )
 
-// GetDiary_List は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
-func GetDiary_List(ctx context.Context, all bool, offset int, limit int, sortBy string, sortOrder string, ipAddress string) ([]entity.DBTablePost, error) {
+// GetDiaryList は日記一覧を取得し、ページングと閲覧者ごとの反応情報を付与します。
+func GetDiaryList(ctx context.Context, all bool, offset int, limit int, sortBy string, sortOrder string, ipAddress string) ([]entity.DBTablePost, error) {
 	db := library.GetDB(ctx)
-	diaryList, err := repository.GetDiary_List(ctx, db, all, offset, limit, sortBy, sortOrder)
+	diaryList, err := repository.GetDiaryList(ctx, db, all, offset, limit, sortBy, sortOrder)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func GetDiary_List(ctx context.Context, all bool, offset int, limit int, sortBy 
 	for i := range diaryList {
 		postIDList[i] = diaryList[i].ID
 	}
-	engagementList, err := repository.GetPostEngagement_List(ctx, db, postIDList, ipAddress)
+	engagementList, err := repository.GetPostEngagementList(ctx, db, postIDList, ipAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func GetDiaryByID(ctx context.Context, id int64, ipAddress string) (*entity.DBTa
 	if err != nil {
 		return nil, err
 	}
-	engagementList, err := repository.GetPostEngagement_List(ctx, db, []int64{diary.ID}, ipAddress)
+	engagementList, err := repository.GetPostEngagementList(ctx, db, []int64{diary.ID}, ipAddress)
 	if err != nil {
 		return nil, err
 	}
