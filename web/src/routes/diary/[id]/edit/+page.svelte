@@ -5,12 +5,13 @@
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
 	let { data } = $props();
+	const initialData = data;
 
-	let title = $state(data.diary.title);
+	let title = $state(initialData.diary.title);
 	const MAX_TITLE_LENGTH = 100;
 	let contentElement = $state<HTMLTextAreaElement | null>(null);
-	let content = $state(data.diary.content);
-	let status = $state(data.diary.status || 'draft');
+	let content = $state(initialData.diary.content);
+	let status = $state(initialData.diary.status || 'draft');
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
 	let isAutoSaving = $state(false);

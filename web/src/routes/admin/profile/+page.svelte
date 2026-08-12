@@ -6,25 +6,26 @@
 	const localAvatarUrl = '/profile.jpg';
 
 	let { data } = $props();
-	let savedProfile = $state(data.profileData);
+	const initialData = data;
+	let savedProfile = $state(initialData.profileData);
 
-	let name = $state(data.profileData.name);
-	let title = $state(data.profileData.title);
-	let quote = $state(data.profileData.quote);
+	let name = $state(initialData.profileData.name);
+	let title = $state(initialData.profileData.title);
+	let quote = $state(initialData.profileData.quote);
 	
 	// bio は配列なので、改行で繋げてテキストエリアで編集
-	let bioText = $state(data.profileData.bio.join('\n\n'));
+	let bioText = $state(initialData.profileData.bio.join('\n\n'));
 	
 	// highlights は配列のコピー
-	let highlights = $state(JSON.parse(JSON.stringify(data.profileData.highlights)));
+	let highlights = $state(JSON.parse(JSON.stringify(initialData.profileData.highlights)));
 	
-	let award = $state(data.profileData.award || '');
+	let award = $state(initialData.profileData.award || '');
 	
 	// expertise は配列なので、カンマ区切りで編集
-	let expertiseText = $state(data.profileData.expertise.join(', '));
+	let expertiseText = $state(initialData.profileData.expertise.join(', '));
 	
-	let contactEmail = $state(data.profileData.contactEmail);
-	let finalQuote = $state(data.profileData.finalQuote);
+	let contactEmail = $state(initialData.profileData.contactEmail);
+	let finalQuote = $state(initialData.profileData.finalQuote);
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');

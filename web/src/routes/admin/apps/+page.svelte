@@ -4,7 +4,8 @@
 	import IconButton from '$lib/components/IconButton.svelte';
 
 	let { data } = $props();
-	let appProjects = $state(data.appProjects);
+	const initialData = data;
+	let appProjects = $state(initialData.appProjects);
 
 	async function handleDelete(id: string) {
 		if (!confirm('このアプリを削除してもよろしいですか？')) return;
