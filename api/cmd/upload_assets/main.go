@@ -31,7 +31,11 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("create storage client: %w", err))
 	}
-	defer client.Close()
+	defer func() {
+		if err := client.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "close storage client: %v\n", err)
+		}
+	}()
 
 	bucket := client.Bucket(bucketName)
 	if err := ensureBucket(ctx, bucket, bucketName, library.Env("GCP_PROJECT")); err != nil {
@@ -60,13 +64,17 @@ func ensureBucket(ctx context.Context, bucket *storage.BucketHandle, bucketName,
 	return nil
 }
 
-func upload(ctx context.Context, bucket *storage.BucketHandle, sourceName, objectName string) error {
+func upload(ctx context.Context, bucket *storage.BucketHandle, sourceName, objectName string) (err error) {
 	sourcePath := filepath.Join("..", "web", "static", sourceName)
 	file, err := os.Open(sourcePath)
 	if err != nil {
 		return fmt.Errorf("open %q: %w", sourcePath, err)
 	}
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); err == nil && closeErr != nil {
+			err = fmt.Errorf("close %q: %w", sourceName, closeErr)
+		}
+	}()
 
 	writer := bucket.Object(objectName).NewWriter(ctx)
 	writer.ContentType = mime.TypeByExtension(filepath.Ext(sourceName))
