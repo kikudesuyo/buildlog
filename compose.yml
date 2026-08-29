@@ -21,3 +21,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  gcs:
+    image: fsouza/fake-gcs-server:latest
+    container_name: buildlog-gcs
+    restart: unless-stopped
+    ports:
+      - "${GCS_PORT:-14443}:4443"
+    volumes:
+      - ./.local/gcs:/data
+    command: ["-scheme", "http", "-public-host", "localhost:${GCS_PORT:-14443}"]

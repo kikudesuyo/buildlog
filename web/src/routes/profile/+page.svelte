@@ -23,7 +23,7 @@
 					<img
 						class="aspect-square h-full w-full object-cover grayscale transition-all duration-300 hover:grayscale-0"
 						alt={data.profileData.name}
-						src="/profile.jpg"
+						src={data.profileData.avatarUrl}
 						onerror={handleAvatarError}
 						loading="lazy"
 					/>

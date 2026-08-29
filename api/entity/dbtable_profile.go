@@ -6,6 +6,7 @@ type DBTableProfile struct {
 	ID           int64     `gorm:"column:id;primaryKey"`
 	Name         string    `gorm:"column:name"`
 	Title        string    `gorm:"column:title"`
+	AvatarURL    string    `gorm:"column:avatar_url"`
 	Quote        string    `gorm:"column:quote"`
 	Bio          string    `gorm:"column:bio"`
 	Highlights   string    `gorm:"column:highlights"`

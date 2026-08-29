@@ -41,6 +41,7 @@ func GetProfile(ctx context.Context) (*entity.ProfileResponse, error) {
 	return &entity.ProfileResponse{
 		Name:         dbProfile.Name,
 		Title:        dbProfile.Title,
+		AvatarURL:    library.PublicAssetURL(dbProfile.AvatarURL),
 		Quote:        dbProfile.Quote,
 		Bio:          bio,
 		Highlights:   highlights,
@@ -82,6 +83,11 @@ func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entit
 	}
 
 	db := library.GetDB(ctx)
+	currentProfile, err := repository.GetProfile(ctx, db)
+	if err != nil {
+		return nil, err
+	}
+	dbProfile.AvatarURL = currentProfile.AvatarURL
 	if err := repository.UpdateProfile(ctx, db, &dbProfile); err != nil {
 		return nil, err
 	}
@@ -89,6 +95,7 @@ func UpdateProfile(ctx context.Context, req entity.UpdateProfileRequest) (*entit
 	return &entity.ProfileResponse{
 		Name:         dbProfile.Name,
 		Title:        dbProfile.Title,
+		AvatarURL:    library.PublicAssetURL(dbProfile.AvatarURL),
 		Quote:        dbProfile.Quote,
 		Bio:          req.Bio,
 		Highlights:   req.Highlights,

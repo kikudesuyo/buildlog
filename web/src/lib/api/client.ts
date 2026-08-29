@@ -441,6 +441,7 @@ export async function fetchProfile(fetchFn: ApiFetch): Promise<ProfileData> {
 		id: number;
 		name: string;
 		title: string;
+		avatar_url: string;
 		quote: string;
 		bio: string[];
 		highlights: { title: string; period: string; description: string }[];
@@ -453,6 +454,7 @@ export async function fetchProfile(fetchFn: ApiFetch): Promise<ProfileData> {
 	return {
 		name: response.data.name,
 		title: response.data.title,
+		avatarUrl: response.data.avatar_url,
 		quote: response.data.quote,
 		bio: response.data.bio,
 		highlights: response.data.highlights,
@@ -468,6 +470,7 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 		id: number;
 		name: string;
 		title: string;
+		avatar_url: string;
 		quote: string;
 		bio: string[];
 		highlights: { title: string; period: string; description: string }[];
@@ -490,6 +493,7 @@ export async function updateProfile(profile: ProfileData): Promise<ProfileData> 
 	return {
 		name: response.data.name,
 		title: response.data.title,
+		avatarUrl: response.data.avatar_url,
 		quote: response.data.quote,
 		bio: response.data.bio,
 		highlights: response.data.highlights,

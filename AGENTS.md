@@ -461,6 +461,24 @@ git switch -c issue/<issue-number>
 
 # マルチエージェント・並行作業
 
+複数のAgentまたはユーザーが同時に作業する可能性がある場合は、作業対象のブランチごとに専用のworktreeを使用してください。現在の作業ツリーで別ブランチへ切り替えて、他の作業中の変更を巻き込んではいけません。
+
+作業開始前に以下を確認し、対象ブランチのworktreeが存在しない場合は作成してください。
+
+```bash
+git status --short --branch
+git worktree list
+git branch -vv
+```
+
+worktreeの作成例:
+
+```bash
+git worktree add /tmp/<project>-<issue-number> issue/<issue-number>
+```
+
+既存のworktreeに未コミット変更がある場合は、それを保持したまま別のworktreeを使用してください。worktree間で変更を共有する必要がある場合は、commit、patch、または明示的なユーザー確認を使用してください。
+
 別Agentによってbranchや作業ツリーが変更されている場合があります。
 
 branchが変わったことだけを理由に作業を停止してはいけません。

@@ -47,6 +47,7 @@ export interface AppProject {
 export interface ProfileData {
 	name: string;
 	title: string;
+	avatarUrl: string;
 	quote: string;
 	bio: string[];
 	highlights: {

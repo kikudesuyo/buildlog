@@ -25,7 +25,7 @@ func mapToAppResponse(dbApp *entity.DBTableApp) (*entity.AppResponse, error) {
 		Tags:        tags,
 		Description: dbApp.Description,
 		Icon:        dbApp.Icon,
-		IconURL:     dbApp.IconURL,
+		IconURL:     library.PublicAssetURL(dbApp.IconURL),
 		DemoURL:     dbApp.DemoURL,
 		CodeURL:     dbApp.CodeURL,
 	}, nil
