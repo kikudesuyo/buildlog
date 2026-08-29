@@ -1,4 +1,4 @@
-.PHONY: build dev dev-auth lint lint-fix docker-build-prod _docker-build deploy-prod deploy-staging __deploy migrate_apply_prod migrate_apply_staging
+.PHONY: build dev dev-auth upload-assets lint lint-fix docker-build-prod _docker-build deploy-prod deploy-staging __deploy migrate_apply_prod migrate_apply_staging
 
 GO111MODULE=on
 LOAD_ENV=. ./default_env.sh
@@ -18,6 +18,10 @@ dev:
 dev-auth:
 	gcloud auth application-default login \
 	  --scopes=https://www.googleapis.com/auth/cloud-platform
+
+upload-assets:
+	$(LOAD_ENV) ; \
+	go run ./cmd/upload_assets
 
 lint:
 	@type golangci-lint > /dev/null || go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.4

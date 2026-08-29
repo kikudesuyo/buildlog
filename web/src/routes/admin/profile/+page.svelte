@@ -3,8 +3,6 @@
 	import { updateProfile } from '$lib/api/client';
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
-	const localAvatarUrl = '/profile.jpg';
-
 	let { data } = $props();
 	const initialData = data;
 	let savedProfile = $state(initialData.profileData);
@@ -68,6 +66,7 @@
 			const updatedProfile = await updateProfile({
 				name,
 				title,
+				avatarUrl: savedProfile.avatarUrl,
 				quote,
 				bio,
 				highlights,
@@ -143,7 +142,7 @@
 				</div>
 
 				<div class="flex md:col-span-2">
-					<img src={localAvatarUrl} alt="プロフィール画像" class="h-16 w-16 rounded-full border border-outline-variant/30 object-cover" />
+					<img src={data.profileData.avatarUrl} alt="プロフィール画像" class="h-16 w-16 rounded-full border border-outline-variant/30 object-cover" />
 				</div>
 			</div>
 		</section>
