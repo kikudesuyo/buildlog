@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/library"
 	"github.com/kikudesuyo/buildlog/api/repository"
 	"github.com/kikudesuyo/buildlog/api/xerror"
+	"gorm.io/gorm"
 )
 
 const (
@@ -54,8 +56,7 @@ func CreateDailyLearning(ctx context.Context, req entity.CreateLearningRequest) 
 	return &response, nil
 }
 
-// GenerateLearning creates a period summary from the available lower-granularity records.
-// The generated text is intentionally limited to source content and does not infer new achievements.
+// GenerateLearning creates a period summary from the sources defined by the growth-log specification.
 func GenerateLearning(ctx context.Context, periodType string, req entity.GenerateLearningRequest) (*entity.LearningResponse, error) {
 	if periodType != WeeklyLearning && periodType != MonthlyLearning {
 		return nil, xerror.ClientValidationErr(errors.New("only weekly or monthly learning can be generated"))
@@ -65,20 +66,13 @@ func GenerateLearning(ctx context.Context, periodType string, req entity.Generat
 		return nil, xerror.ClientValidationErr(errors.New("invalid period start"))
 	}
 	start, end := learningPeriod(periodType, requestedStart)
-	sourceType := DailyLearning
-	if periodType == MonthlyLearning {
-		sourceType = WeeklyLearning
-	}
-	sources, err := repository.ListLearnings(ctx, library.GetDB(ctx), sourceType, start, end)
+	db := library.GetDB(ctx)
+	lines, err := learningSourceLines(ctx, db, periodType, start, end)
 	if err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
-	if len(sources) == 0 {
-		return nil, xerror.ClientValidationErr(errors.New("no source learnings found"))
-	}
-	lines := make([]string, 0, len(sources))
-	for _, source := range sources {
-		lines = append(lines, "- "+strings.TrimSpace(source.Content))
+	if len(lines) == 0 {
+		return nil, xerror.ClientValidationErr(errors.New("no source content found"))
 	}
 	prefix := "今週取り組んだこと:"
 	if periodType == MonthlyLearning {
@@ -93,6 +87,54 @@ func GenerateLearning(ctx context.Context, periodType string, req entity.Generat
 	}
 	response := learningResponse(learning)
 	return &response, nil
+}
+
+func learningSourceLines(ctx context.Context, db *gorm.DB, periodType string, start, end time.Time) ([]string, error) {
+	lines := make([]string, 0)
+	if periodType == WeeklyLearning {
+		posts, err := repository.ListPublishedPostsForLearning(ctx, db, start, end)
+		if err != nil {
+			return nil, err
+		}
+		for _, post := range posts {
+			lines = append(lines, formatLearningSource(post.Type, post.Title, post.Content))
+		}
+		externalPosts, err := repository.ListExternalPostsForLearning(ctx, db, start, end)
+		if err != nil {
+			return nil, err
+		}
+		for _, post := range externalPosts {
+			lines = append(lines, formatLearningSource(post.Provider, post.Title, post.Excerpt))
+		}
+		return lines, nil
+	}
+
+	weekly, err := repository.ListLearnings(ctx, db, WeeklyLearning, start, end)
+	if err != nil {
+		return nil, err
+	}
+	for _, learning := range weekly {
+		lines = append(lines, formatLearningSource("weekly", "", learning.Content))
+	}
+	goals, err := repository.GetGoalPeriod(ctx, db, monthlyGoalPeriod, start)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if goals != nil {
+		for _, goal := range goals.Goals {
+			progress := fmt.Sprintf("進捗 %d/%d", goal.ProgressValue, goal.TargetValue)
+			lines = append(lines, formatLearningSource("goal", goal.Title, progress))
+		}
+	}
+	return lines, nil
+}
+
+func formatLearningSource(source, title, content string) string {
+	content = strings.TrimSpace(content)
+	if title = strings.TrimSpace(title); title != "" {
+		return "- [" + source + "] " + title + ": " + content
+	}
+	return "- [" + source + "] " + content
 }
 
 func learningPeriod(periodType string, now time.Time) (time.Time, time.Time) {

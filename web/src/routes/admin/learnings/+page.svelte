@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createDailyLearning, generateLearning } from '$lib/api/client';
+	import { generateLearning } from '$lib/api/client';
 	import type { Learning, LearningPeriodType } from '$lib/api/types';
 
 	let { data } = $props();
@@ -9,30 +9,10 @@
 		weekly: data.weekly,
 		monthly: data.monthly
 	});
-	let content = $state('');
-	let level = $state<NonNullable<Learning['level']>>('understood');
 	let errorMessage = $state('');
 	let isSubmitting = $state(false);
 
 	const labels = { daily: '今日', weekly: '今週', monthly: '今月' } as const;
-
-	async function saveDaily() {
-		if (!content.trim()) {
-			errorMessage = '学びの内容を入力してください。';
-			return;
-		}
-		isSubmitting = true;
-		errorMessage = '';
-		try {
-			const item = await createDailyLearning(content, level);
-			learnings.daily = [item, ...learnings.daily];
-			content = '';
-		} catch {
-			errorMessage = '学びを保存できませんでした。';
-		} finally {
-			isSubmitting = false;
-		}
-	}
 
 	async function generate() {
 		if (activePeriod === 'daily') return;
@@ -70,14 +50,10 @@
 	</div>
 
 	{#if activePeriod === 'daily'}
-		<form onsubmit={(event) => { event.preventDefault(); saveDaily(); }} class="mb-8 rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5">
-			<label for="learning-content" class="font-label-md text-label-md mb-2 block text-primary">今日の学び</label>
-			<textarea id="learning-content" bind:value={content} rows="4" class="font-body-md text-body-md mb-4 w-full rounded-lg border border-outline-variant/40 bg-surface px-3 py-2 text-primary" placeholder="学んだこと、理解したこと、試したことを記録…"></textarea>
-			<div class="flex flex-wrap items-end justify-between gap-4">
-				<label class="font-label-sm text-label-sm text-on-surface-variant">理解度<select bind:value={level} class="ml-2 min-h-11 rounded-lg border border-outline-variant/40 bg-surface px-3 py-2 text-primary"><option value="learned">知った</option><option value="understood">理解した</option><option value="applied">使った</option><option value="explainable">説明できる</option></select></label>
-				<button type="submit" disabled={isSubmitting} class="font-label-md text-label-md min-h-11 rounded-lg bg-primary px-5 py-2 text-on-primary">保存する</button>
-			</div>
-		</form>
+		<div class="mb-8 rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5">
+			<p class="font-label-md text-label-md text-primary">Daily は自動取り込みです</p>
+			<p class="font-body-sm text-body-sm mt-2 text-on-surface-variant">Notion に記録したログをローカルスケジューラが取り込みます。この画面では取り込まれた今日の学びを確認できます。</p>
+		</div>
 	{/if}
 
 	{#if errorMessage}<p class="font-body-sm text-body-sm mb-4 text-error" role="alert">{errorMessage}</p>{/if}
