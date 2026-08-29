@@ -7,15 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
-// ListDeletedPosts は一覧を取得します。
-func ListDeletedPosts(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
-	var posts []entity.DBTablePost
+// GetDeletedPostList は一覧を取得します。
+func GetDeletedPostList(ctx context.Context, db *gorm.DB) ([]entity.DBTablePost, error) {
+	var postList []entity.DBTablePost
 	err := db.WithContext(ctx).
 		Unscoped().
 		Where("deleted_at IS NOT NULL").
 		Order("deleted_at DESC").
-		Find(&posts).Error
-	return posts, err
+		Find(&postList).Error
+	return postList, err
 }
 
 // RestorePost は削除済みデータを復元します。

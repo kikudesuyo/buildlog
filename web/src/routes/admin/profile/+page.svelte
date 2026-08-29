@@ -6,26 +6,26 @@
 	const localAvatarUrl = '/profile.jpg';
 
 	let { data } = $props();
-	let savedProfile = $state(data.profileData);
+	const initialData = data;
+	let savedProfile = $state(initialData.profileData);
 
-	let name = $state(data.profileData.name);
-	let title = $state(data.profileData.title);
-	let subtitle = $state(data.profileData.subtitle);
-	let quote = $state(data.profileData.quote);
+	let name = $state(initialData.profileData.name);
+	let title = $state(initialData.profileData.title);
+	let quote = $state(initialData.profileData.quote);
 	
 	// bio は配列なので、改行で繋げてテキストエリアで編集
-	let bioText = $state(data.profileData.bio.join('\n\n'));
+	let bioText = $state(initialData.profileData.bio.join('\n\n'));
 	
 	// highlights は配列のコピー
-	let highlights = $state(JSON.parse(JSON.stringify(data.profileData.highlights)));
+	let highlights = $state(JSON.parse(JSON.stringify(initialData.profileData.highlights)));
 	
-	let award = $state(data.profileData.award || '');
+	let award = $state(initialData.profileData.award || '');
 	
 	// expertise は配列なので、カンマ区切りで編集
-	let expertiseText = $state(data.profileData.expertise.join(', '));
+	let expertiseText = $state(initialData.profileData.expertise.join(', '));
 	
-	let contactEmail = $state(data.profileData.contactEmail);
-	let finalQuote = $state(data.profileData.finalQuote);
+	let contactEmail = $state(initialData.profileData.contactEmail);
+	let finalQuote = $state(initialData.profileData.finalQuote);
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
@@ -34,7 +34,6 @@
 	let isDirty = $derived(
 		name !== savedProfile.name ||
 		title !== savedProfile.title ||
-		subtitle !== savedProfile.subtitle ||
 		quote !== savedProfile.quote ||
 		bioText !== savedProfile.bio.join('\n\n') ||
 		JSON.stringify(highlights) !== JSON.stringify(savedProfile.highlights) ||
@@ -69,7 +68,6 @@
 			const updatedProfile = await updateProfile({
 				name,
 				title,
-				subtitle,
 				quote,
 				bio,
 				highlights,
@@ -125,7 +123,7 @@
 	</div>
 </header>
 
-	<div class="editorial-container mx-auto max-w-[800px] px-gutter pb-16 pt-28 md:pb-20 md:pt-24">
+	<div class="editorial-container mx-auto px-gutter pb-16 pt-28 md:!max-w-6xl md:pb-20 md:pt-24">
 	<h1 class="font-display-lg mb-6 text-display-lg text-primary font-bold tracking-tight md:mb-8">プロフィール編集</h1>
 
 	<form class="flex flex-col gap-7 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-xs md:gap-8 md:p-8" onsubmit={(e) => e.preventDefault()}>
@@ -142,11 +140,6 @@
 				<div class="flex flex-col gap-1.5">
 					<label for="title" class="font-label-md text-label-md font-bold text-on-surface">肩書き / Title</label>
 					<input id="title" type="text" bind:value={title} class="variable-input min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
-				</div>
-
-				<div class="flex flex-col gap-1.5 md:col-span-2">
-					<label for="subtitle" class="font-label-md text-label-md font-bold text-on-surface">サブタイトル / Subtitle</label>
-					<input id="subtitle" type="text" bind:value={subtitle} class="variable-input min-w-0 rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting} />
 				</div>
 
 				<div class="flex md:col-span-2">
@@ -201,7 +194,7 @@
 							</div>
 							<div class="flex flex-col gap-1">
 								<label for="hl-desc-{index}" class="font-label-sm text-label-sm text-outline">説明 / Description</label>
-								<textarea id="hl-desc-{index}" bind:value={highlight.description} class="variable-input h-16 min-w-0 resize-none rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-1 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0" disabled={isSubmitting}></textarea>
+								<textarea id="hl-desc-{index}" bind:value={highlight.description} class="variable-input min-h-[120px] min-w-0 resize-y rounded-none border-0 border-b border-outline-variant/50 bg-transparent px-0 py-2 text-body-md text-on-surface focus:border-primary focus:outline-none focus:ring-0 md:min-h-[160px]" disabled={isSubmitting}></textarea>
 							</div>
 						</div>
 					</div>

@@ -6,8 +6,9 @@ test('verify calendar UI displays correctly and interactive click actions work',
 	await page.waitForLoadState('networkidle');
 
 	// 見出しの確認
-	const header = page.locator('text=投稿履歴とカレンダー');
+	const header = page.getByRole('heading', { name: '投稿履歴', exact: true });
 	await expect(header).toBeVisible();
+	await expect(page.getByText('これまでの執筆活動の記録です。投稿のある日をクリックすると、その記事にアクセスできます。')).toBeVisible();
 
 	// カレンダー内の投稿日を示すドットマークや primary カラーのセルがあるかを確認
 	// 投稿が存在する日付セルをクリックしてみる
