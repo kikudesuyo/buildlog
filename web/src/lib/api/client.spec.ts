@@ -94,6 +94,14 @@ describe('fetchTechFeed', () => {
 		expect(fetchFn).toHaveBeenCalledWith('/api/v1/techs?limit=1');
 	});
 
+	it('sends the likes sort parameter', async () => {
+		const fetchFn = apiFetch({ data_list: [techPost] });
+
+		await fetchTechFeed(fetchFn, false, 0, 10, 'desc', 'likes');
+
+		expect(fetchFn).toHaveBeenCalledWith('/api/v1/techs?limit=10&sort=likes');
+	});
+
 	it('returns an empty list when there are no posts', async () => {
 		const result = await fetchTechFeed(apiFetch({ data_list: [] }));
 

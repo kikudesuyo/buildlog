@@ -33,11 +33,15 @@ func HandleGetTechList(r *http.Request, requestData map[string]interface{}) (htt
 	if err != nil {
 		return nil, err
 	}
+	sortBy := query.Get("sort")
+	if sortBy != "likes" {
+		sortBy = "newest"
+	}
 	order := query.Get("order")
 	if order != "asc" {
 		order = "desc"
 	}
-	techList, err := service.GetTechList(r.Context(), false, offset, limit, order, getClientIP(r))
+	techList, err := service.GetTechList(r.Context(), false, offset, limit, sortBy, order, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}
