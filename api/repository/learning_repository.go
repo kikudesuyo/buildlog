@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func ListLearnings(ctx context.Context, db *gorm.DB, periodType string, start, end time.Time) ([]entity.DBTableLearning, error) {
+func FetchLearnings(ctx context.Context, db *gorm.DB, periodType string, start, end time.Time) ([]entity.DBTableLearning, error) {
 	var learnings []entity.DBTableLearning
 	err := db.WithContext(ctx).
 		Where("period_type = ? AND period_start >= ? AND period_start <= ?", periodType, start, end).

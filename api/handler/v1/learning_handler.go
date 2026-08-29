@@ -12,7 +12,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/xerror"
 )
 
-func HandleGetCurrentLearnings(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+func HandleFetchCurrentLearnings(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	if err := handler.ValidateRequestWithAuth(r); err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func HandleGetCurrentLearnings(r *http.Request, requestData map[string]interface
 	if periodType == "" {
 		periodType = service.DailyLearning
 	}
-	items, err := service.GetCurrentLearnings(r.Context(), periodType, time.Now())
+	items, err := service.FetchCurrentLearnings(r.Context(), periodType, time.Now())
 	if err != nil {
 		return nil, err
 	}

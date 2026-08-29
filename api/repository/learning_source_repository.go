@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// ListPublishedPostsForLearning は指定期間の公開済みアプリ投稿を取得します。
-func ListPublishedPostsForLearning(ctx context.Context, db *gorm.DB, start, end time.Time) ([]entity.DBTablePost, error) {
+// FetchPublishedPostsForLearning は指定期間の公開済みアプリ投稿を取得します。
+func FetchPublishedPostsForLearning(ctx context.Context, db *gorm.DB, start, end time.Time) ([]entity.DBTablePost, error) {
 	var posts []entity.DBTablePost
 	err := db.WithContext(ctx).
 		Where("status = ? AND created_at >= ? AND created_at < ?", "published", start, end.AddDate(0, 0, 1)).
@@ -17,8 +17,8 @@ func ListPublishedPostsForLearning(ctx context.Context, db *gorm.DB, start, end 
 	return posts, err
 }
 
-// ListExternalPostsForLearning は指定期間に公開された外部投稿を取得します。
-func ListExternalPostsForLearning(ctx context.Context, db *gorm.DB, start, end time.Time) ([]entity.DBTableExternalPost, error) {
+// FetchExternalPostsForLearning は指定期間に公開された外部投稿を取得します。
+func FetchExternalPostsForLearning(ctx context.Context, db *gorm.DB, start, end time.Time) ([]entity.DBTableExternalPost, error) {
 	var posts []entity.DBTableExternalPost
 	err := db.WithContext(ctx).
 		Where("published_at >= ? AND published_at < ?", start, end.AddDate(0, 0, 1)).

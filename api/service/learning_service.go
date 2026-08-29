@@ -23,12 +23,12 @@ const (
 
 var validLearningLevels = map[string]bool{"learned": true, "understood": true, "applied": true, "explainable": true}
 
-func GetCurrentLearnings(ctx context.Context, periodType string, now time.Time) ([]entity.LearningResponse, error) {
+func FetchCurrentLearnings(ctx context.Context, periodType string, now time.Time) ([]entity.LearningResponse, error) {
 	if !validPeriodType(periodType) {
 		return nil, xerror.ClientValidationErr(errors.New("invalid learning period type"))
 	}
 	start, end := learningPeriod(periodType, now.UTC())
-	items, err := repository.ListLearnings(ctx, library.GetDB(ctx), periodType, start, end)
+	items, err := repository.FetchLearnings(ctx, library.GetDB(ctx), periodType, start, end)
 	if err != nil {
 		return nil, xerror.UnknownServerErr(err)
 	}
@@ -92,14 +92,14 @@ func CreateLearningSummary(ctx context.Context, periodType string, req entity.Cr
 func learningSourceLines(ctx context.Context, db *gorm.DB, periodType string, start, end time.Time) ([]string, error) {
 	lines := make([]string, 0)
 	if periodType == WeeklyLearning {
-		posts, err := repository.ListPublishedPostsForLearning(ctx, db, start, end)
+		posts, err := repository.FetchPublishedPostsForLearning(ctx, db, start, end)
 		if err != nil {
 			return nil, err
 		}
 		for _, post := range posts {
 			lines = append(lines, formatLearningSource(post.Type, post.Title, post.Content))
 		}
-		externalPosts, err := repository.ListExternalPostsForLearning(ctx, db, start, end)
+		externalPosts, err := repository.FetchExternalPostsForLearning(ctx, db, start, end)
 		if err != nil {
 			return nil, err
 		}
@@ -109,7 +109,7 @@ func learningSourceLines(ctx context.Context, db *gorm.DB, periodType string, st
 		return lines, nil
 	}
 
-	weekly, err := repository.ListLearnings(ctx, db, WeeklyLearning, start, end)
+	weekly, err := repository.FetchLearnings(ctx, db, WeeklyLearning, start, end)
 	if err != nil {
 		return nil, err
 	}
