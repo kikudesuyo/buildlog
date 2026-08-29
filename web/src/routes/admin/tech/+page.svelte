@@ -27,7 +27,7 @@
 </script>
 
 <svelte:head><title>Buildlog — Admin Tech Feed</title></svelte:head>
-<div class="editorial-container mx-auto flex flex-col gap-6 px-gutter">
+<div class="editorial-container mx-auto flex flex-col gap-6 px-gutter md:!max-w-6xl">
 	<section class="flex justify-end">
 		<Button type="button" onclick={handleQiitaSync} disabled={isSyncing} class="shrink-0 gap-2 px-5 py-2.5 hover:bg-primary/95">
 			<span class="material-symbols-outlined text-[18px]">{isSyncing ? 'sync' : 'sync_alt'}</span>

@@ -95,7 +95,7 @@
 </script>
 
 <svelte:head><title>Buildlog — Admin Diary</title></svelte:head>
-<section class="editorial-container mx-auto mb-10 px-gutter" aria-labelledby="goals-heading">
+<section class="editorial-container mx-auto mb-10 px-gutter md:!max-w-6xl" aria-labelledby="goals-heading">
 	<div class="mb-4 flex items-center justify-between gap-4">
 		<div>
 			<h1 id="goals-heading" class="font-headline-lg text-headline-lg text-primary">今月の目標</h1>

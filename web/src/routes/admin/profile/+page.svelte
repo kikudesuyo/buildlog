@@ -123,7 +123,7 @@
 	</div>
 </header>
 
-	<div class="editorial-container mx-auto max-w-[800px] px-gutter pb-16 pt-28 md:pb-20 md:pt-24">
+	<div class="editorial-container mx-auto px-gutter pb-16 pt-28 md:!max-w-6xl md:pb-20 md:pt-24">
 	<h1 class="font-display-lg mb-6 text-display-lg text-primary font-bold tracking-tight md:mb-8">プロフィール編集</h1>
 
 	<form class="flex flex-col gap-7 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-xs md:gap-8 md:p-8" onsubmit={(e) => e.preventDefault()}>

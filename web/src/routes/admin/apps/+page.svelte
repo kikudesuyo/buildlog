@@ -22,7 +22,7 @@
 	<title>Apps 一覧 — Buildlog Admin</title>
 </svelte:head>
 
-<div class="editorial-container mx-auto px-gutter pt-8">
+<div class="editorial-container mx-auto px-gutter pt-8 md:!max-w-6xl">
 	<!-- ヘッダー -->
 	<header class="flex justify-between items-center mb-8">
 		<div>

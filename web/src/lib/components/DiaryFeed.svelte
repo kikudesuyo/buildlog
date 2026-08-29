@@ -109,7 +109,7 @@
 	});
 </script>
 
-<div class="editorial-container mx-auto px-gutter relative flex flex-col gap-8">
+<div class="editorial-container mx-auto px-gutter relative flex flex-col gap-8 {isAdmin ? 'md:!max-w-6xl' : ''}">
 	<header class="flex flex-wrap items-center justify-between gap-4">
 		<div>
 			{#if isAdmin}
