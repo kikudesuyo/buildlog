@@ -18,12 +18,13 @@ const (
 )
 
 type QiitaItem struct {
-	ID        string    `json:"id"`
-	Title     string    `json:"title"`
-	Body      string    `json:"body"`
-	URL       string    `json:"url"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID         string    `json:"id"`
+	Title      string    `json:"title"`
+	Body       string    `json:"body"`
+	URL        string    `json:"url"`
+	LikesCount int64     `json:"likes_count"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 type QiitaClient struct {
@@ -39,7 +40,7 @@ func NewQiitaClient(httpClient *http.Client, user string) *QiitaClient {
 	return &QiitaClient{BaseURL: qiitaBaseURL, User: user, HTTPClient: httpClient}
 }
 
-func (c *QiitaClient) GetUserArticles(ctx context.Context) ([]QiitaItem, error) {
+func (c *QiitaClient) GetUserArticleList(ctx context.Context) ([]QiitaItem, error) {
 	items := make([]QiitaItem, 0)
 	for page := 1; page <= 100; page++ {
 		pageItems, err := c.fetchPage(ctx, page)
@@ -75,9 +76,9 @@ func (c *QiitaClient) fetchPage(ctx context.Context, page int) ([]QiitaItem, err
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Qiita API returned status %s", res.Status)
+		return nil, fmt.Errorf("qiita API returned status %s", res.Status)
 	}
 
 	var items []QiitaItem

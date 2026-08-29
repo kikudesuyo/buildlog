@@ -10,6 +10,7 @@ type DBTableExternalPost struct {
 	Title        string    `gorm:"column:title" json:"title"`
 	Excerpt      string    `gorm:"column:excerpt" json:"excerpt"`
 	ThumbnailURL string    `gorm:"column:thumbnail_url" json:"thumbnail_url"`
+	LikesCount   int64     `gorm:"column:likes_count" json:"likes_count"`
 	PublishedAt  time.Time `gorm:"column:published_at" json:"published_at"`
 	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updated_at"`
 	CreatedAt    time.Time `gorm:"column:created_at" json:"created_at"`

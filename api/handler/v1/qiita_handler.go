@@ -8,13 +8,13 @@ import (
 	"github.com/kikudesuyo/buildlog/api/service"
 )
 
-// HandleSyncQiitaArticles は管理画面からQiita記事を同期します。
-func HandleSyncQiitaArticles(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+// HandleSyncQiitaArticleList は管理画面からQiita記事を同期します。
+func HandleSyncQiitaArticleList(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	if err := handler.ValidateRequestWithAuth(r); err != nil {
 		return nil, err
 	}
 
-	count, err := service.SyncQiitaArticles(r.Context())
+	count, err := service.SyncQiitaArticleList(r.Context())
 	if err != nil {
 		return nil, err
 	}

@@ -5,16 +5,17 @@
 	import UnsavedChangesGuard from '$lib/components/UnsavedChangesGuard.svelte';
 
 	let { data } = $props();
+	const initialData = data;
 
-	let slug = $state(data.appProject.slug || '');
-	let name = $state(data.appProject.name);
-	let category = $state(data.appProject.category);
-	let tagsText = $state(data.appProject.tags.join(', '));
-	let description = $state(data.appProject.description);
-	let icon = $state(data.appProject.icon);
-	let iconUrl = $state(data.appProject.iconUrl || '');
-	let demoUrl = $state(data.appProject.demoUrl || '');
-	let codeUrl = $state(data.appProject.codeUrl || '');
+	let slug = $state(initialData.appProject.slug || '');
+	let name = $state(initialData.appProject.name);
+	let category = $state(initialData.appProject.category);
+	let tagsText = $state(initialData.appProject.tags.join(', '));
+	let description = $state(initialData.appProject.description);
+	let icon = $state(initialData.appProject.icon);
+	let iconUrl = $state(initialData.appProject.iconUrl || '');
+	let demoUrl = $state(initialData.appProject.demoUrl || '');
+	let codeUrl = $state(initialData.appProject.codeUrl || '');
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
@@ -93,7 +94,7 @@
 	</div>
 </header>
 
-<div class="editorial-container mx-auto px-gutter pt-24 pb-20 max-w-[600px]">
+<div class="editorial-container mx-auto px-gutter pt-24 pb-20 md:!max-w-6xl">
 	<h1 class="font-display-lg text-display-lg mb-8 text-primary font-bold tracking-tight">アプリ編集</h1>
 
 	<form class="flex flex-col gap-6" onsubmit={(e) => e.preventDefault()}>

@@ -89,7 +89,7 @@
 	</div>
 </header>
 
-<div class="editorial-container mx-auto px-gutter pt-24 pb-20 max-w-[600px]">
+<div class="editorial-container mx-auto px-gutter pt-24 pb-20 md:!max-w-6xl">
 	<h1 class="font-display-lg text-display-lg mb-8 text-primary font-bold tracking-tight">新規アプリ登録</h1>
 
 	<form class="flex flex-col gap-6" onsubmit={(e) => e.preventDefault()}>
