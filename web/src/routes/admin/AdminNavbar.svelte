@@ -9,7 +9,6 @@
 		{ href: '/admin/profile', label: 'Profile', description: '自己紹介を管理', icon: 'person' },
 		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' },
 		{ href: '/admin/analytics', label: 'Analytics', description: 'アクセス統計・分析', icon: 'analytics' },
-<<<<<<< HEAD
 		{ href: '/admin/learnings', label: 'Learnings', description: '成長ログを管理', icon: 'trending_up' },
 		{ href: '/admin/trash', label: 'Archive', description: 'アーカイブ', icon: 'inventory_2' }
 	] as const;
