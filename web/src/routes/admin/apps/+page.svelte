@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { deleteApp } from '$lib/api/client';
+	import IconButton from '$lib/components/IconButton.svelte';
 
 	let { data } = $props();
-	let appProjects = $state(data.appProjects);
+	const initialData = data;
+	let appProjects = $state(initialData.appProjects);
 
 	async function handleDelete(id: string) {
 		if (!confirm('このアプリを削除してもよろしいですか？')) return;
@@ -20,7 +22,7 @@
 	<title>Apps 一覧 — Buildlog Admin</title>
 </svelte:head>
 
-<div class="editorial-container mx-auto px-gutter pt-8">
+<div class="editorial-container mx-auto px-gutter pt-8 md:!max-w-6xl">
 	<!-- ヘッダー -->
 	<header class="flex justify-between items-center mb-8">
 		<div>
@@ -68,14 +70,7 @@
 							>
 								edit
 							</a>
-							<button
-								type="button"
-								onclick={() => handleDelete(app.id)}
-								class="material-symbols-outlined rounded-lg p-2 text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors cursor-pointer"
-								title="削除"
-							>
-								delete
-							</button>
+							<IconButton icon="delete" variant="danger" type="button" onclick={() => handleDelete(app.id)} title="削除" aria-label="削除" />
 						</div>
 					</div>
 				{/each}

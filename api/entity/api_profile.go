@@ -8,9 +8,7 @@ type ProfileHighlight struct {
 
 type ProfileResponse struct {
 	Name         string             `json:"name"`
-	Subtitle     string             `json:"subtitle"`
 	Title        string             `json:"title"`
-	AvatarURL    string             `json:"avatar_url"`
 	Quote        string             `json:"quote"`
 	Bio          []string           `json:"bio"`
 	Highlights   []ProfileHighlight `json:"highlights"`
@@ -22,9 +20,7 @@ type ProfileResponse struct {
 
 type UpdateProfileRequest struct {
 	Name         string             `json:"name"`
-	Subtitle     string             `json:"subtitle"`
 	Title        string             `json:"title"`
-	AvatarURL    string             `json:"avatar_url"`
 	Quote        string             `json:"quote"`
 	Bio          []string           `json:"bio"`
 	Highlights   []ProfileHighlight `json:"highlights"`

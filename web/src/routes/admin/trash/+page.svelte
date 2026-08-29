@@ -2,7 +2,8 @@
 	import { restoreEntry } from '$lib/api/client';
 
 	let { data } = $props();
-	let trashEntries = $state(data.trashEntries);
+	const initialData = data;
+	let trashEntries = $state(initialData.trashEntries);
 
 	function formatDate(dateStr: string) {
 		if (!dateStr) return '';
@@ -22,13 +23,13 @@
 </script>
 
 <svelte:head>
-	<title>ゴミ箱 — Buildlog Admin</title>
+	<title>アーカイブ — Buildlog Admin</title>
 </svelte:head>
 
-<div class="editorial-container mx-auto px-gutter pt-8">
+<div class="editorial-container mx-auto px-gutter pt-8 md:!max-w-6xl">
 	<!-- ヘッダー -->
 	<header class="mb-8">
-		<h1 class="font-display-lg text-display-lg text-primary font-bold tracking-tight">ゴミ箱 (削除済み一覧)</h1>
+		<h1 class="font-display-lg text-display-lg text-primary font-bold tracking-tight">アーカイブ (削除済み一覧)</h1>
 		<p class="font-body-md text-body-md text-on-surface-variant mt-1">削除されたつぶやきや技術記事を管理・復元できます。</p>
 	</header>
 
@@ -36,7 +37,7 @@
 	<div class="flex flex-col gap-4">
 		{#if trashEntries.length === 0}
 			<div class="text-center py-12 border border-dashed border-outline-variant/30 rounded-2xl bg-surface-container-low text-outline">
-				ゴミ箱は空です。
+				アーカイブは空です。
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 gap-4">

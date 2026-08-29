@@ -54,9 +54,19 @@ import { SvelteMap } from 'svelte/reactivity';
 		isPopoverOpen = false;
 	}
 
+	function postHref(post: HistoryItem) {
+		return post.type === 'tech' ? (post.url ?? resolve('/tech')) : resolve(`/diary/${post.id}?from=calendar`);
+	}
+
+	function isExternalPost(post: HistoryItem) {
+		return post.type === 'tech' && Boolean(post.url);
+	}
+
 	// 月間カレンダーのデータ生成
 	let currentYear = $state(new Date().getFullYear());
 	let currentMonth = $state(new Date().getMonth()); // 0-indexed
+	let touchStartX = $state<number | null>(null);
+	let touchStartY = $state<number | null>(null);
 
 	function nextMonth() {
 		if (currentMonth === 11) {
@@ -76,6 +86,29 @@ import { SvelteMap } from 'svelte/reactivity';
 			currentMonth -= 1;
 		}
 		closePopover();
+	}
+
+	function handleTouchStart(event: TouchEvent) {
+		const touch = event.changedTouches[0];
+		touchStartX = touch?.clientX ?? null;
+		touchStartY = touch?.clientY ?? null;
+	}
+
+	function handleTouchEnd(event: TouchEvent) {
+		if (touchStartX === null || touchStartY === null) return;
+
+		const touch = event.changedTouches[0];
+		const deltaX = (touch?.clientX ?? touchStartX) - touchStartX;
+		const deltaY = (touch?.clientY ?? touchStartY) - touchStartY;
+		const isHorizontalSwipe = Math.abs(deltaX) >= 50 && Math.abs(deltaX) > Math.abs(deltaY);
+
+		if (isHorizontalSwipe) {
+			if (deltaX < 0) nextMonth();
+			else prevMonth();
+		}
+
+		touchStartX = null;
+		touchStartY = null;
 	}
 
 	const monthlyDays = $derived.by(() => {
@@ -120,15 +153,15 @@ import { SvelteMap } from 'svelte/reactivity';
 	];
 </script>
 
-<div class="flex flex-col gap-10 mt-10 p-6 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest">
+<div id="post-history" class="flex flex-col gap-10 mt-10 p-6 rounded-2xl border border-outline-variant/30 bg-surface-container-lowest">
 	<!-- ヘッダー -->
 	<header class="flex flex-col gap-2">
 		<h2 class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2">
 			<span class="material-symbols-outlined text-2xl">calendar_month</span>
-			投稿履歴とカレンダー
+			投稿履歴
 		</h2>
 		<p class="font-body-sm text-body-sm text-outline">
-			これまでの執筆活動の記録です。緑色のセルやドットマークのある日をクリックすると、その日の記事にアクセスできます。
+			これまでの執筆活動の記録です。投稿のある日をクリックすると、その記事にアクセスできます。
 		</p>
 	</header>
 
@@ -141,6 +174,7 @@ import { SvelteMap } from 'svelte/reactivity';
 					<button
 						type="button"
 						onclick={prevMonth}
+						aria-label="前の月"
 						class="p-1 rounded-md text-outline hover:bg-surface-container hover:text-primary transition-all cursor-pointer flex items-center justify-center"
 					>
 						<span class="material-symbols-outlined text-lg">chevron_left</span>
@@ -151,6 +185,7 @@ import { SvelteMap } from 'svelte/reactivity';
 					<button
 						type="button"
 						onclick={nextMonth}
+						aria-label="次の月"
 						class="p-1 rounded-md text-outline hover:bg-surface-container hover:text-primary transition-all cursor-pointer flex items-center justify-center"
 					>
 						<span class="material-symbols-outlined text-lg">chevron_right</span>
@@ -159,7 +194,13 @@ import { SvelteMap } from 'svelte/reactivity';
 			</header>
 
 			<!-- カレンダーグリッド -->
-			<div class="grid grid-cols-7 gap-y-2 text-center text-body-sm font-medium">
+			<div
+				role="group"
+				aria-label="月間カレンダー。左右にスワイプして月を移動できます"
+				class="grid grid-cols-7 gap-y-2 touch-pan-y text-center text-body-sm font-medium"
+				ontouchstart={handleTouchStart}
+				ontouchend={handleTouchEnd}
+			>
 				<!-- 曜日ヘッダー -->
 				<span class="text-error/85 py-1 text-[11px]">日</span>
 				<span class="text-outline py-1 text-[11px]">月</span>
@@ -176,7 +217,7 @@ import { SvelteMap } from 'svelte/reactivity';
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
 						<div
 							onclick={(e) => day.dateStr && handleDateClick(e, day.dateStr)}
-							class="relative flex flex-col items-center justify-center h-8 w-8 mx-auto rounded-full transition-all duration-150 {day.hasPost ? 'hover:bg-primary/20 text-primary font-bold cursor-pointer' : 'text-on-surface-variant'}"
+							class="relative flex flex-col items-center justify-center h-8 w-8 mx-auto rounded-full transition-all duration-150 {day.hasPost ? 'bg-primary/10 hover:bg-primary/20 text-primary font-bold cursor-pointer' : 'text-on-surface-variant'}"
 						>
 							<span>{day.dayNum}</span>
 							{#if day.hasPost}
@@ -217,15 +258,19 @@ import { SvelteMap } from 'svelte/reactivity';
 			</button>
 		</header>
 		<ul class="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
-			{#each selectedPosts as post (post.id)}
+			{#each selectedPosts as post (`${post.type}:${post.id}`)}
 				<li class="flex flex-col gap-1 text-body-md">
+					<!-- eslint-disable svelte/no-navigation-without-resolve -->
 					<a
-						href={post.type === 'tech' ? resolve(`/tech/${post.id}`) : resolve(`/diary/${post.id}`)}
+						href={postHref(post)}
+						target={isExternalPost(post) ? '_blank' : undefined}
+						rel={isExternalPost(post) ? 'noreferrer' : undefined}
 						class="text-on-surface hover:text-primary hover:underline transition-colors font-medium leading-snug"
 						onclick={closePopover}
 					>
 						{post.title}
 					</a>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
 					<div class="flex items-center gap-2">
 						<span
 							class="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider {post.type === 'tech' ? 'bg-primary-fixed text-primary' : 'bg-secondary-fixed text-secondary'}"

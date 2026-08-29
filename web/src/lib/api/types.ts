@@ -10,11 +10,17 @@ export interface DiaryEntry {
 	hasLiked?: boolean;
 }
 
+export interface ExternalPost {
+	provider: string;
+	url: string;
+	thumbnailUrl: string;
+}
+
 export interface TechArticle {
+	key: string;
 	id: number;
 	title: string;
 	content: string;
-	category: string;
 	views?: number;
 	status?: 'draft' | 'published';
 	createdAt: string;
@@ -22,9 +28,8 @@ export interface TechArticle {
 	likesCount: number;
 	commentsCount: number;
 	hasLiked?: boolean;
+	external?: ExternalPost;
 }
-
-export type FeaturedTechArticle = TechArticle;
 
 export interface AppProject {
 	id: string;
@@ -41,9 +46,7 @@ export interface AppProject {
 
 export interface ProfileData {
 	name: string;
-	subtitle: string;
 	title: string;
-	avatarUrl: string;
 	quote: string;
 	bio: string[];
 	highlights: {
@@ -98,6 +101,7 @@ export interface HistoryItem {
 	type: 'diary' | 'tech';
 	title: string;
 	createdAt: string;
+	url?: string;
 }
 
 export interface CommentEntry {

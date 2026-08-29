@@ -7,46 +7,42 @@ import (
 	"gorm.io/gorm"
 )
 
-// ListTechs は一覧を取得します。
-func ListTechs(ctx context.Context, db *gorm.DB, all bool, offset, limit int) ([]entity.DBTablePost, error) {
-	techList := make([]entity.DBTablePost, 0)
-	query := db.WithContext(ctx).Where("type = ?", "tech")
-	if !all {
-		query = query.Where("status = ?", "published")
+// GetExternalPostList は外部記事を指定された条件で取得します。
+func GetExternalPostList(ctx context.Context, db *gorm.DB, sortBy, order string, offset, limit int) ([]entity.DBTableExternalPost, error) {
+	orderBy := "DESC"
+	if order == "asc" {
+		orderBy = "ASC"
 	}
+	var postList []entity.DBTableExternalPost
+	query := db.WithContext(ctx)
+	if sortBy == "likes" {
+		query = query.Order("likes_count " + orderBy).Order("published_at " + orderBy)
+	} else {
+		query = query.Order("published_at " + orderBy)
+	}
+	query = query.Order("id " + orderBy)
 	if offset > 0 {
 		query = query.Offset(offset)
 	}
 	if limit > 0 {
 		query = query.Limit(limit)
 	}
-	err := query.
-		Order("created_at DESC").
-		Order("id DESC").
-		Find(&techList).Error
-	return techList, err
+	return postList, query.Find(&postList).Error
 }
 
-// GetTechByID はデータを取得します。
-func GetTechByID(ctx context.Context, db *gorm.DB, id int64) (*entity.DBTablePost, error) {
-	var tech entity.DBTablePost
-	err := db.WithContext(ctx).Where("type = ?", "tech").First(&tech, id).Error
-	return &tech, err
+// FindExternalPost は外部記事をプロバイダーと外部IDで取得します。
+func FindExternalPost(ctx context.Context, db *gorm.DB, provider, externalID string) (*entity.DBTableExternalPost, error) {
+	var post entity.DBTableExternalPost
+	err := db.WithContext(ctx).Where("provider = ? AND external_id = ?", provider, externalID).First(&post).Error
+	return &post, err
 }
 
-// CreateTech はデータを作成します。
-func CreateTech(ctx context.Context, db *gorm.DB, tech *entity.DBTablePost) error {
-	tech.Type = "tech"
-	return db.WithContext(ctx).Create(tech).Error
+// InsertExternalPost は外部記事を登録します。
+func InsertExternalPost(ctx context.Context, db *gorm.DB, post *entity.DBTableExternalPost) error {
+	return db.WithContext(ctx).Create(post).Error
 }
 
-// UpdateTech はデータを更新します。
-func UpdateTech(ctx context.Context, db *gorm.DB, tech *entity.DBTablePost) error {
-	tech.Type = "tech"
-	return db.WithContext(ctx).Save(tech).Error
-}
-
-// DeleteTech はデータを削除します。
-func DeleteTech(ctx context.Context, db *gorm.DB, id int64) error {
-	return db.WithContext(ctx).Where("type = ?", "tech").Delete(&entity.DBTablePost{}, id).Error
+// UpdateExternalPost は外部記事を更新します。
+func UpdateExternalPost(ctx context.Context, db *gorm.DB, post *entity.DBTableExternalPost) error {
+	return db.WithContext(ctx).Save(post).Error
 }

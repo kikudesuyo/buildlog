@@ -1,10 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { DiaryEntry } from '$lib/api/types';
-	import { fetchDiaryEntries, type ApiFetch } from '$lib/api/client';
+	import { fetchDiaryEntries, type ApiFetch, type DiarySort, type DiarySortOrder } from '$lib/api/client';
 	import { resolve } from '$app/paths';
+	import { replaceState } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { tick } from 'svelte';
 	import LikeButton from './LikeButton.svelte';
+	import Button from './Button.svelte';
+	import IconButton from './IconButton.svelte';
 
 	type Props = {
 		entries: DiaryEntry[];
@@ -14,14 +18,20 @@
 	};
 
 	let { entries: initialEntries, isAdmin = false, onEdit, onDelete }: Props = $props();
-	let entries = $state(initialEntries);
+	const initialState = { entries: initialEntries, isAdmin };
+	let entries = $state(initialState.entries);
 	const pageSize = 3;
 	let isLoading = $state(false);
 	let loadError = $state(false);
-	let hasMore = $state(!isAdmin && initialEntries.length === pageSize);
-	const storageKey = `diary-feed-count:${isAdmin ? 'admin' : 'public'}`;
+	let hasMore = $state(!initialState.isAdmin && initialState.entries.length === pageSize);
+	const storageKey = `diary-feed-count:${initialState.isAdmin ? 'admin' : 'public'}`;
+	let sortBy = $state<DiarySort>($page.url.searchParams.get('sort') === 'likes' ? 'likes' : 'newest');
+	let sortOrder = $state<DiarySortOrder>($page.url.searchParams.get('order') === 'asc' ? 'asc' : 'desc');
+	let statusFilter = $state<'all' | 'draft' | 'published'>('all');
 	let restoreTarget = 0;
-	let displayEntries = $derived(entries);
+	let displayEntries = $derived(
+		statusFilter === 'all' ? entries : entries.filter((entry) => entry.status === statusFilter)
+	);
 	let actionRefs = $state<Record<number, HTMLButtonElement | undefined>>({});
 	let headingRef: HTMLHeadingElement;
 	let notification = $state<{ message: string; kind: 'success' | 'error' } | null>(null);
@@ -53,10 +63,36 @@
 		isLoading = true;
 		loadError = false;
 		try {
-			const nextEntries = await fetchDiaryEntries(fetch as ApiFetch, isAdmin, entries.length, pageSize);
+			const nextEntries = await fetchDiaryEntries(fetch as ApiFetch, isAdmin, entries.length, pageSize, sortBy, sortOrder);
 			entries = [...entries, ...nextEntries];
 			hasMore = nextEntries.length === pageSize;
 			sessionStorage.setItem(storageKey, String(entries.length));
+		} catch {
+			loadError = true;
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	async function handleSortChange(nextSortBy: DiarySort, nextSortOrder: DiarySortOrder) {
+		if (sortBy === nextSortBy && sortOrder === nextSortOrder) return;
+
+		sortBy = nextSortBy;
+		sortOrder = nextSortOrder;
+		const nextUrl = new URL($page.url);
+		if (nextSortBy === 'newest') nextUrl.searchParams.delete('sort');
+		else nextUrl.searchParams.set('sort', nextSortBy);
+		if (nextSortOrder === 'desc') nextUrl.searchParams.delete('order');
+		else nextUrl.searchParams.set('order', nextSortOrder);
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
+		await replaceState(`${resolve('/diary')}${nextUrl.search}`, {});
+		isLoading = true;
+		loadError = false;
+		try {
+			const nextEntries = await fetchDiaryEntries(fetch as ApiFetch, isAdmin, 0, pageSize, nextSortBy, nextSortOrder);
+			entries = nextEntries;
+			hasMore = !isAdmin && nextEntries.length === pageSize;
+			sessionStorage.setItem(storageKey, String(nextEntries.length));
 		} catch {
 			loadError = true;
 		} finally {
@@ -73,21 +109,61 @@
 	});
 </script>
 
-<div class="editorial-container mx-auto px-gutter relative flex flex-col gap-8">
-	<header class="flex items-center justify-between">
+<div class="editorial-container mx-auto px-gutter relative flex flex-col gap-8 {isAdmin ? 'md:!max-w-6xl' : ''}">
+	<header class="flex flex-wrap items-center justify-between gap-4">
 		<div>
 			{#if isAdmin}
 				<p class="font-label-sm text-label-sm mb-stack-sm tracking-[0.2em] text-outline uppercase">Content Manager / Diary</p>
 			{/if}
 			<h1 bind:this={headingRef} tabindex="-1" class="font-display-lg text-display-lg text-primary">{isAdmin ? 'つぶやき管理' : '日々のつぶやき'}</h1>
-	</div>
+		</div>
+		<div class="flex flex-wrap items-center justify-end gap-2">
+			{#if isAdmin}
+				<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
+					<span>状態</span>
+					<select
+						bind:value={statusFilter}
+						class="font-label-sm text-label-sm min-h-11 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2 text-primary"
+						aria-label="つぶやきの状態"
+					>
+						<option value="all">すべて</option>
+						<option value="draft">下書き</option>
+						<option value="published">公開</option>
+					</select>
+				</label>
+			{/if}
+			<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
+				<span>並び順</span>
+				<select
+					value={sortBy}
+					onchange={(event) => handleSortChange(event.currentTarget.value as DiarySort, sortOrder)}
+					class="font-label-sm text-label-sm min-h-11 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2 text-primary"
+					aria-label="つぶやきの並び順"
+				>
+					<option value="newest">新着順</option>
+					<option value="likes">いいね順</option>
+				</select>
+			</label>
+			<label class="font-label-sm text-label-sm flex items-center gap-2 text-on-surface-variant">
+				<span>順序</span>
+				<select
+					value={sortOrder}
+					onchange={(event) => handleSortChange(sortBy, event.currentTarget.value as DiarySortOrder)}
+					class="font-label-sm text-label-sm min-h-11 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3 py-2 text-primary"
+					aria-label="つぶやきの並び順序"
+				>
+					<option value="desc">降順</option>
+					<option value="asc">昇順</option>
+				</select>
+			</label>
+		</div>
 		{#if isAdmin}
 			<a
 				href={resolve(isAdmin ? '/admin/diary/new' : '/diary/new')}
-				class="font-label-md text-label-md flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary px-6 py-2.5 text-on-primary transition-all hover:bg-primary/95 active:scale-95"
+				class="font-label-md text-label-md flex min-h-11 w-28 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-on-primary transition-all hover:bg-primary/95 active:scale-95 md:w-32 md:px-4"
 			>
 				<span class="material-symbols-outlined text-[18px]">add</span>
-				つぶやく
+				<span class="whitespace-nowrap">つぶやく</span>
 			</a>
 		{/if}
 	</header>
@@ -104,12 +180,8 @@
 					</div>
 					{#if isAdmin}
 						<div class="flex gap-2">
-							<button type="button" onclick={() => onEdit?.(entry.id)} class="min-h-11 min-w-11 rounded-lg p-1 text-outline opacity-60 transition-all duration-200 hover:text-primary hover:opacity-100" title={`編集: ${entry.title}`} aria-label={`編集: ${entry.title}`}>
-								<span class="material-symbols-outlined text-[18px]">edit</span>
-							</button>
-							<button bind:this={actionRefs[entry.id]} type="button" onclick={() => deleteEntry(entry)} class="min-h-11 min-w-11 rounded-lg p-1 text-outline opacity-60 transition-all duration-200 hover:text-error hover:opacity-100" title={`削除: ${entry.title}`} aria-label={`削除: ${entry.title}`}>
-								<span class="material-symbols-outlined text-[18px]">delete</span>
-							</button>
+							<IconButton icon="edit" type="button" onclick={() => onEdit?.(entry.id)} class="text-outline opacity-60 hover:opacity-100" title={`編集: ${entry.title}`} aria-label={`編集: ${entry.title}`} />
+							<IconButton bind:element={actionRefs[entry.id]} icon="delete" variant="danger" type="button" onclick={() => deleteEntry(entry)} class="text-outline opacity-60 hover:opacity-100" title={`削除: ${entry.title}`} aria-label={`削除: ${entry.title}`} />
 						</div>
 					{/if}
 				</div>
@@ -140,7 +212,7 @@
 	{#if loadError}
 		<div class="flex flex-col items-center gap-3" role="alert">
 			<p class="font-body-sm text-body-sm text-error">過去の記録を読み込めませんでした。</p>
-			<button type="button" onclick={loadMore} class="font-label-md text-label-md cursor-pointer rounded-lg border border-error px-6 py-2 text-error transition-colors hover:bg-error hover:text-on-error">再試行</button>
+			<Button type="button" variant="danger" onclick={loadMore} class="cursor-pointer px-6">再試行</Button>
 		</div>
 	{:else if isLoading}
 		<div class="flex items-center justify-center gap-2" role="status" aria-live="polite">
@@ -149,9 +221,9 @@
 		</div>
 	{:else if hasMore}
 		<div class="flex justify-center">
-			<button type="button" onclick={loadMore} class="font-label-md text-label-md cursor-pointer rounded-lg border border-primary px-8 py-3 text-primary transition-all hover:bg-primary hover:text-on-primary active:scale-95">
+			<Button type="button" variant="outline" onclick={loadMore} class="cursor-pointer px-8 py-3 active:scale-95">
 				過去の記録を見る
-			</button>
+			</Button>
 		</div>
 	{:else if !isAdmin}
 		<p class="font-body-sm text-body-sm text-center text-outline" role="status">すべての記録を表示しました。</p>

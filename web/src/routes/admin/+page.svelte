@@ -4,8 +4,10 @@
 	import { deleteDiary, saveCurrentGoals } from '$lib/api/client';
 	import type { GoalPeriod } from '$lib/api/types';
 	import DiaryFeed from '$lib/components/DiaryFeed.svelte';
+	import IconButton from '$lib/components/IconButton.svelte';
 	let { data } = $props();
-	let goals = $state<GoalPeriod>(data.goals);
+	const initialData = data;
+	let goals = $state<GoalPeriod>(initialData.goals);
 	let isGoalDialogOpen = $state(false);
 	let isSavingGoals = $state(false);
 	let goalError = $state('');
@@ -93,13 +95,13 @@
 </script>
 
 <svelte:head><title>Buildlog — Admin Diary</title></svelte:head>
-<section class="editorial-container mx-auto mb-10 px-gutter" aria-labelledby="goals-heading">
+<section class="editorial-container mx-auto mb-10 px-gutter md:!max-w-6xl" aria-labelledby="goals-heading">
 	<div class="mb-4 flex items-center justify-between gap-4">
 		<div>
 			<h1 id="goals-heading" class="font-headline-lg text-headline-lg text-primary">今月の目標</h1>
 			<p class="font-body-sm text-body-sm text-on-surface-variant">{goals.startsAt} — {goals.endsAt}</p>
 		</div>
-		<button type="button" onclick={() => openGoalDialog()} class="font-label-md text-label-md min-h-11 rounded-lg border border-primary px-4 py-2 text-primary hover:bg-primary hover:text-on-primary">目標を追加</button>
+		<button type="button" onclick={() => openGoalDialog()} class="font-label-md text-label-md inline-flex min-h-11 min-w-28 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-primary px-3 py-2 text-primary hover:bg-primary hover:text-on-primary md:min-w-32 md:px-4">目標を追加</button>
 	</div>
 	<div class="grid gap-4 md:grid-cols-2">
 		{#each goals.goals as goal (goal.id)}
@@ -120,8 +122,8 @@
 								達成
 							</span>
 						{/if}
-						<button type="button" onclick={() => openGoalDialog(goal)} class="min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container-high hover:text-primary" aria-label={`${goal.title}を編集`}><span class="material-symbols-outlined text-[18px]">edit</span></button>
-						<button type="button" onclick={() => removeGoal(goal)} class="min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-error/10 hover:text-error" aria-label={`${goal.title}を削除`}><span class="material-symbols-outlined text-[18px]">delete</span></button>
+						<IconButton icon="edit" type="button" onclick={() => openGoalDialog(goal)} aria-label={`${goal.title}を編集`} />
+						<IconButton icon="delete" variant="danger" type="button" onclick={() => removeGoal(goal)} aria-label={`${goal.title}を削除`} />
 					</div>
 				</div>
 				<div class="flex flex-col gap-1.5">
@@ -150,7 +152,7 @@
 
 {#if isGoalDialogOpen}
 	<div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-primary/20 px-4 py-24 backdrop-blur-xs" role="presentation">
-		<section role="dialog" aria-modal="true" aria-labelledby="goal-dialog-title" class="w-full max-w-2xl rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xl">
+		<div role="dialog" aria-modal="true" aria-labelledby="goal-dialog-title" class="w-full max-w-2xl rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-xl">
 			<div class="mb-6 flex items-start justify-between gap-4">
 				<div>
 					<h2 id="goal-dialog-title" class="font-headline-lg text-headline-lg text-primary">{isAddingGoal ? '目標を追加' : '目標を編集'}</h2>
@@ -172,7 +174,7 @@
 			<div class="mt-6 flex flex-wrap justify-between gap-3">
 				<div class="flex w-full justify-end gap-3"><button type="button" onclick={closeGoalDialog} class="font-label-md text-label-md min-h-11 rounded-lg px-4 py-2 text-on-surface-variant" disabled={isSavingGoals}>キャンセル</button><button type="button" onclick={submitGoal} class="font-label-md text-label-md min-h-11 rounded-lg bg-primary px-5 py-2 text-on-primary" disabled={isSavingGoals}>{isSavingGoals ? '保存中…' : '保存する'}</button></div>
 			</div>
-		</section>
+		</div>
 	</div>
 {/if}
 

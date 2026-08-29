@@ -168,7 +168,7 @@
 								</span>
 								<div class="flex flex-col truncate">
 									<a
-										href={item.type === 'tech' ? resolve(`/tech/${item.id}`) : resolve(`/diary/${item.id}`)}
+										href={item.type === 'tech' ? resolve('/tech') : resolve(`/diary/${item.id}`)}
 										class="font-body-md text-body-md font-semibold text-on-surface hover:text-primary hover:underline transition-all truncate"
 									>
 										{item.title}

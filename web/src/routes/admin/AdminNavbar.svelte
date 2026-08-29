@@ -9,8 +9,9 @@
 		{ href: '/admin/profile', label: 'Profile', description: '自己紹介を管理', icon: 'person' },
 		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' },
 		{ href: '/admin/analytics', label: 'Analytics', description: 'アクセス統計・分析', icon: 'analytics' },
+<<<<<<< HEAD
 		{ href: '/admin/learnings', label: 'Learnings', description: '成長ログを管理', icon: 'trending_up' },
-		{ href: '/admin/trash', label: 'Trash', description: 'ゴミ箱', icon: 'delete_outline' }
+		{ href: '/admin/trash', label: 'Archive', description: 'アーカイブ', icon: 'inventory_2' }
 	] as const;
 
 	function resolveAdminPath(path: (typeof navItems)[number]['href']) {
@@ -86,7 +87,7 @@
 	></button>
 {/if}
 
-<aside aria-label="管理メニュー" aria-modal={isOpen ? 'true' : undefined} class="fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-outline-variant/20 bg-surface-container-lowest {isOpen ? 'flex' : 'hidden'} md:flex">
+<aside aria-label="管理メニュー" class="fixed inset-y-0 left-0 z-50 w-64 flex-col border-r border-outline-variant/20 bg-surface-container-lowest {isOpen ? 'flex' : 'hidden'} md:flex">
 	<div class="flex h-20 items-center border-b border-outline-variant/20 px-6">
 		<a href={resolve('/admin')} class="flex items-center gap-3 text-primary transition-opacity hover:opacity-80">
 			<span class="material-symbols-outlined text-2xl">dashboard_customize</span>
@@ -115,21 +116,35 @@
 			{/each}
 		</nav>
 
-		<div class="mt-auto rounded-xl border border-outline-variant/20 bg-surface-container-low p-4">
-			<p class="font-label-sm text-label-sm mb-1 text-outline">現在のモード</p>
-			<p class="font-label-md text-label-md flex items-center gap-2 font-semibold text-primary">
-				<span class="h-2 w-2 rounded-full bg-primary"></span>
-				Content Manager
-			</p>
-		</div>
 	</div>
-
-	<div class="border-t border-outline-variant/20 p-4">
-		<a href={resolve('/')} onclick={closeMenu} class="font-label-md text-label-md flex items-center gap-2 rounded-lg px-3 py-2 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary">
-			<span class="material-symbols-outlined text-[18px]">visibility</span>
-			公開サイトを見る
+	<div class="border-t border-outline-variant/20 px-3 py-4">
+		<button
+			type="button"
+			aria-pressed={isDarkMode}
+			aria-label={isDarkMode ? '現在はダークモード。ライトモードに切り替える' : '現在はライトモード。ダークモードに切り替える'}
+			onclick={toggleTheme}
+			class="mb-2 hidden min-h-11 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary md:flex"
+			title={isDarkMode ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
+		>
+			<span class="material-symbols-outlined text-[21px]">{isDarkMode ? 'light_mode' : 'dark_mode'}</span>
+			<span class="flex flex-col">
+				<span class="font-label-md text-label-md font-semibold">テーマ</span>
+				<span class="font-label-sm text-label-sm text-outline">{isDarkMode ? 'ライトモード' : 'ダークモード'}</span>
+			</span>
+		</button>
+		<a
+			href={resolve('/')}
+			onclick={closeMenu}
+			class="flex items-center gap-3 rounded-xl px-3 py-3 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+		>
+			<span class="material-symbols-outlined text-[21px]">public</span>
+			<span class="flex flex-col">
+				<span class="font-label-md text-label-md font-semibold">公開サイト</span>
+				<span class="font-label-sm text-label-sm text-outline">サイトを確認</span>
+			</span>
 		</a>
 	</div>
+
 </aside>
 
 <header class="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-outline-variant/20 bg-surface-container-lowest px-gutter md:hidden">
@@ -146,7 +161,6 @@
 		</button>
 		<a href={resolve('/admin')} class="font-headline-md text-headline-md font-bold tracking-tight text-primary">Buildlog <span class="font-label-sm text-label-sm ml-2 text-outline">Admin</span></a>
 	</div>
-	<a href={resolve('/')} class="material-symbols-outlined rounded-lg p-2 text-on-surface-variant hover:bg-surface-container">visibility</a>
 	<button type="button" aria-label="テーマを切り替える" onclick={toggleTheme} class="material-symbols-outlined min-h-11 min-w-11 rounded-lg p-2 text-on-surface-variant hover:bg-surface-container" title={isDarkMode ? "ライトモードに切り替え" : "ダークモードに切り替え"}>
 		{isDarkMode ? 'light_mode' : 'dark_mode'}
 	</button>

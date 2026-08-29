@@ -19,13 +19,21 @@ func HandleGetDiaryList(r *http.Request, requestData map[string]interface{}) (ht
 	}
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	sortBy := r.URL.Query().Get("sort")
+	if sortBy != "likes" {
+		sortBy = "newest"
+	}
+	sortOrder := r.URL.Query().Get("order")
+	if sortOrder != "asc" {
+		sortOrder = "desc"
+	}
 	if offset < 0 {
 		offset = 0
 	}
 	if limit < 0 {
 		limit = 0
 	}
-	diaryList, err := service.ListDiaries(r.Context(), all, offset, limit, getClientIP(r))
+	diaryList, err := service.GetDiaryList(r.Context(), all, offset, limit, sortBy, sortOrder, getClientIP(r))
 	if err != nil {
 		return nil, err
 	}

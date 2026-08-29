@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/kikudesuyo/buildlog/api/library"
@@ -25,7 +24,7 @@ func JWTToCtx() func(next http.Handler) http.Handler {
 			ctx := r.Context()
 			if token == "" {
 				ctx = library.CtxSetJWTError(ctx, xerror.AuthJWTEmptyToken())
-			} else if !service.ValidateJWTToken(token, os.Getenv("ADMIN_SESSION_SECRET")) {
+			} else if !service.ValidateJWTToken(token, library.Env("ADMIN_SESSION_SECRET")) {
 				ctx = library.CtxSetJWTError(ctx, xerror.AuthJWTInvalidTokenErr(nil))
 			} else {
 				ctx = library.CtxSetJWTAuthenticated(ctx)
