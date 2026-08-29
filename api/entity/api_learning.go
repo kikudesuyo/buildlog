@@ -6,7 +6,7 @@ type CreateLearningRequest struct {
 	Level       *string `json:"level"`
 }
 
-type GenerateLearningRequest struct {
+type CreateLearningSummaryRequest struct {
 	PeriodStart string `json:"period_start"`
 }
 

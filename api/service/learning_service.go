@@ -56,8 +56,8 @@ func CreateDailyLearning(ctx context.Context, req entity.CreateLearningRequest) 
 	return &response, nil
 }
 
-// GenerateLearning creates a period summary from the sources defined by the growth-log specification.
-func GenerateLearning(ctx context.Context, periodType string, req entity.GenerateLearningRequest) (*entity.LearningResponse, error) {
+// CreateLearningSummary creates a period summary from the sources defined by the growth-log specification.
+func CreateLearningSummary(ctx context.Context, periodType string, req entity.CreateLearningSummaryRequest) (*entity.LearningResponse, error) {
 	if periodType != WeeklyLearning && periodType != MonthlyLearning {
 		return nil, xerror.ClientValidationErr(errors.New("only weekly or monthly learning can be generated"))
 	}

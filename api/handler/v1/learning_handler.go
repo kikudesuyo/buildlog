@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/kikudesuyo/buildlog/api/entity"
 	"github.com/kikudesuyo/buildlog/api/handler"
 	"github.com/kikudesuyo/buildlog/api/service"
@@ -41,16 +42,16 @@ func HandleCreateDailyLearning(r *http.Request, requestData map[string]interface
 	return entity.NewObjectResponse(item), nil
 }
 
-func HandleGenerateLearning(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+func HandleCreateLearningSummary(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	if err := handler.ValidateRequestWithAuth(r); err != nil {
 		return nil, err
 	}
-	periodType, _ := requestData["period_type"].(string)
-	var req entity.GenerateLearningRequest
+	periodType := chi.URLParam(r, "period_type")
+	var req entity.CreateLearningSummaryRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, xerror.ClientValidationErr(err)
 	}
-	item, err := service.GenerateLearning(r.Context(), periodType, req)
+	item, err := service.CreateLearningSummary(r.Context(), periodType, req)
 	if err != nil {
 		return nil, err
 	}

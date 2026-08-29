@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { generateLearning } from '$lib/api/client';
+	import { createLearningSummary } from '$lib/api/client';
 	import type { Learning, LearningPeriodType } from '$lib/api/types';
 
 	let { data } = $props();
@@ -19,7 +19,7 @@
 		isSubmitting = true;
 		errorMessage = '';
 		try {
-			const item = await generateLearning(activePeriod);
+			const item = await createLearningSummary(activePeriod);
 			learnings[activePeriod] = [item, ...learnings[activePeriod]];
 		} catch {
 			errorMessage = '元となる学びがないため、まとめを生成できませんでした。';

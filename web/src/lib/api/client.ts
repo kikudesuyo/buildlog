@@ -359,8 +359,8 @@ export async function createDailyLearning(content: string, level: NonNullable<Le
 	return mapLearning(response.data);
 }
 
-export async function generateLearning(periodType: Exclude<LearningPeriodType, 'daily'>): Promise<Learning> {
-	const response = await sendRequest<ApiObjectResponse<ApiLearning>>('POST', `/learnings/generate?period_type=${periodType}`, {
+export async function createLearningSummary(periodType: Exclude<LearningPeriodType, 'daily'>): Promise<Learning> {
+	const response = await sendRequest<ApiObjectResponse<ApiLearning>>('POST', `/learning-summaries/${periodType}`, {
 		period_start: new Date().toISOString().slice(0, 10)
 	});
 	return mapLearning(response.data);
