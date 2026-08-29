@@ -6,25 +6,26 @@
 	const localAvatarUrl = '/profile.jpg';
 
 	let { data } = $props();
-	let savedProfile = $state(data.profileData);
+	const initialData = data;
+	let savedProfile = $state(initialData.profileData);
 
-	let name = $state(data.profileData.name);
-	let title = $state(data.profileData.title);
-	let quote = $state(data.profileData.quote);
+	let name = $state(initialData.profileData.name);
+	let title = $state(initialData.profileData.title);
+	let quote = $state(initialData.profileData.quote);
 	
 	// bio は配列なので、改行で繋げてテキストエリアで編集
-	let bioText = $state(data.profileData.bio.join('\n\n'));
+	let bioText = $state(initialData.profileData.bio.join('\n\n'));
 	
 	// highlights は配列のコピー
-	let highlights = $state(JSON.parse(JSON.stringify(data.profileData.highlights)));
+	let highlights = $state(JSON.parse(JSON.stringify(initialData.profileData.highlights)));
 	
-	let award = $state(data.profileData.award || '');
+	let award = $state(initialData.profileData.award || '');
 	
 	// expertise は配列なので、カンマ区切りで編集
-	let expertiseText = $state(data.profileData.expertise.join(', '));
+	let expertiseText = $state(initialData.profileData.expertise.join(', '));
 	
-	let contactEmail = $state(data.profileData.contactEmail);
-	let finalQuote = $state(data.profileData.finalQuote);
+	let contactEmail = $state(initialData.profileData.contactEmail);
+	let finalQuote = $state(initialData.profileData.finalQuote);
 
 	let isSubmitting = $state(false);
 	let errorMessage = $state('');
@@ -122,7 +123,7 @@
 	</div>
 </header>
 
-	<div class="editorial-container mx-auto max-w-[800px] px-gutter pb-16 pt-28 md:pb-20 md:pt-24">
+	<div class="editorial-container mx-auto px-gutter pb-16 pt-28 md:!max-w-6xl md:pb-20 md:pt-24">
 	<h1 class="font-display-lg mb-6 text-display-lg text-primary font-bold tracking-tight md:mb-8">プロフィール編集</h1>
 
 	<form class="flex flex-col gap-7 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-xs md:gap-8 md:p-8" onsubmit={(e) => e.preventDefault()}>

@@ -84,7 +84,6 @@
 		const end = contentElement.selectionEnd;
 		content = `${content.slice(0, start)}${prefix}${content.slice(start, end)}${suffix}${content.slice(end)}`;
 		requestAnimationFrame(() => {
-			contentElement?.focus();
 			contentElement?.setSelectionRange(start + prefix.length, end + prefix.length);
 		});
 	}
@@ -105,7 +104,7 @@
 {#if errorMessage}
 	<div class="mx-auto max-w-container-max px-gutter text-body-sm text-error md:hidden" role="alert">{errorMessage}</div>
 {/if}
-<nav class="fixed inset-x-0 bottom-0 z-50 flex gap-2 border-t border-outline-variant/20 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden" aria-label="編集アクション">
+<nav class="fixed inset-x-0 bottom-0 z-50 flex gap-2 border-t border-outline-variant/20 bg-surface/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden" aria-label="編集アクション">
 	<button type="button" onclick={() => handleSave('draft')} disabled={isSubmitting} class="min-h-11 flex-1 rounded-lg border border-outline-variant/40 px-3 py-2 font-label-md text-outline disabled:opacity-50">下書き保存</button>
 	<button type="button" onclick={() => handleSave('published')} disabled={isSubmitting} class="min-h-11 flex-1 rounded-lg bg-primary px-3 py-2 font-label-md text-on-primary disabled:opacity-50">{isSubmitting ? '投稿中...' : '投稿する'}</button>
 </nav>
@@ -131,10 +130,6 @@
 			<button type="button" onclick={() => handleSave('draft')} disabled={isSubmitting} class="font-label-md text-label-md text-outline hover:text-primary">下書き保存</button>
 			<button type="button" onclick={() => handleSave('published')} disabled={isSubmitting} class="font-label-md text-label-md rounded-lg bg-primary px-5 py-2 text-on-primary disabled:opacity-50">{isSubmitting ? '投稿中...' : '投稿する'}</button>
 		</div>
-		<nav class="sticky top-20 z-10 flex gap-2 rounded-lg border border-outline-variant/20 bg-surface-container-lowest/95 p-2 backdrop-blur md:hidden" aria-label="編集セクション">
-			<a href="#editor-body" class="min-h-11 flex-1 rounded px-3 py-2 text-center font-label-md text-label-md text-primary">本文</a>
-			<a href="#editor-settings" class="min-h-11 flex-1 rounded px-3 py-2 text-center font-label-md text-label-md text-primary">設定</a>
-		</nav>
 		<!-- タイトル -->
 		<div class="border-b border-outline-variant/10 pb-4 mb-4">
 			<textarea

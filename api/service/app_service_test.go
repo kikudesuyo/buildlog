@@ -22,13 +22,13 @@ func useMockDB(t *testing.T) sqlmock.Sqlmock {
 	return mock
 }
 
-func TestListAppsReturnsMappedApps(t *testing.T) {
+func TestGetAppListReturnsMappedApps(t *testing.T) {
 	mock := useMockDB(t)
 	mock.ExpectQuery(`SELECT .* FROM "apps" ORDER BY id ASC`).WillReturnRows(
 		sqlmock.NewRows(appColumns).AddRow(42, "sample-app", "Sample App", "tool", `["go"]`, "Description", "terminal", "icons/app.svg", "https://demo.example.test", "https://github.com/example/app", time.Now(), time.Now()),
 	)
 
-	got, err := ListApps(context.Background())
+	got, err := GetAppList(context.Background())
 	if err != nil {
 		t.Fatalf("ListApps returned error: %v", err)
 	}
@@ -40,11 +40,11 @@ func TestListAppsReturnsMappedApps(t *testing.T) {
 	}
 }
 
-func TestListAppsReturnsRepositoryError(t *testing.T) {
+func TestGetAppListReturnsRepositoryError(t *testing.T) {
 	mock := useMockDB(t)
 	mock.ExpectQuery(`SELECT .* FROM "apps" ORDER BY id ASC`).WillReturnError(sqlmock.ErrCancelled)
 
-	if _, err := ListApps(context.Background()); err == nil {
+	if _, err := GetAppList(context.Background()); err == nil {
 		t.Fatal("ListApps returned nil error")
 	}
 }

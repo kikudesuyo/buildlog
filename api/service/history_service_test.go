@@ -33,7 +33,7 @@ func TestListPostHistoryReturnsNonDeletedPostsInDescendingOrder(t *testing.T) {
 			AddRow(wantNewestID, "tech", "new", newestCreatedAt, "https://example.com/new").
 			AddRow(wantOlderID, "diary", "old", olderCreatedAt, ""))
 
-	items, err := ListPostHistory(context.Background())
+	items, err := GetPostHistoryList(context.Background())
 	if err != nil {
 		t.Fatalf("ListPostHistory() error = %v", err)
 	}
@@ -52,7 +52,7 @@ func TestListPostHistoryReturnsNonNilEmptySliceWhenNoPostsExist(t *testing.T) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT id, type, title, created_at, '' AS url FROM posts WHERE deleted_at IS NULL UNION ALL SELECT id, 'tech' AS type, title, published_at AS created_at, url FROM external_posts ORDER BY created_at DESC`)).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "type", "title", "created_at", "url"}))
 
-	items, err := ListPostHistory(context.Background())
+	items, err := GetPostHistoryList(context.Background())
 	wantItemCount := 0
 	if err != nil || items == nil || len(items) != wantItemCount {
 		t.Fatalf("ListPostHistory() = %#v, %v, want a non-nil slice with %d items", items, err, wantItemCount)
@@ -66,7 +66,7 @@ func TestListPostHistoryReturnsRepositoryError(t *testing.T) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT id, type, title, created_at, '' AS url FROM posts WHERE deleted_at IS NULL UNION ALL SELECT id, 'tech' AS type, title, published_at AS created_at, url FROM external_posts ORDER BY created_at DESC`)).
 		WillReturnError(errors.New("database unavailable"))
 
-	items, err := ListPostHistory(context.Background())
+	items, err := GetPostHistoryList(context.Background())
 	wantItemCount := 0
 	if items == nil || len(items) != wantItemCount || err == nil {
 		t.Fatalf("ListPostHistory() = %#v, %v, want a non-nil slice with %d items and an error", items, err, wantItemCount)

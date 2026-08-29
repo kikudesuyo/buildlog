@@ -3,6 +3,7 @@ module github.com/kikudesuyo/buildlog/api
 go 1.25.0
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/go-chi/chi/v5 v5.3.1
 	github.com/morikuni/failure v1.1.2
 	gorm.io/driver/postgres v1.6.2

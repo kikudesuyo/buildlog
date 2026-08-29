@@ -33,7 +33,7 @@ func TestListCommentsByPostIDReturnsCommentsOrderedByCreation(t *testing.T) {
 			AddRow(1, 42, "first", createdAt, createdAt).
 			AddRow(2, 42, "second", createdAt.Add(time.Minute), createdAt.Add(time.Minute)))
 
-	comments, err := ListCommentsByPostID(context.Background(), 42)
+	comments, err := GetCommentListByPostID(context.Background(), 42)
 	if err != nil {
 		t.Fatalf("ListCommentsByPostID() error = %v", err)
 	}
@@ -53,7 +53,7 @@ func TestListCommentsByPostIDReturnsEmptySliceWhenNoCommentsExist(t *testing.T) 
 		WithArgs(int64(0)).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "post_id", "content", "created_at", "updated_at"}))
 
-	comments, err := ListCommentsByPostID(context.Background(), 0)
+	comments, err := GetCommentListByPostID(context.Background(), 0)
 	if err != nil {
 		t.Fatalf("ListCommentsByPostID() error = %v", err)
 	}
@@ -73,7 +73,7 @@ func TestListCommentsByPostIDWrapsRepositoryError(t *testing.T) {
 		WithArgs(int64(7)).
 		WillReturnError(errors.New("database unavailable"))
 
-	comments, err := ListCommentsByPostID(context.Background(), 7)
+	comments, err := GetCommentListByPostID(context.Background(), 7)
 	if comments != nil || err == nil || !xerror.IsCustomError(err) {
 		t.Fatalf("ListCommentsByPostID() = %#v, %v, want custom error", comments, err)
 	}

@@ -7,7 +7,7 @@ import (
 	"github.com/kikudesuyo/buildlog/api/library"
 )
 
-// ListTechs は外部記事の一覧を取得します。
-func ListTechs(ctx context.Context, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, error) {
-	return ListTechFeed(ctx, library.GetDB(ctx), all, offset, limit, order, ipAddress)
+// GetTechList は外部記事の一覧を取得します。
+func GetTechList(ctx context.Context, all bool, offset, limit int, sortBy, order, ipAddress string) ([]entity.TechFeedItem, error) {
+	return GetTechFeedList(ctx, library.GetDB(ctx), all, offset, limit, sortBy, order, ipAddress)
 }

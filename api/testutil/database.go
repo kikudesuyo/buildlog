@@ -24,7 +24,7 @@ func NewMockDB(t testing.TB) (*gorm.DB, sqlmock.Sqlmock) {
 	}), &gorm.Config{})
 	if err != nil {
 		_ = sqlDB.Close()
-		t.Fatalf("open GORM mock database: %v", err)
+		t.Fatalf("open GORM database: %v", err)
 	}
 
 	t.Cleanup(func() {
@@ -32,4 +32,9 @@ func NewMockDB(t testing.TB) (*gorm.DB, sqlmock.Sqlmock) {
 	})
 
 	return db, mock
+}
+
+// NewTestDB はsqlmock接続を使用したGORMのテスト用DBを生成します。
+func NewTestDB(t testing.TB) (*gorm.DB, sqlmock.Sqlmock) {
+	return NewMockDB(t)
 }

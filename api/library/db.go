@@ -12,9 +12,7 @@ import (
 
 var db *gorm.DB
 
-// SetDBForTest replaces the process-local database used by services and
-// returns a function that restores the previous value. It is intended for
-// tests that use a sqlmock-backed GORM connection.
+// SetDBForTest はテスト中だけ利用するDBを設定し、終了時に元のDBへ戻す関数を返します。
 func SetDBForTest(testDB *gorm.DB) func() {
 	previous := db
 	db = testDB

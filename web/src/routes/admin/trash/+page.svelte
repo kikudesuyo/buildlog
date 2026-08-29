@@ -2,7 +2,8 @@
 	import { restoreEntry } from '$lib/api/client';
 
 	let { data } = $props();
-	let trashEntries = $state(data.trashEntries);
+	const initialData = data;
+	let trashEntries = $state(initialData.trashEntries);
 
 	function formatDate(dateStr: string) {
 		if (!dateStr) return '';
@@ -25,7 +26,7 @@
 	<title>アーカイブ — Buildlog Admin</title>
 </svelte:head>
 
-<div class="editorial-container mx-auto px-gutter pt-8">
+<div class="editorial-container mx-auto px-gutter pt-8 md:!max-w-6xl">
 	<!-- ヘッダー -->
 	<header class="mb-8">
 		<h1 class="font-display-lg text-display-lg text-primary font-bold tracking-tight">アーカイブ (削除済み一覧)</h1>

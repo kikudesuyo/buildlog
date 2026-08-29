@@ -3,6 +3,8 @@ package testutil
 import (
 	"regexp"
 	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
 )
 
 // TestNewMockDBUsesGORMAndSQLMock は、GORMとSQL mockを組み合わせたテストDBで
@@ -20,5 +22,13 @@ func TestNewMockDBUsesGORMAndSQLMock(t *testing.T) {
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatalf("unmet SQL expectations: %v", err)
+	}
+}
+
+func TestNewTestDBUsesSQLMockConnection(t *testing.T) {
+	db, mock := NewTestDB(t)
+	mock.ExpectExec(regexp.QuoteMeta("SELECT 1")).WillReturnResult(sqlmock.NewResult(1, 1))
+	if err := db.Exec("SELECT 1").Error; err != nil {
+		t.Fatalf("execute test query: %v", err)
 	}
 }

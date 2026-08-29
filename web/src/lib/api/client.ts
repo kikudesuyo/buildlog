@@ -1,7 +1,6 @@
 import type { LoadEvent } from '@sveltejs/kit';
 import type {
 	DiaryEntry,
-	FeaturedTechArticle,
 	TechArticle,
 	TrashEntry,
 	AppProject,
@@ -60,6 +59,7 @@ export type ApiPost = {
 export type DiarySort = 'newest' | 'likes';
 export type DiarySortOrder = 'asc' | 'desc';
 export type TechSortOrder = 'asc' | 'desc';
+export type TechSort = 'newest' | 'likes';
 
 export async function fetchDiaryEntries(
 	fetchFn: ApiFetch,
@@ -91,8 +91,14 @@ export async function fetchDiaryEntries(
 	}));
 }
 
-export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, limit = 0, order: TechSortOrder = 'desc'): Promise<{
-	featuredArticle: FeaturedTechArticle | null;
+export async function fetchTechFeed(
+	fetchFn: ApiFetch,
+	all = false,
+	offset = 0,
+	limit = 0,
+	order: TechSortOrder = 'desc',
+	sort: TechSort = 'newest'
+): Promise<{
 	techArticles: TechArticle[];
 	hasMore: boolean;
 }> {
@@ -101,11 +107,12 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 	if (!all && offset && offset > 0) params.set('offset', String(offset));
 	if (!all && limit && limit > 0) params.set('limit', String(limit));
 	if (order !== 'desc') params.set('order', order);
+	if (sort !== 'newest') params.set('sort', sort);
 	const query = params.toString();
 	const url = query ? `/techs?${query}` : '/techs';
 	const response = await get<ApiListResponse<ApiPost>>(fetchFn, url);
-	const hasMore = !all && !!limit && response.data_list.length > limit;
-	const page = limit && limit > 0 ? response.data_list.slice(0, limit) : response.data_list;
+	const hasMore = !all && !!limit && response.data_list.length === limit;
+	const page = response.data_list;
 	
 	const allArticles: TechArticle[] = page.map((post) => ({
 		key: post.key ?? `post:${post.id}`,
@@ -124,25 +131,8 @@ export async function fetchTechFeed(fetchFn: ApiFetch, all = false, offset = 0, 
 			: undefined
 	}));
 
-	const featured = !offset && allArticles.length > 0 ? allArticles[0] : null;
-	const fallbackFeatured: FeaturedTechArticle = {
-		key: 'fallback',
-		id: 0,
-		title: '',
-		content: '',
-		views: 0,
-		status: 'draft' as const,
-		createdAt: '',
-		updatedAt: '',
-		likesCount: 0,
-		commentsCount: 0,
-		hasLiked: false
-	};
-	const remaining = featured ? allArticles.slice(1) : allArticles;
-
 	return {
-		featuredArticle: featured ?? (offset ? null : fallbackFeatured),
-		techArticles: remaining,
+		techArticles: allArticles,
 		hasMore
 	};
 }

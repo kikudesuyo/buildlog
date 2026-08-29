@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"sort"
 	"strings"
 
 	"github.com/kikudesuyo/buildlog/api/entity"
@@ -17,32 +16,32 @@ import (
 
 const qiitaUser = "kikudesuyo"
 
-// SyncQiitaArticles はアプリケーションで利用するQiitaユーザーの記事を同期します。
-func SyncQiitaArticles(ctx context.Context) (int, error) {
+// SyncQiitaArticleList はアプリケーションで利用するQiitaユーザーの記事を同期します。
+func SyncQiitaArticleList(ctx context.Context) (int, error) {
 	qiitaClient := external.NewQiitaClient(nil, qiitaUser)
-	items, err := qiitaClient.GetUserArticles(ctx)
+	itemList, err := qiitaClient.GetUserArticleList(ctx)
 	if err != nil {
 		return 0, err
 	}
 	db := library.GetDB(ctx)
-	for _, item := range items {
+	for _, item := range itemList {
 		metadata, _ := qiitaClient.GetOGP(ctx, item.URL)
 		if err := syncQiitaArticle(ctx, db, item, metadata); err != nil {
 			return 0, err
 		}
 	}
-	return len(items), nil
+	return len(itemList), nil
 }
 
-func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int, order, ipAddress string) ([]entity.TechFeedItem, error) {
-	externalPosts, err := repository.ListExternalPosts(ctx, db, order)
+func GetTechFeedList(ctx context.Context, db *gorm.DB, all bool, offset, limit int, sortBy, order, ipAddress string) ([]entity.TechFeedItem, error) {
+	externalPostList, err := repository.GetExternalPostList(ctx, db, sortBy, order, offset, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	items := make([]entity.TechFeedItem, 0, len(externalPosts))
-	for _, post := range externalPosts {
-		items = append(items, entity.TechFeedItem{
+	itemList := make([]entity.TechFeedItem, 0, len(externalPostList))
+	for _, post := range externalPostList {
+		itemList = append(itemList, entity.TechFeedItem{
 			Key: fmt.Sprintf("external:%d", post.ID), ID: post.ID, Type: "external", Title: post.Title, Content: post.Excerpt,
 			Status: "published", CreatedAt: post.PublishedAt, UpdatedAt: post.UpdatedAt,
 			LikesCount: post.LikesCount,
@@ -50,30 +49,7 @@ func ListTechFeed(ctx context.Context, db *gorm.DB, all bool, offset, limit int,
 		})
 	}
 
-	sortTechFeedItems(items, order)
-	if offset >= len(items) {
-		return []entity.TechFeedItem{}, nil
-	}
-	end := len(items)
-	if limit > 0 && offset+limit < end {
-		end = offset + limit
-	}
-	return items[offset:end], nil
-}
-
-func sortTechFeedItems(items []entity.TechFeedItem, order string) {
-	sort.SliceStable(items, func(i, j int) bool {
-		if items[i].CreatedAt.Equal(items[j].CreatedAt) {
-			if order == "asc" {
-				return items[i].ID < items[j].ID
-			}
-			return items[i].ID > items[j].ID
-		}
-		if order == "asc" {
-			return items[i].CreatedAt.Before(items[j].CreatedAt)
-		}
-		return items[i].CreatedAt.After(items[j].CreatedAt)
-	})
+	return itemList, nil
 }
 
 func syncQiitaArticle(ctx context.Context, db *gorm.DB, item external.QiitaItem, metadata external.OGPMetadata) error {

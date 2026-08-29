@@ -32,7 +32,7 @@ func TestListTechsReturnsExternalArticlesInRequestedOrder(t *testing.T) {
 			AddRow(2, "qiita", "https://example.com/2", "new", "summary", "thumb", 4, now, now, now).
 			AddRow(1, "qiita", "https://example.com/1", "old", "summary", "thumb", 1, now.Add(-time.Hour), now, now))
 
-	items, err := ListTechs(context.Background(), false, 0, 10, "desc", "")
+	items, err := GetTechList(context.Background(), false, 0, 10, "created_at", "desc", "")
 	if err != nil {
 		t.Fatalf("ListTechs() error = %v", err)
 	}
@@ -48,7 +48,7 @@ func TestListTechsReturnsEmptySliceWhenOffsetExceedsResults(t *testing.T) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "external_posts" ORDER BY published_at ASC,id ASC`)).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "provider", "url", "title", "excerpt", "thumbnail_url", "likes_count", "published_at", "updated_at", "created_at"}))
 
-	items, err := ListTechs(context.Background(), false, 1, 10, "asc", "")
+	items, err := GetTechList(context.Background(), false, 1, 10, "created_at", "asc", "")
 	if err != nil || items == nil || len(items) != 0 {
 		t.Fatalf("ListTechs() = %#v, %v, want non-nil empty slice when offset exceeds results", items, err)
 	}
@@ -61,7 +61,7 @@ func TestListTechsReturnsRepositoryError(t *testing.T) {
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "external_posts" ORDER BY published_at DESC,id DESC`)).
 		WillReturnError(errors.New("database unavailable"))
 
-	items, err := ListTechs(context.Background(), false, 0, 10, "desc", "")
+	items, err := GetTechList(context.Background(), false, 0, 10, "created_at", "desc", "")
 	if items != nil || err == nil {
 		t.Fatalf("ListTechs() = %#v, %v, want nil items and error", items, err)
 	}

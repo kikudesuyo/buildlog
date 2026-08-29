@@ -265,6 +265,7 @@ Acceptance Criteria検証
 - 自己レビューに未解決の指摘がない
 - セキュリティ上の懸念がない
 - 意図しない差分がない
+- CIエラーがない
 
 問題が1つでもある場合は実装へ戻ってください。
 
@@ -446,7 +447,7 @@ PR作成後、GitHub上で実際に画像・動画が表示・参照できるこ
 
 複数Agent・複数ユーザーが同時に開発するため、古いbranchを起点に作業してはいけません。
 
-作業開始時は必ず最新の `main` を取得してください。
+作業開始時は必ず最新の `main` を取得してください。またworktreeを作成して着手してください。
 
 ```bash
 git switch main
@@ -811,3 +812,10 @@ UI変更の場合は、
 - 未解決の重大な問題を隠す
 
 **最終的な判断基準は「コードを書いたか」ではなく、「Issueで要求された状態が実際に実現されているか」です。**
+
+## 本番用の機密環境変数
+
+- GitHub Actionsから本番用のAPIキー・パスワード等を利用する場合、GitHub Secretsを直接参照せず、Google Cloud Workload Identity Federation（WIF）で専用サービスアカウントへ認証する。
+- 機密値はGoogle Cloud Secret Managerへ保存し、ワークフロー内で`gcloud secrets versions access latest`を使用して取得する。
+- 専用サービスアカウントには対象Secretの`roles/secretmanager.secretAccessor`だけを付与し、リポジトリ単位のWIF条件で利用元を制限する。
+- 機密値をログへ出力せず、GitHub Actionsへ渡す場合は`::add-mask::`でマスキングする。

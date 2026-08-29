@@ -28,7 +28,7 @@ func TestListDiariesReturnsEmptySliceForNoPublishedPosts(t *testing.T) {
 		WithArgs("diary", "published", 10).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "type", "title", "content", "status"}))
 
-	diaries, err := ListDiaries(context.Background(), false, 0, 10, "created_at", "DESC", "127.0.0.1")
+	diaries, err := GetDiaryList(context.Background(), false, 0, 10, "created_at", "DESC", "127.0.0.1")
 	if err != nil || diaries == nil || len(diaries) != 0 {
 		t.Fatalf("ListDiaries() = %#v, %v, want empty slice", diaries, err)
 	}
@@ -44,7 +44,7 @@ func TestListDiariesReturnsRepositoryError(t *testing.T) {
 		WithArgs("diary", "published", 10).
 		WillReturnError(errors.New("list failed"))
 
-	diaries, err := ListDiaries(context.Background(), false, 0, 10, "created_at", "DESC", "")
+	diaries, err := GetDiaryList(context.Background(), false, 0, 10, "created_at", "DESC", "")
 	if diaries != nil || err == nil {
 		t.Fatalf("ListDiaries() = %#v, %v, want error", diaries, err)
 	}

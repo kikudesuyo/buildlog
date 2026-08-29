@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestQiitaClientGetUserArticlesGetsEveryPage(t *testing.T) {
+func TestQiitaClientGetUserArticleListGetsEveryPage(t *testing.T) {
 	client := NewQiitaClient(&http.Client{Transport: roundTripperFunc(func(r *http.Request) (*http.Response, error) {
 		if r.URL.Path != "/api/v2/users/kikudesuyo/items" {
 			t.Fatalf("unexpected path: %s", r.URL.Path)
@@ -38,16 +38,16 @@ func TestQiitaClientGetUserArticlesGetsEveryPage(t *testing.T) {
 		}, nil
 	})}, "kikudesuyo")
 	client.BaseURL = "https://qiita.example/api/v2/"
-	items, err := client.GetUserArticles(context.Background())
+	items, err := client.GetUserArticleList(context.Background())
 	if err != nil {
-		t.Fatalf("GetUserArticles returned error: %v", err)
+		t.Fatalf("GetUserArticleList returned error: %v", err)
 	}
 	if len(items) != qiitaPerPage+1 {
 		t.Fatalf("expected %d items, got %d", qiitaPerPage+1, len(items))
 	}
 }
 
-func TestQiitaClientGetUserArticlesIncludesLikesCount(t *testing.T) {
+func TestGetUserArticleListLikesCount(t *testing.T) {
 	client := NewQiitaClient(&http.Client{Transport: roundTripperFunc(func(r *http.Request) (*http.Response, error) {
 		body := `[{"id":"article-1","likes_count":42}]`
 		return &http.Response{
@@ -60,9 +60,9 @@ func TestQiitaClientGetUserArticlesIncludesLikesCount(t *testing.T) {
 	})}, "kikudesuyo")
 	client.BaseURL = "https://qiita.example/api/v2/"
 
-	items, err := client.GetUserArticles(context.Background())
+	items, err := client.GetUserArticleList(context.Background())
 	if err != nil {
-		t.Fatalf("GetUserArticles returned error: %v", err)
+		t.Fatalf("GetUserArticleList returned error: %v", err)
 	}
 	if len(items) != 1 || items[0].LikesCount != 42 {
 		t.Fatalf("likes_count = %d, want 42", items[0].LikesCount)
