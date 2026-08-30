@@ -73,6 +73,10 @@ atlas migrate apply --env local
 
 ## 🚀 デプロイと CI/CD
 
+### Gemini PR Reviewer
+
+Pull Requestの差分とGoの検証結果をGeminiでレビューする仕組みを導入しています。必要なGoogle Cloud / GitHub設定は[Gemini PR Reviewerの手順](docs/gemini-reviewer.md)を参照してください。
+
 ### バックエンドのデプロイ
 GitHub の `main` ブランチにプッシュすると、GitHub Actions 経由で自動デプロイが走ります。
 手動でコマンドからデプロイする場合は、`api` ディレクトリで以下を実行します。
