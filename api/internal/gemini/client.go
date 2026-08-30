@@ -88,23 +88,23 @@ func (c Client) Review(ctx context.Context, prompt string) (review.Result, error
 	if err != nil {
 		return review.Result{}, fmt.Errorf("call Gemini API: %w", err)
 	}
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 	responseBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return review.Result{}, fmt.Errorf("read Gemini response: %w", err)
 	}
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusMultipleChoices {
-		return review.Result{}, fmt.Errorf("Gemini API returned %s: %s", res.Status, strings.TrimSpace(string(responseBody)))
+		return review.Result{}, fmt.Errorf("gemini API returned %s: %s", res.Status, strings.TrimSpace(string(responseBody)))
 	}
 	var decoded response
 	if err := json.Unmarshal(responseBody, &decoded); err != nil {
 		return review.Result{}, fmt.Errorf("decode Gemini response: %w", err)
 	}
 	if decoded.Error != nil {
-		return review.Result{}, fmt.Errorf("Gemini API error: %s", decoded.Error.Message)
+		return review.Result{}, fmt.Errorf("gemini API error: %s", decoded.Error.Message)
 	}
 	if len(decoded.Candidates) == 0 || len(decoded.Candidates[0].Content.Parts) == 0 {
-		return review.Result{}, fmt.Errorf("Gemini response contains no text candidate")
+		return review.Result{}, fmt.Errorf("gemini response contains no text candidate")
 	}
 	return review.Parse([]byte(decoded.Candidates[0].Content.Parts[0].Text))
 }

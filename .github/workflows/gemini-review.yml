@@ -22,7 +22,7 @@ jobs:
   review:
     name: Review pull request with Gemini
     # Do not expose the review credential to code from forked repositories.
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && vars.GCP_REVIEW_PROJECT != '' && vars.GCP_REVIEW_WIF_PROVIDER != '' && vars.GCP_REVIEW_SERVICE_ACCOUNT != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
