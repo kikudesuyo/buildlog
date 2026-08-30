@@ -1,0 +1,109 @@
+name: Gemini PR Review
+
+on:
+  pull_request:
+    branches: [main, staging]
+
+concurrency:
+  group: gemini-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+env:
+  GCP_REVIEW_PROJECT: ${{ vars.GCP_REVIEW_PROJECT }}
+  GCP_REVIEW_WIF_PROVIDER: ${{ vars.GCP_REVIEW_WIF_PROVIDER }}
+  GCP_REVIEW_SERVICE_ACCOUNT: ${{ vars.GCP_REVIEW_SERVICE_ACCOUNT }}
+
+jobs:
+  review:
+    name: Review pull request with Gemini
+    # Do not expose the review credential to code from forked repositories.
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.0'
+          cache: true
+          cache-dependency-path: api/go.sum
+
+      - name: Collect pull request diff
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: git diff "origin/$BASE_REF...HEAD" -- . ':!docs/screenshots' > diff.txt
+
+      - name: Collect test result
+        working-directory: api
+        run: |
+          set +e
+          go test ./... 2>&1 | tee ../test-result.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> ../test-result.txt
+
+      - name: Collect vet result
+        working-directory: api
+        run: |
+          set +e
+          go vet ./... 2>&1 | tee ../vet-result.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> ../vet-result.txt
+          cat ../vet-result.txt >> ../test-result.txt
+
+      - name: Collect lint result
+        working-directory: api
+        run: |
+          set +e
+          go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.4 run ./... 2>&1 | tee ../lint-result.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> ../lint-result.txt
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.GCP_REVIEW_WIF_PROVIDER }}
+          service_account: ${{ env.GCP_REVIEW_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Load Gemini API key from Secret Manager
+        run: |
+          set -euo pipefail
+          test -n "$GCP_REVIEW_PROJECT"
+          test -n "$GCP_REVIEW_WIF_PROVIDER"
+          test -n "$GCP_REVIEW_SERVICE_ACCOUNT"
+          GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=GEMINI_API_KEY --project="$GCP_REVIEW_PROJECT")"
+          test -n "$GEMINI_API_KEY"
+          echo '::add-mask::'"$GEMINI_API_KEY"
+          printf 'GEMINI_API_KEY=%s\n' "$GEMINI_API_KEY" >> "$GITHUB_ENV"
+
+      - name: Run Gemini review
+        id: review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+        run: |
+          set +e
+          (cd api && go run ./cmd/reviewer \
+            -diff ../diff.txt \
+            -test-result ../test-result.txt \
+            -lint-result ../lint-result.txt) > review.md
+          review_status=$?
+          set -e
+          test -s review.md
+          comment_id="$(gh api --paginate \
+            "/repos/${GITHUB_REPOSITORY}/issues/${{ github.event.pull_request.number }}/comments" \
+            --jq '.[] | select(.body | contains("<!-- gemini-reviewer -->")) | .id' | tail -n 1)"
+          if [[ -n "$comment_id" ]]; then
+            gh api --method PATCH "/repos/${GITHUB_REPOSITORY}/issues/comments/$comment_id" -f body="$(<review.md)"
+          else
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file review.md
+          fi
+          exit "$review_status"
