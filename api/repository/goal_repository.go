@@ -18,6 +18,17 @@ func GetGoalPeriod(ctx context.Context, db *gorm.DB, periodType string, startsAt
 	return &period, err
 }
 
+// GetGoalPeriodList は期間別の目標履歴を取得します。
+func GetGoalPeriodList(ctx context.Context, db *gorm.DB, periodType string, before time.Time) ([]entity.DBTableGoalPeriod, error) {
+	periodList := make([]entity.DBTableGoalPeriod, 0)
+	err := db.WithContext(ctx).
+		Where("period_type = ? AND starts_at < ?", periodType, before).
+		Preload("Goals", func(db *gorm.DB) *gorm.DB { return db.Order("id ASC") }).
+		Order("starts_at DESC").
+		Find(&periodList).Error
+	return periodList, err
+}
+
 // SaveGoalPeriod はデータを保存します。
 func SaveGoalPeriod(ctx context.Context, db *gorm.DB, period *entity.DBTableGoalPeriod) error {
 	return db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {

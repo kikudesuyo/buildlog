@@ -47,6 +47,7 @@ func NewRouter() http.Handler {
 		r.Get("/posts/history", handleFunc(v1.HandleGetPostHistory))
 		r.Get("/admin/analytics", handleFunc(v1.HandleGetAnalytics))
 		r.Get("/goals/current", handleFunc(v1.HandleGetCurrentGoals))
+		r.Get("/goals/history", handleFunc(v1.HandleGetGoalHistory))
 		r.Put("/goals/current", handleFunc(v1.HandleSaveCurrentGoals))
 	})
 

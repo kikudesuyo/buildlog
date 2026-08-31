@@ -9,6 +9,7 @@
 		{ href: '/admin/profile', label: 'Profile', description: '自己紹介を管理', icon: 'person' },
 		{ href: '/admin/apps', label: 'Apps', description: 'プロダクトを管理', icon: 'apps' },
 		{ href: '/admin/analytics', label: 'Analytics', description: 'アクセス統計・分析', icon: 'analytics' },
+		{ href: '/admin/goals', label: 'Goals', description: '目標履歴', icon: 'flag' },
 		{ href: '/admin/trash', label: 'Archive', description: 'アーカイブ', icon: 'inventory_2' }
 	] as const;
 
@@ -24,6 +25,8 @@
 				return resolve('/admin/apps');
 			case '/admin/profile':
 				return resolve('/admin/profile');
+			case '/admin/goals':
+				return resolve('/admin/goals');
 			default:
 				return resolve('/admin');
 		}

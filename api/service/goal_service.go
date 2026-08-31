@@ -29,6 +29,20 @@ func GetCurrentGoals(ctx context.Context) (*entity.GoalPeriodResponse, error) {
 	return newGoalPeriodResponse(period.PeriodType, period.StartsAt, period.EndsAt, period.Goals), nil
 }
 
+// GetGoalHistory は現在月より前の目標履歴を取得します。
+func GetGoalHistory(ctx context.Context) ([]entity.GoalPeriodResponse, error) {
+	db := library.GetDB(ctx)
+	periodList, err := repository.GetGoalPeriodList(ctx, db, monthlyGoalPeriod, currentMonthStart())
+	if err != nil {
+		return nil, xerror.UnknownServerErr(err)
+	}
+	history := make([]entity.GoalPeriodResponse, 0, len(periodList))
+	for _, period := range periodList {
+		history = append(history, *newGoalPeriodResponse(period.PeriodType, period.StartsAt, period.EndsAt, period.Goals))
+	}
+	return history, nil
+}
+
 // SaveCurrentGoals はデータを保存します。
 func SaveCurrentGoals(ctx context.Context, req entity.SaveGoalsRequest) (*entity.GoalPeriodResponse, error) {
 	db := library.GetDB(ctx)
