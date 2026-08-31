@@ -125,3 +125,15 @@ export interface GoalPeriod {
 	endsAt: string;
 	goals: Goal[];
 }
+
+export type LearningPeriodType = 'daily' | 'weekly' | 'monthly';
+
+export interface Learning {
+	id: number;
+	periodType: LearningPeriodType;
+	periodStart: string;
+	periodEnd: string;
+	content: string;
+	level?: 'learned' | 'understood' | 'applied' | 'explainable';
+	generatedBy: 'user' | 'ai';
+}

@@ -1,4 +1,4 @@
-h1:kP2wbxrSxxVfVYMac7hPmv2Nj0gcQ/OrCppq47XdvMI=
+h1:XeqCkhQbEiRx6K7a5dSETFDBROAbmPYuI/XKW1A8jFs=
 20260720120000_post.sql h1:W6Ug8xDzRjSbgAX3EuUM+xS6N5ODi7g0W8vw1Kp/mso=
 20260727000000_profile.sql h1:Twgzan+Zizx70YPpctzcT3BhE0OhoDW+4E81yOpK4Kc=
 20260727010000_app.sql h1:fnbdrJSmoj+1Qwrfuephc27x7VDW07laYXhtwYY43yA=
@@ -17,3 +17,4 @@ h1:kP2wbxrSxxVfVYMac7hPmv2Nj0gcQ/OrCppq47XdvMI=
 20260810162529_add_pdf_edition_app.sql h1:tPcr39GKqcgXe1QKxs4JEoAZlnrgLifE5yAsj1MEc0w=
 20260812000000_remove_subtitle_from_profiles.sql h1:utnIa8eDvb26VnxykUeQcs2hL9oMYd1qX38uipB8UkY=
 20260812000001_add_likes_count_to_external_posts.sql h1:kBTqqQ8GaxqaRn/SEZceO2H1I6NgeD63ITrl5qOhp8Y=
+20260813000000_learnings.sql h1:7NSI+AW9WJ9XGVKTmkqcwgnR4/0RMGK96E+Bx0XOUwE=
