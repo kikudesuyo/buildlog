@@ -22,6 +22,18 @@ func HandleGetCurrentGoals(r *http.Request, requestData map[string]interface{}) 
 	return entity.NewObjectResponse(goals), nil
 }
 
+// HandleGetGoalHistory はHTTPリクエストを受け取り、目標履歴を返します。
+func HandleGetGoalHistory(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
+	if err := handler.ValidateRequestWithAuth(r); err != nil {
+		return nil, err
+	}
+	history, err := service.GetGoalHistory(r.Context())
+	if err != nil {
+		return nil, err
+	}
+	return entity.NewListResponse(history), nil
+}
+
 // HandleSaveCurrentGoals はHTTPリクエストを受け取り、対応する処理結果を返します。
 func HandleSaveCurrentGoals(r *http.Request, requestData map[string]interface{}) (http.Handler, error) {
 	if err := handler.ValidateRequestWithAuth(r); err != nil {

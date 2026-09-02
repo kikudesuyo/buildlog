@@ -309,6 +309,11 @@ export async function fetchCurrentGoals(fetchFn: ApiFetch): Promise<GoalPeriod> 
 	return mapGoalPeriod(response.data);
 }
 
+export async function fetchGoalHistory(fetchFn: ApiFetch): Promise<GoalPeriod[]> {
+	const response = await get<ApiListResponse<ApiGoalPeriod>>(fetchFn, '/goals/history');
+	return response.data_list.map(mapGoalPeriod);
+}
+
 export async function saveCurrentGoals(goals: Array<{ title: string; targetValue: number; progressValue: number }>): Promise<GoalPeriod> {
 	const response = await sendRequest<ApiObjectResponse<ApiGoalPeriod>>('PUT', '/goals/current', {
 		period_type: 'monthly',

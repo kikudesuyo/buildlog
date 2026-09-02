@@ -14,6 +14,9 @@
 	let editingGoalId = $state<number | null>(null);
 	let isAddingGoal = $state(false);
 	let draftGoal = $state({ title: '', targetValue: 1, progressValue: 0 });
+	const isMonthStart = new Date().getDate() <= 7;
+	let shouldReviewLastMonth = $derived(isMonthStart && data.goalHistory.length > 0);
+	let shouldSetCurrentGoals = $derived(isMonthStart && goals.goals.length === 0);
 
 	async function handleDelete(id: number) {
 		try {
@@ -96,6 +99,14 @@
 
 <svelte:head><title>Buildlog — Admin Diary</title></svelte:head>
 <section class="editorial-container mx-auto mb-10 px-gutter md:!max-w-6xl" aria-labelledby="goals-heading">
+	{#if shouldReviewLastMonth || shouldSetCurrentGoals}
+		<div class="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4" role="status">
+			<h2 class="font-label-md text-label-md font-semibold text-primary">月初の確認</h2>
+			{#if shouldReviewLastMonth}<p class="font-body-md text-body-md mt-2 text-on-surface-variant">先月の目標を確認して、振り返りを提出しましょう。</p>{/if}
+			{#if shouldSetCurrentGoals}<p class="font-body-md text-body-md mt-2 text-on-surface-variant">今月の目標が未設定です。月初の目標を登録しましょう。</p>{/if}
+			<a href="/admin/goals" class="font-label-md text-label-md mt-3 inline-flex min-h-11 items-center rounded-lg bg-primary px-4 py-2 text-on-primary">過去の目標を見る</a>
+		</div>
+	{/if}
 	<div class="mb-4 flex items-center justify-between gap-4">
 		<div>
 			<h1 id="goals-heading" class="font-headline-lg text-headline-lg text-primary">今月の目標</h1>
